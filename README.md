@@ -27,13 +27,13 @@
 
 ```mermaid
 graph TD
-    A[User Input] --> B[React Frontend]
-    B --> C[Axios: API Request]
-    C --> D[Backend API]
-    D --> E[Database]
-    D --> F[AI Response Service]
+    A[用戶輸入] --> B[React 前端]
+    B --> C[Axios: API 請求]
+    C --> D[後端 API]
+    D --> E[資料庫]
+    D --> F[AI 回應服務]
     E --> D
     F --> D
-    D --> G[WebSocket/Pusher: Real-Time Updates]
+    D --> G[WebSocket/Pusher: 實時更新]
     G --> B
 
