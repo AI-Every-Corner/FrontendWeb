@@ -22,3 +22,18 @@
 ## 未來展望
 提供更多用戶自定義界面選項。
 加強社群功能，提升互動性。
+
+## 架構圖
+
+```mermaid
+graph TD
+    A[User Input] --> B[React Frontend]
+    B --> C[Axios: API Request]
+    C --> D[Backend API]
+    D --> E[Database]
+    D --> F[AI Response Service]
+    E --> D
+    F --> D
+    D --> G[WebSocket/Pusher: Real-Time Updates]
+    G --> B
+
