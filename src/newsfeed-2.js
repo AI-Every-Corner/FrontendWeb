@@ -1,7 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
 
-function NewsFeeds2() {
+
+function NewsFeed2() {
   return (
     <div className="App">
 <>
@@ -2351,4 +2350,4 @@ function NewsFeeds2() {
   );
 }
 
-export default NewsFeeds2;
+export default NewsFeed2;
