@@ -1,6 +1,11 @@
-
+import { Chart } from 'react-google-charts';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 function Profile() {
+
+
   return (
     <div className="App">
 <>
@@ -829,7 +834,7 @@ function Profile() {
                 <div className="profile-info-right">
                   {/* Posts section */}
                   <div className="row">
-                    <div className="col-md-9 profile-center">
+                    <div className="col-md-8 profile-center">
                       <ul className="list-inline profile-links d-flex justify-content-between w-shadow rounded">
                         <li className="list-inline-item profile-active">
                           <a href="#">Timeline</a>
@@ -871,7 +876,7 @@ function Profile() {
                           </div>
                         </li>
                       </ul>
-                      <ul className="list-unstyled" style={{ marginBottom: 0 }}>
+                      {/* <ul className="list-unstyled" style={{ marginBottom: 0 }}>
                         <li className="media post-form w-shadow">
                           <div className="media-body">
                             <div className="form-group post-input">
@@ -918,7 +923,23 @@ function Profile() {
                             </div>
                           </div>
                         </li>
-                      </ul>
+                      </ul> */}
+                
+                    {/* <div style={{  display: 'flex',
+                    justifyContent: 'center',  // 水平置中
+                    alignItems: 'center',      // 垂直置中  
+                        }}> */}
+                <Container>
+              <Row>
+              <Col   md={1} lg={1}></Col>
+              <Col>  <CalendarChart /></Col>
+                <Col  md={1} lg={1}></Col>
+            </Row>
+            </Container>
+               
+                  {/* </div> */}
+                        
+                     
                       <div className="bg-white profile-posts-options mt-5 mb-4 py-3 d-flex justify-content-between shadow-sm">
                         <div className="col-md-3 col-sm-12">
                           <h6 className="timeline-title">Posts</h6>
@@ -1407,10 +1428,11 @@ function Profile() {
                         </div>
                       </div>
                     </div>
-                    <div className="col-md-3 profile-quick-media">
+                    <div className="col-md-4 profile-quick-media">
                       <h6 className="text-muted timeline-title">
-                        Recent Media
+                        Recent Mood
                       </h6>
+                     
                       <div className="quick-media">
                         <div className="media-overlay" />
                         <a href="#" className="quick-media-img">
@@ -1761,5 +1783,76 @@ function Profile() {
     </div>
   );
 }
+
+
+
+
+
+
+function CalendarChart() {
+  const data = [
+    [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
+    [new Date(2024, 5, 12), 3],
+    [new Date(2024, 8, 5), 10],
+    [new Date(2024, 0, 16), 4],
+    [new Date(2024, 5, 16), 9],
+    [new Date(2024, 9, 18), 5],
+    [new Date(2024, 10, 18), 5],
+    [new Date(2024, 10, 26), 3],
+    [new Date(2024, 4, 8), 9],
+    [new Date(2024, 1, 16), 8],
+    [new Date(2024, 5, 1), 9],
+    [new Date(2024, 8, 2), 8],
+    [new Date(2024, 11, 15), 5],
+    [new Date(2024, 5, 11), 2],
+    [new Date(2024, 6, 18), 9],
+   
+  ];
+  
+
+  const options = {
+    title: "Your Mood for 2024",
+    height: 350,
+    calendar: {
+      cellSize: 11,  // 單元格大小
+      dayOfWeekLabel: {
+        fontName: 'Arial',
+        fontSize: 14,
+        color: '#666',
+      },
+      monthLabel: {
+        fontName: 'Arial',
+        fontSize: 18,
+        color: '#333',
+      },
+      focusedCellColor: {
+        stroke: '#ff0000',
+        strokeOpacity: 0.8,
+      },
+      colorAxis: {
+        minValue: 0,
+        maxValue: 10,
+        colors: ['#ffffff', '#00008b'],  // 白色到深藍色
+      },
+    },
+  };
+
+  return (
+    <div style={{ width: '100%', 
+      aspectRatio: '6 / 1' ,
+
+      }}>
+      <Chart
+        chartType="Calendar"
+        data={data}
+        options={options}
+        width="100%"  // 寬度設為 100%
+        height="100%"  // 高度設為 100%
+        loader={<div>Loading Chart...</div>}
+      />
+    </div>
+  );
+}
+
 
 export default Profile;
