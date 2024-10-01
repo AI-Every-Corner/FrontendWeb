@@ -2,7 +2,7 @@ import { Chart } from 'react-google-charts';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
+import { useState } from 'react';
 function Profile() {
 
     // State to manage the visibility of the dropdown menu
@@ -633,7 +633,15 @@ function Profile() {
                                                                 </div>
                                                             </li>
                                                         </ul>
-                                                        <CalendarChart />
+                                                        <Container>
+                                                        <Row>
+                                                            <Col md={1} lg={1} xl={1}></Col>
+                                                            <Col>  <CalendarChart /></Col>
+                                                            <Col md={1} lg={1} xl={1}></Col>
+                                                        </Row>
+                                                      
+                                                        </Container>
+                                                     
                                                         <div className="bg-white profile-posts-options mt-5 mb-4 py-3 d-flex justify-content-between shadow-sm">
                                                             <div className="col-md-3 col-sm-12">
                                                                 <h6 className="timeline-title">Posts</h6>
