@@ -17,10 +17,11 @@ import SignUp from './sign-up';
 // import Widgets from './widgets';
 import reportWebVitals from './reportWebVitals';
 import PrivateRoute from './PrivateRoute';
-
+import { UserProvider } from './context';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <UserProvider>
   <Router>
     <Routes>
     <Route path='/' element={<PrivateRoute element={MainPage} />} />
@@ -38,6 +39,7 @@ root.render(
       <Route path='/sign-up' element={<SignUp />} />
     </Routes>
   </Router>
+  </UserProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
