@@ -1,15 +1,12 @@
-import React, { useEffect, useState, useContext} from 'react'
-import { useNavigate } from 'react-router-dom';
-import { logout } from './api';
-import { UserContext } from './context';
+import React, { useEffect, useState } from 'react'
+
 function Settings() {
 
   // State to manage the visibility of the dropdown menu
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [settingDropdownVisible, setSettingDropdownVisible] = useState(false);
   const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
-  const navigate = useNavigate();
-  const { avatarUrl } = useContext(UserContext);
+
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -23,13 +20,6 @@ function Settings() {
   // Function to toggle notification dropdown visibility
   const toggleNotificationDropdown = () => {
     setNotificationDropdownVisible(!notificationDropdownVisible);
-  };
-
-  // Function to handle logout
-  const handleLogout = async () => {
-    await logout();
-    alert('登出成功');
-    navigate('/sign-in');
   };
 
   return (
@@ -68,7 +58,7 @@ function Settings() {
                 className="navbar navbar-expand-lg shadow-sm sticky-top"
               >
                 <ul className="navbar-nav mr-5" id="main_menu">
-                  <a className="navbar-brand nav-item mr-lg-5" href ="/">
+                  <a className="navbar-brand nav-item mr-lg-5" href="index.html">
                     <img
                       src="assets/images/logo-64x64.png"
                       width={40}
@@ -399,7 +389,7 @@ function Settings() {
                     <a href="/profile" className="nav-link nav-links">
                       <div className="menu-user-image">
                         <img
-                          src={avatarUrl}
+                          src="assets/images/users/user-4.jpg"
                           className="menu-user-img ml-1"
                           alt="Menu Image"
                         />
@@ -441,7 +431,7 @@ function Settings() {
                         />{" "}
                         Settings
                       </a>
-                      <a className="dropdown-item logout-btn" href="#" onClick={handleLogout}>
+                      <a className="dropdown-item logout-btn" href="#">
                         <img
                           src="assets/images/icons/navbar/logout.png"
                           alt="Navbar icon"

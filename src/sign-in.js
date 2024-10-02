@@ -11,22 +11,17 @@ function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     try {
       const response = await axios.post('http://localhost:8080/api/auth/login', { username, password });
       console.log(response.data);
       // 處理登錄成功,例如保存token到localStorage
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userImage', response.data.imagePath);
       alert('登錄成功');
+      // 重定向到主頁或儀表板
       navigate('/');
-
     } catch (error) {
-      if (error.respones && error.respones.status === 401) {
-        setError('帳號或密碼錯誤');
-      } else {
-        setError('登入失敗: ' + (error.response?.data || error.message));
-      }
+      setError('登入失敗: ' + (error.response?.data || error.message));
+      // 處理錯誤,例如顯示錯誤消息
     }
   };
 
@@ -102,13 +97,6 @@ function SignIn() {
                 />
               </div>
             </div>
-            {error && (
-              <div className="col-md-12">
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              </div>
-            )}
             <div className="col-md-12 mb-3">
               <a href="forgot-password.html">Forgot password?</a>
             </div>

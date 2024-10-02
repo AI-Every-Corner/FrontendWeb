@@ -12,12 +12,8 @@ import Settings from './settings';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 // import Widgets from './widgets';
-import { UserContext } from './context';
-import { useContext, useState } from 'react';
 
 function MainPage() {
-
-  const { avatarUrl } = useContext(UserContext);
 
   return (
   <div className="App">
@@ -715,7 +711,7 @@ function MainPage() {
         <Link to="/profile" className="nav-link nav-links">
           <div className="menu-user-image">
           <img
-            src={avatarUrl}
+            src="assets/images/users/user-4.jpg"
             className="menu-user-img ml-1"
             alt="Menu Image"
           />
