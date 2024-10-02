@@ -2,8 +2,14 @@ import { Chart } from 'react-google-charts';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useState } from 'react';
+import React,{ useState, useEffect, useContext } from 'react';
+import { useNavigate} from 'react-router-dom';
+import { UserContext } from './context';
+import { logout } from './api';
+
 function Profile() {
+    const navigate = useNavigate();
+    const { avatarUrl } = useContext(UserContext);
 
     // State to manage the visibility of the dropdown menu
     const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -17,6 +23,13 @@ function Profile() {
     // Function to toggle notification dropdown visibility
     const toggleNotificationDropdown = () => {
         setNotificationDropdownVisible(!notificationDropdownVisible);
+    };
+
+    // Function to handle logout
+    const handleLogout = async () => {
+        await logout();
+        alert('登出成功');
+        navigate('/sign-in');
     };
 
     return (
@@ -341,9 +354,10 @@ function Profile() {
                                             <a href="/profile" className="nav-link nav-links">
                                                 <div className="menu-user-image">
                                                     <img
-                                                        src="assets/images/users/user-4.jpg"
-                                                        className="menu-user-img ml-1"
-                                                        alt="Menu Image"
+                                                        src={avatarUrl}
+                                                        className="User Avatar"
+                                                        alt="User Avatar"
+                                                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%' }}
                                                     />
                                                 </div>
                                             </a>
@@ -384,7 +398,7 @@ function Profile() {
                                                     />{" "}
                                                     Settings
                                                 </a>
-                                                <a className="dropdown-item logout-btn" href="#">
+                                                <a className="dropdown-item logout-btn" href="#" onClick={handleLogout}>
                                                     <img
                                                         src="assets/images/icons/navbar/logout.png"
                                                         alt="Navbar icon"
@@ -420,7 +434,7 @@ function Profile() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src="assets/images/users/user-4.jpg"
+                                                            src={avatarUrl}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
@@ -673,7 +687,7 @@ function Profile() {
                                                         <div className="post border-bottom p-3 bg-white w-shadow">
                                                             <div className="media text-muted pt-3">
                                                                 <img
-                                                                    src="assets/images/users/user-4.jpg"
+                                                                    src={avatarUrl}
                                                                     alt="Online user"
                                                                     className="mr-3 post-user-image"
                                                                 />
@@ -910,7 +924,7 @@ function Profile() {
                                                                                         <li className="media comment-form">
                                                                                             <a href="#" className="pull-left">
                                                                                                 <img
-                                                                                                    src="assets/images/users/user-4.jpg"
+                                                                                                    src={avatarUrl}
                                                                                                     alt=""
                                                                                                     className="img-circle"
                                                                                                 />
@@ -1482,8 +1496,6 @@ function Profile() {
                 {/* Optional */}
             </>
 
-    </div>
-  );
     </div>
   );
 }
