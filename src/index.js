@@ -16,22 +16,24 @@ import SignIn from './sign-in';
 import SignUp from './sign-up';
 // import Widgets from './widgets';
 import reportWebVitals from './reportWebVitals';
+import PrivateRoute from './PrivateRoute';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Router>
     <Routes>
-      <Route path='/' element={<MainPage />} />
-      <Route path='/blanck' element={<Blank />} />
-      <Route path='/components' element={<Components />} />
-      <Route path='/friends' element={<Friends />} />
-      <Route path='/groups' element={<Groups />} />
-      <Route path='/marcketplace' element={<MarcketPlace />} />
-      <Route path='/messages' element={<Messages />} />
-      <Route path='/modal' element={<Modal />} />
-      <Route path='/newsfeed-2' element={<NewsFeed2 />} />
-      <Route path='/profile' element={<Profile />} />
-      <Route path='/settings' element={<Settings />} />
+    <Route path='/' element={<PrivateRoute element={MainPage} />} />
+      <Route path='/blanck' element={<PrivateRoute element={Blank} />} />
+      <Route path='/components' element={<PrivateRoute element={Components} />} />
+      <Route path='/friends' element={<PrivateRoute element={Friends} />} />
+      <Route path='/groups' element={<PrivateRoute element={Groups} />} />
+      <Route path='/marcketplace' element={<PrivateRoute element={MarcketPlace} />} />
+      <Route path='/messages' element={<PrivateRoute element={Messages} />} />
+      <Route path='/modal' element={<PrivateRoute element={Modal} />} />
+      <Route path='/newsfeed-2' element={<PrivateRoute element={NewsFeed2} />} />
+      <Route path='/profile' element={<PrivateRoute element={Profile} />} />
+      <Route path='/settings' element={<PrivateRoute element={Settings} />} />
       <Route path='/sign-in' element={<SignIn />} />
       <Route path='/sign-up' element={<SignUp />} />
     </Routes>
