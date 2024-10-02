@@ -1484,6 +1484,8 @@ function Profile() {
 
     </div>
   );
+    </div>
+  );
 }
 
 
