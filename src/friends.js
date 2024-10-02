@@ -1,3 +1,4 @@
+import logo from './logo.svg';
 
 
 function Friends() {
@@ -238,7 +239,7 @@ function Friends() {
                         <a href="#" className="notify-right-icon">
                           <i className="bx bx-radio-circle-marked" />
                         </a>
-                        <p className="time">Great, I’ll see you tomorrow!.</p>
+                        <p className="time">Great, I�耱l see you tomorrow!.</p>
                       </div>
                     </li>
                     <li>
@@ -1480,7 +1481,7 @@ function Friends() {
             data-dismiss="modal"
             aria-label="Close"
           >
-            <span aria-hidden="true">×</span>
+            <span aria-hidden="true">�</span>
           </button>
         </div>
         <div className="modal-body new-msg-body">
