@@ -8,8 +8,6 @@ import MarcketPlace from './marketplace';
 import Messeges from './messages';
 // import Modal from './modal';
 import NewsFeed2 from './newsfeed-2';
-import Profile from './Profile';
-import Settings from './Settings';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 import PostList from './postlist';
