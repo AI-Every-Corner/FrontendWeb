@@ -10,7 +10,6 @@ function SignUp() {
     username: '',
     password: '',
     birth: '',
-    age: '',
     gender: '',
     email: '',
     phoneNum: '',
@@ -154,16 +153,10 @@ function SignUp() {
                 </div>
                 <div className="col-md-6">
                   <div className="form-group">
-                    <input type="number" className="form-control" name="age" placeholder="Age" value={formData.age} onChange={handleChange} />
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="form-group">
                     <select name="gender" className="form-control" value={formData.gender} onChange={handleChange}>
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
-                      <option value="Other">Other</option>
                     </select>
                   </div>
                 </div>

@@ -4,25 +4,30 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MainPage from './mainpage'
 import Blank from './blank';
 import Components from './components';
-import Friends from './friends';
+import Friends from './Friends';
 import Groups from './groups';
 import MarcketPlace from './marketplace';
 import Messages from './messages';
 import Modal from './modal';
 import NewsFeed2 from './newsfeed-2';
-import Profile from './profile';
-import Settings from './settings';
+import Profile from './Profile';
+import About from './About';
+import Photo from './Photo';
+import Settings from './Settings';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 // import Widgets from './widgets';
 import reportWebVitals from './reportWebVitals';
 import PrivateRoute from './PrivateRoute';
 import { UserProvider } from './context';
+import Header from './Header';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <UserProvider>
   <Router>
+    <Header />
+    <div className="main-content">
     <Routes>
     <Route path='/' element={<PrivateRoute element={MainPage} />} />
       <Route path='/blanck' element={<PrivateRoute element={Blank} />} />
@@ -38,6 +43,7 @@ root.render(
       <Route path='/sign-in' element={<SignIn />} />
       <Route path='/sign-up' element={<SignUp />} />
     </Routes>
+    </div>
   </Router>
   </UserProvider>
 );
