@@ -3,6 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useState } from 'react';
+
 function Profile() {
 
     // State to manage the visibility of the dropdown menu
@@ -1136,14 +1137,8 @@ function Profile() {
 
     </div>
   );
-    </div>
-  );
+    
 }
-
-
-
-
-
 
 function CalendarChart() {
   const data = [

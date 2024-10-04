@@ -13,14 +13,8 @@
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
     "react-dom": "^18.3.1",
-<<<<<<< HEAD
     "react-google-charts": "^5.1.0",
-=======
-    "react-dropzone": "^14.2.3",
-    "react-google-charts": "^4.0.7",
-    "react-image-crop": "^11.0.7",
     "react-infinite-scroll-component": "^6.1.0",
->>>>>>> 7ac237d13247c6b3a992d084f017cf05a1489315
     "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
