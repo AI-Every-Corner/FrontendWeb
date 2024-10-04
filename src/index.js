@@ -4,15 +4,15 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MainPage from './mainpage'
 import Blank from './blank';
 import Components from './components';
-import Friends from './Friends';
+import Friends from './friends';
 import Groups from './groups';
 import MarcketPlace from './marketplace';
 import Messages from './messages';
 import Modal from './modal';
 import NewsFeed2 from './newsfeed-2';
 import Profile from './profile';
-import About from './About';
-import Photo from './Photo';
+import About from './about';
+import Photo from './photo';
 import Settings from './settings';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
@@ -20,7 +20,7 @@ import SignUp from './sign-up';
 import reportWebVitals from './reportWebVitals';
 import PrivateRoute from './PrivateRoute';
 import { UserProvider } from './context';
-import Header from './Header';
+import Header from './header';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -45,6 +45,8 @@ root.render(
                 <Route path='/newsfeed-2' element={<PrivateRoute element={NewsFeed2} />} />
                 <Route path='/profile' element={<PrivateRoute element={Profile} />} />
                 <Route path='/settings' element={<PrivateRoute element={Settings} />} />
+                <Route path='/about' element={<PrivateRoute element={About} />} />
+                <Route path='/photo' element={<PrivateRoute element={Photo} />} /> 
               </Routes>
             </div>
           </>

@@ -262,7 +262,7 @@ function Profile() {
                                                                 <a href="/profile">Timeline</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/About">About</a>
+                                                                <a href="/about">About</a>
                                                             </li>
                                                             <li className="list-inline-item">
                                                                 <a href="/friends">Friends</a>
