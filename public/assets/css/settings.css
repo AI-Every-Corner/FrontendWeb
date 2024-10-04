@@ -4,6 +4,28 @@
  * Licensed under MIT (https://github.com/ArtMin96/argon-social/blob/master/LICENSE.md)
  */
 
+ .profile-img-upload {
+    display: flex;
+    align-items: center; /* Aligns the image and upload section side by side */
+  }
+  
+  .upload-section {
+    margin-right: 20px; /* Adds space between the upload section and image preview */
+  }
+  
+  .image-preview {
+    width: 100px; /* Max width for the preview image */
+    height: 100px; /* Max height */
+  }
+  
+  .image-preview img {
+    width: 100%; /* Ensure the image scales within the container */
+    height: auto; /* Maintains the aspect ratio */
+    border-radius: 50%; /* Optional: make the preview circular */
+    object-fit: cover; /* Ensures the image fills the space proportionally */
+  }
+  
+
 .message-right-side {
     width: 100%;
     padding: 0
