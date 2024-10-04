@@ -45,6 +45,8 @@ root.render(
                 <Route path='/newsfeed-2' element={<PrivateRoute element={NewsFeed2} />} />
                 <Route path='/profile' element={<PrivateRoute element={Profile} />} />
                 <Route path='/settings' element={<PrivateRoute element={Settings} />} />
+                <Route path='/about' element={<PrivateRoute element={About} />} />
+                <Route path='/photo' element={<PrivateRoute element={Photo} />} /> 
               </Routes>
             </div>
           </>
