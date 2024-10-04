@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext} from 'react'
+import { useNavigate } from 'react-router-dom';
+import { logout } from './api';
+import { UserContext } from './context';
 
 function Settings() {
 
@@ -7,6 +10,11 @@ function Settings() {
   const [settingDropdownVisible, setSettingDropdownVisible] = useState(false);
   const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
 
+  const [previewSrc, setPreviewSrc] = useState(null);
+
+
+  const navigate = useNavigate();
+  const { avatarUrl } = useContext(UserContext);
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -20,6 +28,26 @@ function Settings() {
   // Function to toggle notification dropdown visibility
   const toggleNotificationDropdown = () => {
     setNotificationDropdownVisible(!notificationDropdownVisible);
+  };
+
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewSrc(reader.result); // Set the image source to the preview
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewSrc(null); // Clear the preview if no file is selected
+    }
+  };
+  // Function to handle logout
+  const handleLogout = async () => {
+    await logout();
+    alert('登出成功');
+    navigate('/sign-in');
   };
 
   return (
@@ -49,11 +77,11 @@ function Settings() {
         <link href="assets/css/components.css" rel="stylesheet" />
         <link href="assets/css/settings.css" rel="stylesheet" />
         <link href="assets/css/forms.css" rel="stylesheet" />
-        <link href="assets/css/media.css" rel="stylesheet" />
+        0<link href="assets/css/media.css" rel="stylesheet" />  
         <div className="container-fluid newsfeed d-flex" id="wrapper">
           <div className="row newsfeed-size f-width">
             <div className="col-md-12 message-right-side">
-              
+
               <div className="row message-right-side-content">
                 <div className="col-md-12">
                   <div id="message-frame">
@@ -160,7 +188,7 @@ function Settings() {
                         <h2>Personal Information</h2>
                         <form action="" method="" className="mt-4 settings-form">
                           <div className="row">
-                            <div className="col-md-12">
+                            <div className="col-md-6">
                               <div className="form-row mb-3 align-items-center">
                                 <div className="col">
                                   <label htmlFor="settingsUsername">Username</label>
@@ -178,12 +206,22 @@ function Settings() {
                                     Your public username is the same as your timeline
                                     address.
                                   </small>
+                                  <small className="form-text text-muted">
+                                    <i className="bx bx-check success" /> Username is available
+                                  </small>
                                 </div>
-                                <div className="col check-username">
-                                  <span>
-                                    <i className="bx bx-check success" /> Username is
-                                    available
-                                  </span>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="form-row mb-3 align-items-center">
+                                <div className="col">
+                                  <label htmlFor="settingsNickName">NickName</label>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    id="settingsNickName"
+                                    placeholder="NickName"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -211,18 +249,28 @@ function Settings() {
                                 />
                               </div>
                             </div>
-                            <div className="col-md-3">
-                              <div className="form-row mb-3 align-items-center">
-                                <div className="col">
-                                  <label htmlFor="settingsAge">Age</label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    id="settingsAge"
-                                    placeholder="18"
-                                  />
+                            <div className="col-md-4">
+                              
+                                <div className="profile-img-upload" />
+                                <div className="profile-img-section">
+                                  <label htmlFor="updateProfilePic" className="upload">
+                                    <i className="bx bxs-camera" /> Upload image
+                                    <input
+                                      type="file"
+                                      id="updateProfilePicInput"
+                                      className="text-center upload"
+                                      accept="image/*"
+                                      onChange={handleImageChange} // Call the function on file change
+                                    />
+                                  </label>
+                                  {/* Image Preview */}
+                                  {previewSrc && (
+                                    <div className="image-preview">
+                                      <img src={previewSrc} alt="Selected Preview" className="img-thumbnail" />
+                                    </div>
+                                  )}
                                 </div>
-                              </div>
+                              
                             </div>
                           </div>
                           <div className="row">
@@ -251,26 +299,10 @@ function Settings() {
                                   aria-describedby="passwordHelp"
                                   placeholder="New Password"
                                 />
-                                <small
-                                  id="passwordHelp"
-                                  className="form-text text-muted"
-                                >
-                                  It's a good idea to use a strong password that
+                                <small className="form-text text-muted">
+                                  <i className="bx bx-check success" /> It's a good idea to use a strong password that
                                   you're not using elsewhere.
                                 </small>
-
-                                <div className="progress w-100 mt-2">
-                                  <div className="progress w-25">
-                                    <div
-                                      className="progress-bar bg-success"
-                                      role="progressbar"
-                                      style={{ width: '75%' }}
-                                      aria-valuenow={50}
-                                      aria-valuemin={0}
-                                      aria-valuemax={100}
-                                    />
-                                  </div>
-                                </div>
                               </div>
                             </div>
                             <div className="col-md-3">
@@ -328,12 +360,10 @@ function Settings() {
                                     Updating this email will only change where you
                                     receive notifications.
                                   </small>
-                                </div>
-                                <div className="col check-username">
-                                  <span>
+                                  <small className="form-text text-muted">
                                     <i className="bx bx-check success" /> Email
                                     Address is available
-                                  </span>
+                                  </small>
                                 </div>
                               </div>
                             </div>

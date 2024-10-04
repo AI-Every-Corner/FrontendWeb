@@ -2,9 +2,14 @@ import { Chart } from 'react-google-charts';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useState } from 'react';
+import React,{ useState, useEffect, useContext } from 'react';
+import { useNavigate} from 'react-router-dom';
+import { UserContext } from './context';
+import { logout } from './api';
 
 function Profile() {
+    const navigate = useNavigate();
+    const { avatarUrl } = useContext(UserContext);
 
     // State to manage the visibility of the dropdown menu
     const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -18,6 +23,13 @@ function Profile() {
     // Function to toggle notification dropdown visibility
     const toggleNotificationDropdown = () => {
         setNotificationDropdownVisible(!notificationDropdownVisible);
+    };
+
+    // Function to handle logout
+    const handleLogout = async () => {
+        await logout();
+        alert('登出成功');
+        navigate('/sign-in');
     };
 
     return (
@@ -73,7 +85,7 @@ function Profile() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src="assets/images/users/user-4.jpg"
+                                                            src={avatarUrl}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
@@ -250,7 +262,7 @@ function Profile() {
                                                                 <a href="/profile">Timeline</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/About">About</a>
+                                                                <a href="/about">About</a>
                                                             </li>
                                                             <li className="list-inline-item">
                                                                 <a href="/friends">Friends</a>
@@ -326,7 +338,7 @@ function Profile() {
                                                         <div className="post border-bottom p-3 bg-white w-shadow">
                                                             <div className="media text-muted pt-3">
                                                                 <img
-                                                                    src="assets/images/users/user-4.jpg"
+                                                                    src={avatarUrl}
                                                                     alt="Online user"
                                                                     className="mr-3 post-user-image"
                                                                 />
@@ -563,7 +575,7 @@ function Profile() {
                                                                                         <li className="media comment-form">
                                                                                             <a href="#" className="pull-left">
                                                                                                 <img
-                                                                                                    src="assets/images/users/user-4.jpg"
+                                                                                                    src={avatarUrl}
                                                                                                     alt=""
                                                                                                     className="img-circle"
                                                                                                 />
@@ -1137,7 +1149,6 @@ function Profile() {
 
     </div>
   );
-    
 }
 
 function CalendarChart() {
