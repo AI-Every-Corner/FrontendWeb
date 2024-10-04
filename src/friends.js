@@ -17,231 +17,34 @@ function Friends() {
     };
 
     return (
-        <body className="Friends">
+        <div className="Friends">
+            <meta charSet="utf-8" />
+            <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1, shrink-to-fit=no"
+            />
+            <link rel="icon" type="image/png" href="assets/images/logo-16x16.png" />
+            {/* The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags */}
+            <title>Argon - Social Network</title>
+            {/* Fonts */}
+            <link
+                href="https://fonts.googleapis.com/css?family=Major+Mono+Display"
+                rel="stylesheet"
+            />
+            <link
+                href="https://cdn.jsdelivr.net/npm/boxicons@1.9.2/css/boxicons.min.css"
+                rel="stylesheet"
+            />
+            {/* Styles */}
+            <link href="assets/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+            <link href="assets/css/style.css" rel="stylesheet" />
+            <link href="assets/css/components.css" rel="stylesheet" />
+            <link href="assets/css/profile.css" rel="stylesheet" />
+            <link href="assets/css/media.css" rel="stylesheet" />
             <div className="container-fluid newsfeed d-flex" id="wrapper">
                 <div className="row newsfeed-size">
                     <div className="col-md-12 p-0">
-                        <nav id="navbar-main" className="navbar navbar-expand-lg shadow-sm sticky-top">
-                            <div className="w-100 justify-content-md-center">
-                                <ul className="nav navbar-nav enable-mobile px-2">
-                                    <li className="nav-item">
-                                        <button type="button" className="btn nav-link p-0">
-                                            <img src="assets/images/icons/theme/post-image.png" className="f-nav-icon" alt="Quick make post" />
-                                        </button>
-                                    </li>
-                                    <li className="nav-item w-100 py-2">
-                                        <form className="d-inline form-inline w-100 px-4">
-                                            <div className="input-group">
-                                                <input type="text" className="form-control search-input" placeholder="Search for people, companies, events and more..." aria-label="Search" aria-describedby="search-addon" />
-                                                <div className="input-group-append">
-                                                    <button className="btn search-button" type="button">
-                                                        <i className='bx bx-search'></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </li>
-                                    <li className="nav-item">
-                                        <a href="messages.html" className
-                                            ="nav-link nav-icon nav-links message-drop drop-w-tooltip" data-placement="bottom" data-title="Messages">
-                                            <img src="assets/images/icons/navbar/message.png" className
-                                                ="message-dropdown f-nav-icon" alt="navbar icon" />
-                                        </a>
-                                    </li>
-                                </ul>
-                                <ul className="navbar-nav mr-5 flex-row" id="main_menu">
-                                    <a className="navbar-brand nav-item mr-lg-5" href="index.html">
-                                        <img src="assets/images/logo-64x64.png" width="40" height="40" className="mr-3" alt="Logo" />
-                                    </a>
-
-                                    <form className="w-30 mx-2 my-auto d-inline form-inline mr-5">
-                                        <div className="input-group">
-                                            <input type="text" className="form-control search-input w-75" placeholder="Search for people, companies, events and more..." aria-label="Search" aria-describedby="search-addon" />
-                                            <div className="input-group-append">
-                                                <button className="btn search-button" type="button">
-                                                    <i className='bx bx-search'></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-
-                                    <li className="nav-item s-nav dropdown notification">
-                                        <a href="#"
-                                            className="nav-link nav-links rm-drop-mobile drop-w-tooltip"
-                                            onClick={toggleNotificationDropdown} // Toggle notification dropdown on click 
-                                            data-placement="bottom"
-                                            data-title="Notifications"
-                                            role="button"
-                                            aria-haspopup="true"
-                                            aria-expanded={notificationDropdownVisible}
-                                        >
-                                            <img src="assets/images/icons/navbar/notification.png" className="notification-bell" alt="navbar icon" />
-                                            <span className="badge badge-pill badge-primary">3</span>
-                                        </a>
-                                        <ul
-                                            className={`dropdown-menu notify-drop dropdown-menu-right nav-drop ${notificationDropdownVisible ? 'show' : ''
-                                                }`}
-                                        >
-                                            <div className="notify-drop-title">
-                                                <div className="row">
-                                                    <div className="col-md-6 col-sm-6 col-xs-6 fs-8">Notifications
-                                                        <span className="badge badge-pill badge-primary ml-2">3</span>
-                                                    </div>
-                                                    <div className="col-md-6 col-sm-6 col-xs-6 text-right">
-                                                        <a href="#" className="notify-right-icon">
-                                                            Mark All as Read
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="drop-content">
-                                                <li>
-                                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                                        <div className="notify-img">
-                                                            <img src="assets/images/users/user-10.png" alt="notification user image" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                                        <a href="#" className="notification-user">Sean</a> <span className="notification-type">replied to your comment on a post in </span>
-                                                        <a href="#" className="notification-for">PHP</a>
-                                                        <a href="#" className="notify-right-icon">
-                                                            <i className='bx bx-radio-circle-marked'></i>
-                                                        </a>
-                                                        <p className="time">
-                                                            <span className="badge badge-pill badge-primary"><i className='bx bxs-group'></i></span> 3h
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                                        <div className="notify-img">
-                                                            <img src="assets/images/users/user-7.png" alt="notification user image" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                                        <a href="#" className="notification-user">Kimberly</a>
-                                                        <span className="notification-type">likes your comment "I would really... </span>
-                                                        <a href="#" className="notify-right-icon">
-                                                            <i className='bx bx-radio-circle-marked'></i>
-                                                        </a>
-                                                        <p className="time">
-                                                            <span className="badge badge-pill badge-primary"><i className='bx bxs-like'></i></span> 7h
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                                        <div className="notify-img">
-                                                            <img src="assets/images/users/user-8.png" alt="notification user image" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                                        <span className="notification-type">10 people saw your story before it disappeared. See who saw it.</span>
-                                                        <a href="#" className="notify-right-icon">
-                                                            <i className='bx bx-radio-circle-marked'></i>
-                                                        </a>
-                                                        <p className="time">
-                                                            <span className="badge badge-pill badge-primary">
-                                                                <i className='bx bx-images'></i>
-                                                            </span> 23h
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                                        <div className="notify-img">
-                                                            <img src="assets/images/users/user-11.png" alt="notification user image" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                                        <a href="#" className="notification-user">Michelle</a>
-                                                        <span className="notification-type">posted in </span>
-                                                        <a href="#" className="notification-for">Argon Social Design System</a>
-                                                        <a href="#" className="notify-right-icon">
-                                                            <i className='bx bx-radio-circle-marked'></i>
-                                                        </a>
-                                                        <p className="time">
-                                                            <span className="badge badge-pill badge-primary"><i className='bx bxs-quote-right'></i></span> 1d
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                                        <div className="notify-img">
-                                                            <img src="assets/images/users/user-5.png" alt="notification user image" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                                        <a href="#" className="notification-user">Karen</a> <span className="notification-type">likes your comment "Sure, here... </span>
-                                                        <a href="#" className="notify-right-icon">
-                                                            <i className='bx bx-radio-circle-marked'></i>
-                                                        </a>
-                                                        <p className="time">
-                                                            <span className="badge badge-pill badge-primary"><i className='bx bxs-like'></i></span> 2d
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                                        <div className="notify-img">
-                                                            <img src="assets/images/users/user-12.png" alt="notification user image" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                                        <a href="#" className="notification-user">Irwin</a> <span className="notification-type">posted in </span>
-                                                        <a href="#" className="notification-for">Themeforest</a>
-                                                        <a href="#" className="notify-right-icon">
-                                                            <i className='bx bx-radio-circle-marked'></i>
-                                                        </a>
-                                                        <p className="time">
-                                                            <span className="badge badge-pill badge-primary"><i className='bx bxs-quote-right'></i></span> 3d
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                            </div>
-                                            <div className="notify-drop-footer text-center">
-                                                <a href="#">See More</a>
-                                            </div>
-                                        </ul>
-                                    </li>
-
-                                    <li className="nav-item s-nav">
-                                        <a href="/profile" className="nav-link nav-links">
-                                            <div className="menu-user-image">
-                                                <img src="assets/images/users/user-4.jpg" className="menu-user-img ml-1" alt="Menu Image" />
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li className="nav-item s-nav nav-icon dropdown">
-                                        <a
-                                            href="#"
-                                            onClick={toggleDropdown} // Toggle dropdown on click
-                                            data-placement="bottom"
-                                            data-title="Settings"
-                                            className="nav-link settings-link rm-drop-mobile drop-w-tooltip"
-                                            id="settings-dropdown"
-                                            aria-expanded={dropdownVisible}
-                                        >
-                                            <img src="assets/images/icons/navbar/settings.png" className="nav-settings" alt="navbar icon" />
-                                        </a>
-                                        <div
-                                            className={`dropdown-menu dropdown-menu-right settings-dropdown shadow-sm ${dropdownVisible ? 'show' : ''
-                                                }`}
-                                        >
-                                            <a className="dropdown-item" href="#">
-                                                <img src="assets/images/icons/navbar/help.png" alt="Navbar icon" /> Help Center
-                                            </a>
-                                            <a className="dropdown-item" href="/settings">
-                                                <img src="assets/images/icons/navbar/gear-1.png" alt="Navbar icon" /> Settings</a>
-                                            <a className="dropdown-item logout-btn" href="#">
-                                                <img src="assets/images/icons/navbar/logout.png" alt="Navbar icon" /> Log Out
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </nav>
                         <div className="row profile-right-side-content">
                             <div className="user-profile">
                                 <div className="profile-header-background">
@@ -375,7 +178,7 @@ function Friends() {
                                                             <a href="/friends">Friends</a>
                                                         </li>
                                                         <li className="list-inline-item">
-                                                            <a href="#">Photos</a>
+                                                            <a href="/photo">Photos</a>
                                                         </li>
                                                         <li className="list-inline-item dropdown">
                                                             <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -712,7 +515,7 @@ function Friends() {
             </div>
 
 
-        </body>
+        </div>
     );
 }
 export default Friends;
