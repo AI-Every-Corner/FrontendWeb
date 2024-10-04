@@ -413,7 +413,7 @@ function Header() {
                                         <a href="/profile" className="nav-link nav-links">
                                             <div className="menu-user-image">
                                                 <img
-                                                    src={avatarUrl}
+                                                    src={avatarUrl} 
                                                     className="menu-user-img ml-1"
                                                     alt="Menu Image"
                                                 />
