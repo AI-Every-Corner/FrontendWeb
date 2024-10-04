@@ -1151,11 +1151,6 @@ function Profile() {
   );
 }
 
-
-
-
-
-
 function CalendarChart() {
   const data = [
     [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
@@ -1173,7 +1168,7 @@ function CalendarChart() {
     [new Date(2024, 11, 15), 5],
     [new Date(2024, 5, 11), 2],
     [new Date(2024, 6, 18), 9],
-   
+  
   ];
   
 
