@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { UserContext } from './context';
+import { logout } from './api';
+
 
 function Header() {
 
@@ -8,6 +11,8 @@ function Header() {
     const [settingDropdownVisible, setSettingDropdownVisible] = useState(false);
     const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
     const location = useLocation(); // 使用 useLocation 來獲取當前路徑
+    const { avatarUrl } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+    const navigate = useNavigate();
 
     // Function to toggle dropdown visibility
     const toggleDropdown = () => {
@@ -26,6 +31,13 @@ function Header() {
 
     // 檢查當前路徑是否為首頁，來決定是否顯示 Quick Links
     const isHomePage = location.pathname === '/';
+
+    // Function to handle logout
+    const handleLogout = async () => {
+        await logout();
+        alert('登出成功');
+        navigate('/sign-in');
+    };
 
     return (
         <div className="Header">
@@ -401,7 +413,7 @@ function Header() {
                                         <a href="/profile" className="nav-link nav-links">
                                             <div className="menu-user-image">
                                                 <img
-                                                    src="assets/images/users/user-4.jpg"
+                                                    src={avatarUrl}
                                                     className="menu-user-img ml-1"
                                                     alt="Menu Image"
                                                 />
@@ -443,7 +455,7 @@ function Header() {
                                                 />{" "}
                                                 Settings
                                             </a>
-                                            <a className="dropdown-item logout-btn" href="#">
+                                            <a className="dropdown-item logout-btn" href="#" onClick={handleLogout}>
                                                 <img
                                                     src="assets/images/icons/navbar/logout.png"
                                                     alt="Navbar icon"

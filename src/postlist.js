@@ -6,6 +6,7 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [showImg, setShowImg] = useState(false);
 
     const fetchPosts = async () => {
         try {
@@ -16,7 +17,10 @@ const PostList = () => {
                 },
             });
             console.log(response);
-            setPosts([...posts, ...response.data.posts]);  // Append new posts
+            setPosts([...posts, ...response.data.postRes]);  // Append new posts
+            // if(response.data.img) {
+            //   setShowImg(true);
+            // }
             if (response.data.last) {
                 setHasMore(false);  // No more posts to load
             }
@@ -50,7 +54,8 @@ const PostList = () => {
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
       <a href="#" className="text-gray-dark post-user-name">
-      id: {post.userId}
+      <a className="h5">{post.username}</a>
+      {/* {post.userId} */}
       </a>
       <div className="dropdown">
       <a
