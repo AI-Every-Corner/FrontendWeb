@@ -11,10 +11,10 @@ const PostList = () => {
     const fetchPosts = async () => {
         try {
             const response = await axios.get(`http://localhost:8080/posts`, {
-                params: {
-                  page,
-                  size: 10
-                },
+              params: {
+                page,
+                size: 10
+              },
             });
             console.log(response);
             setPosts([...posts, ...response.data.postRes]);  // Append new posts
@@ -22,28 +22,28 @@ const PostList = () => {
             //   setShowImg(true);
             // }
             if (response.data.last) {
-                setHasMore(false);  // No more posts to load
+              setHasMore(false);  // No more posts to load
             }
         } catch (error) {
-            console.error("Failed to load posts", error);
+          console.error("Failed to load posts", error);
         }
     };
 
     useEffect(() => {
-        fetchPosts();
+      fetchPosts();
     }, [page]);
 
     return (
         <InfiniteScroll
-            dataLength={posts.length}
-            next={() => setPage(page + 1)}  // Load next page
-            hasMore={hasMore}
-            loader={<h4>Loading...</h4>}
-            endMessage={<p>No more posts</p>}
+          dataLength={posts.length}
+          next={() => setPage(page + 1)}  // Load next page
+          hasMore={hasMore}
+          loader={<h4>Loading...</h4>}
+          endMessage={<p>No more posts</p>}
         >
-            {posts.map((post) => (
-                <div key={post.postId}>
-                  {console.log(typeof post.createdAt)}
+          {posts.map((post) => (
+            <div key={post.postId}>
+              {console.log(typeof post.createdAt)}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <img
@@ -167,9 +167,10 @@ const PostList = () => {
 </div>
 <div className="d-block mt-3">
   <img
-  src={post.img}
+  src={post.imagePath}
   className="post-content"
   alt="post image"
+  style={{ display: post.imagePath === "" ? "none" : "block" }} 
   />
 </div>
 <div className="mb-3">
