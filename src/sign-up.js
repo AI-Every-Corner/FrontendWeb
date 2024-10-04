@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone'; // 引入react-dropzone
 
@@ -20,6 +20,7 @@ function SignUp() {
   const [preview, setPreview] = useState(null); // 預覽圖片的狀態
   const [passwordError, setPasswordError] = useState('');
   const [imageUploaded, setImageUploaded] = useState(false); // 照片上傳狀態
+  const [weather, setWeather] = useState({ temp: '', city: '', icon: '' });
 
   // 處理表單輸入
   const handleChange = (e) => {
@@ -94,6 +95,26 @@ function SignUp() {
     accept: 'image/*',
     multiple: false
   });
+
+  useEffect(() => {
+    fetchWeather();
+  }, []);
+  
+  const fetchWeather = async () => {
+    const API_KEY = '';
+
+    const city_name = 'Taipei'; // 或者使用地理位置API獲取用戶當前位置
+    try {
+      const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=${API_KEY}&units=metric`);
+      setWeather({
+        temp: Math.round(response.data.main.temp),
+        city: response.data.name,
+        icon: response.data.weather[0].icon
+      });
+    } catch (error) {
+      console.error('獲取天氣數據失敗:', error);
+    }
+  };
 
   return (
     <div className="App">
@@ -179,7 +200,7 @@ function SignUp() {
                         {isDragActive ? (
                           <p>拖放圖片至此...</p>
                         ) : (
-                          <p>拖拉或點擊上傳圖片</p>
+                          <p>拖拉或點擊上傳大頭照</p>
                         )}
                       </div>
                     )}
@@ -210,13 +231,13 @@ function SignUp() {
           </div>
         </div>
         <div className="col-md-6 auth-bg-image d-flex justify-content-center align-items-center">
-          <div className="auth-left-content mt-5 mb-5 text-center">
-            <div className="weather-small text-white">
-              <p className="current-weather">
-                <i className="bx bx-sun" /> <span>14°</span>
-              </p>
-              <p className="weather-city">Gyumri</p>
-            </div>
+      <div className="auth-left-content mt-5 mb-5 text-center">
+        <div className="weather-small text-white">
+          <p className="current-weather">
+          <img src={`http://openweathermap.org/img/wn/${weather.icon}@2x.png`} alt="Weather icon" /> <span>{weather.temp}°</span>
+          </p>
+          <p className="weather-city">{weather.city}</p>
+        </div>
             <div className="text-white mt-5 mb-5">
               <h2 className="create-account mb-3">Create Account</h2>
               <p>Enter your personal details and start journey with us.</p>
