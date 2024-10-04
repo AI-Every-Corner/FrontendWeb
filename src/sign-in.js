@@ -1,6 +1,35 @@
-
+import { useState, useContext } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 
 function SignIn() {
+  
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const response = await axios.post('http://localhost:8080/api/auth/login', { username, password });
+      console.log(response.data);
+      // 處理登錄成功,例如保存token到localStorage
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userImage', response.data.imagePath);
+      alert('登錄成功');
+      navigate('/');
+
+    } catch (error) {
+      if (error.respones && error.respones.status === 401) {
+        setError('帳號或密碼錯誤');
+      } else {
+        setError('登入失敗: ' + (error.response?.data || error.message));
+      }
+    }
+  };
+
   return (
     <div className="App">
 <>
@@ -47,7 +76,7 @@ function SignIn() {
             </div>
           </div>
         </div>
-        <form action="" method="">
+        <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-md-12">
               <div className="form-group">
@@ -55,7 +84,9 @@ function SignIn() {
                   type="text"
                   className="form-control"
                   name=""
-                  placeholder="Email Address"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
             </div>
@@ -66,9 +97,18 @@ function SignIn() {
                   className="form-control"
                   name=""
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
+            {error && (
+              <div className="col-md-12">
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              </div>
+            )}
             <div className="col-md-12 mb-3">
               <a href="forgot-password.html">Forgot password?</a>
             </div>
@@ -83,7 +123,7 @@ function SignIn() {
             </div>
             <div className="col-md-6 text-right">
               <div className="form-group">
-                <button type="button" className="btn btn-primary sign-up">
+                <button type="submit" className="btn btn-primary sign-up">
                   Sign In
                 </button>
               </div>
@@ -101,7 +141,7 @@ function SignIn() {
             </div>
             <div className="col-md-12 text-center mt-5">
               <span className="go-login">
-                Not yet a member? <a href="sign-up.html">Sign Up</a>
+                Not yet a member? <Link to="/sign-up">Sign Up</Link>
               </span>
             </div>
           </div>

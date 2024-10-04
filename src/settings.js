@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react'
-
+import React, { useEffect, useState, useContext} from 'react'
+import { useNavigate } from 'react-router-dom';
+import { logout } from './api';
+import { UserContext } from './context';
 function Settings() {
 
   // State to manage the visibility of the dropdown menu
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [settingDropdownVisible, setSettingDropdownVisible] = useState(false);
   const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
-
+  const navigate = useNavigate();
+  const { avatarUrl } = useContext(UserContext);
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -20,6 +23,13 @@ function Settings() {
   // Function to toggle notification dropdown visibility
   const toggleNotificationDropdown = () => {
     setNotificationDropdownVisible(!notificationDropdownVisible);
+  };
+
+  // Function to handle logout
+  const handleLogout = async () => {
+    await logout();
+    alert('登出成功');
+    navigate('/sign-in');
   };
 
   return (
