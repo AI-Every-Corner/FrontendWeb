@@ -193,7 +193,7 @@ function MainPage() {
             className="form-control"
             id="postForm"
             rows={2}
-            placeholder="What's on your mind, Arthur?"
+            placeholder="What's on your mind, username?"
             defaultValue={""}
           />
           </div>
@@ -214,12 +214,12 @@ function MainPage() {
             className="btn btn-link post-form-btn btn-sm"
             >
             <img
-              src="assets/images/icons/theme/tag-friend.png"
+              src="assets/images/icons/theme/smile.png"
               alt="post form icon"
             />{" "}
-            <span>Tag Friends</span>
+            <span>Moods</span>
             </button>
-            <button
+            {/* <button
             type="button"
             className="btn btn-link post-form-btn btn-sm"
             >
@@ -228,7 +228,7 @@ function MainPage() {
               alt="post form icon"
             />{" "}
             <span>Check In</span>
-            </button>
+            </button> */}
           </div>
           <div className="col-md-3 text-right">
             <button type="button" className="btn btn-primary btn-sm">
