@@ -9,5 +9,6 @@ export const logout = async () => {
   // await axios.post(`${API_URL}/auth/logout`);
   // 清除本地存儲的用戶信息
   localStorage.removeItem('token');
+  localStorage.removeItem('userId');
   localStorage.removeItem('userImage');
 };

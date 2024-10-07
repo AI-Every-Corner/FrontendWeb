@@ -14,9 +14,19 @@ function SignIn() {
     setError('');
     try {
       const response = await axios.post('http://localhost:8080/api/auth/login', { username, password });
+
       console.log(response.data);
+
       // 處理登錄成功,例如保存token到localStorage
       localStorage.setItem('token', response.data.token);
+      
+       // 檢查後端是否正確返回 userId
+       if (response.data.userId) {
+        localStorage.setItem('userId', response.data.userId);  // 將 userId 存入 localStorage
+      } else {
+        console.error('後端未返回 userId');
+      }
+      
       localStorage.setItem('userImage', response.data.imagePath);
       alert('登錄成功');
       navigate('/');
