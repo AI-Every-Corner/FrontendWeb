@@ -11,19 +11,7 @@ function Profile() {
     const navigate = useNavigate();
     const { avatarUrl } = useContext(UserContext);
 
-    // State to manage the visibility of the dropdown menu
-    const [dropdownVisible, setDropdownVisible] = useState(false);
     const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
-
-    // Function to toggle dropdown visibility
-    const toggleDropdown = () => {
-        setDropdownVisible(!dropdownVisible);
-    };
-
-    // Function to toggle notification dropdown visibility
-    const toggleNotificationDropdown = () => {
-        setNotificationDropdownVisible(!notificationDropdownVisible);
-    };
 
     // Function to handle logout
     const handleLogout = async () => {

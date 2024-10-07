@@ -9,8 +9,15 @@ const PostList = () => {
     const [showImg, setShowImg] = useState(false);
 
     const fetchPosts = async () => {
+
+      const token = localStorage.getItem('token');
+      
         try {
-            const response = await axios.get(`http://localhost:8080/posts`, {
+            const response = await axios.get(`http://localhost:8080/posts`,{
+              headers: {
+                'Authorization': `Bearer ${token}` // 添加 Authorization header
+              }
+            }, {
                 params: {
                   page,
                   size: 10
