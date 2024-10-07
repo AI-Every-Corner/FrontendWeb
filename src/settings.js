@@ -19,7 +19,7 @@ function Settings() {
 
   const [formData, setFormData] = useState({
     username: '',
-    nickname: '',
+    nickName: '',
     gender: '',
     birth: '',
     phoneNum: '',
@@ -106,7 +106,7 @@ function Settings() {
       updatedData.password = newPassword;
     }
 
-    const token = localStorage.getItem('jwtToken'); // 從 localStorage 中讀取 token
+    const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
 
     // 這裡可以發送 PUT 請求來更新用戶數據，使用 username 來動態構建 PUT API 地址
     axios.put(`http://localhost:8080/api/auth/${userId}`, updatedData, {
@@ -287,8 +287,8 @@ function Settings() {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    name="nickname"
-                                    value={formData.nickname || ''}
+                                    name="nickName"
+                                    value={formData.nickName || ''}
                                     onChange={handleInputChange}
                                     placeholder="NickName"
                                   />
