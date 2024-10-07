@@ -1,35 +1,69 @@
-import React, { useEffect, useState, useContext} from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { logout } from './api';
 import { UserContext } from './context';
 
 function Settings() {
 
-  // State to manage the visibility of the dropdown menu
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [settingDropdownVisible, setSettingDropdownVisible] = useState(false);
-  const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
-
   const [previewSrc, setPreviewSrc] = useState(null);
 
+  // States for handling password match
+  const [newPassword, setNewPassword] = useState('');
+  const [retypePassword, setRetypePassword] = useState('');
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+  useEffect(() => {
+    setPasswordsMatch(newPassword === retypePassword);
+  }, [newPassword, retypePassword]);
+
+  const [formData, setFormData] = useState({
+    username: '',
+    nickname: '',
+    gender: '',
+    birth: '',
+    phoneNum: '',
+    email: '',
+  });
 
   const navigate = useNavigate();
-  const { avatarUrl } = useContext(UserContext);
-  // Function to toggle dropdown visibility
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
-  };
+  const { userId } = useContext(UserContext); // 從 UserContext 中獲取 userId
 
-  // Function to toggle dropdown visibility
-  const toggleSettingDropdown = () => {
-    setSettingDropdownVisible(!settingDropdownVisible);
-  };
+  useEffect(() => {
 
-  // Function to toggle notification dropdown visibility
-  const toggleNotificationDropdown = () => {
-    setNotificationDropdownVisible(!notificationDropdownVisible);
-  };
+    console.log('Fetched userId:', userId);
 
+    // 這裡可以用 GET 請求獲取用戶信息並設置到 formData 中
+    axios.get(`http://localhost:8080/api/auth/${userId}`) //  API 地址
+      .then(response => {
+
+        const userData = response.data;
+
+        // 檢查 gender 是否存在，並處理
+        const updatedGender = userData.gender
+          ? userData.gender.charAt(0).toUpperCase() + userData.gender.slice(1).toLowerCase()
+          : '';  // 如果 gender 為 null 或 undefined，設定為空字串
+
+        const updatedFormData = {
+          ...userData,
+          gender: updatedGender,
+        };
+
+        setFormData(response.data); // 更新 formData 的值
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  }, [userId]);
+
+  //更新個人資料
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -43,11 +77,40 @@ function Settings() {
       setPreviewSrc(null); // Clear the preview if no file is selected
     }
   };
-  // Function to handle logout
-  const handleLogout = async () => {
-    await logout();
-    alert('登出成功');
-    navigate('/sign-in');
+
+  // Password change handler
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'settingsNewPassword') {
+      setNewPassword(value);
+    } else if (name === 'settingsRetypePassword') {
+      setRetypePassword(value);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // 複製 formData 來發送到後端
+    const updatedData = { ...formData };
+
+    // 如果有新密碼，則添加到要發送的資料中
+    if (newPassword) {
+      updatedData.password = newPassword;
+    }
+
+    // 這裡可以發送 PUT 請求來更新用戶數據，使用 username 來動態構建 PUT API 地址
+    axios.put(`http://localhost:8080/api/auth/${userId}`, updatedData)
+      .then(response => {
+        alert('資料更新成功！');
+
+        // 清空密碼欄位
+      setNewPassword('');
+      setRetypePassword('');
+      })
+      .catch(error => {
+        console.error('Error updating data:', error);
+      });
   };
 
   return (
@@ -77,7 +140,7 @@ function Settings() {
         <link href="assets/css/components.css" rel="stylesheet" />
         <link href="assets/css/settings.css" rel="stylesheet" />
         <link href="assets/css/forms.css" rel="stylesheet" />
-        0<link href="assets/css/media.css" rel="stylesheet" />  
+        <link href="assets/css/media.css" rel="stylesheet" />
         <div className="container-fluid newsfeed d-flex" id="wrapper">
           <div className="row newsfeed-size f-width">
             <div className="col-md-12 message-right-side">
@@ -186,29 +249,21 @@ function Settings() {
                     <div className="content">
                       <div className="settings-form p-4">
                         <h2>Personal Information</h2>
-                        <form action="" method="" className="mt-4 settings-form">
+                        <form onSubmit={handleSubmit} className="mt-4 settings-form">
                           <div className="row">
                             <div className="col-md-6">
                               <div className="form-row mb-3 align-items-center">
                                 <div className="col">
                                   <label htmlFor="settingsUsername">Username</label>
                                   <input
-                                    type="email"
+                                    type="text"
                                     className="form-control"
-                                    id="settingsUsername"
-                                    aria-describedby="usernameHelp"
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleInputChange}
                                     placeholder="Username"
+                                    disabled // 假設不允許修改 username
                                   />
-                                  <small
-                                    id="usernameHelp"
-                                    className="form-text text-muted"
-                                  >
-                                    Your public username is the same as your timeline
-                                    address.
-                                  </small>
-                                  <small className="form-text text-muted">
-                                    <i className="bx bx-check success" /> Username is available
-                                  </small>
                                 </div>
                               </div>
                             </div>
@@ -219,7 +274,9 @@ function Settings() {
                                   <input
                                     type="text"
                                     className="form-control"
-                                    id="settingsNickName"
+                                    name="nickname"
+                                    value={formData.nickname || ''}
+                                    onChange={handleInputChange}
                                     placeholder="NickName"
                                   />
                                 </div>
@@ -230,11 +287,12 @@ function Settings() {
                                 <label htmlFor="settingsGender">Gender</label>
                                 <select
                                   className="form-control"
-                                  id="settingsGender"
+                                  name="gender"
+                                  value={formData.gender}
+                                  onChange={handleInputChange}
                                 >
-                                  <option value="male">Male</option>
-                                  <option value="female">Female</option>
-                                  <option value="other">Other</option>
+                                  <option value="Male">Male</option>
+                                  <option value="Female">Female</option>
                                 </select>
                               </div>
                             </div>
@@ -244,33 +302,35 @@ function Settings() {
                                 <input
                                   type="text"
                                   className="form-control"
-                                  id="settingsBirth"
+                                  name="birth"
+                                  value={formData.birth || ''}
+                                  onChange={handleInputChange}
                                   placeholder="1900-01-01"
                                 />
                               </div>
                             </div>
                             <div className="col-md-4">
-                              
-                                <div className="profile-img-upload" />
-                                <div className="profile-img-section">
-                                  <label htmlFor="updateProfilePic" className="upload">
-                                    <i className="bx bxs-camera" /> Upload image
-                                    <input
-                                      type="file"
-                                      id="updateProfilePicInput"
-                                      className="text-center upload"
-                                      accept="image/*"
-                                      onChange={handleImageChange} // Call the function on file change
-                                    />
-                                  </label>
-                                  {/* Image Preview */}
-                                  {previewSrc && (
-                                    <div className="image-preview">
-                                      <img src={previewSrc} alt="Selected Preview" className="img-thumbnail" />
-                                    </div>
-                                  )}
-                                </div>
-                              
+
+                              <div className="profile-img-upload" />
+                              <div className="profile-img-section">
+                                <label htmlFor="updateProfilePic" className="upload">
+                                  <i className="bx bxs-camera" /> Upload image
+                                  <input
+                                    type="file"
+                                    name="updateProfilePicInput"
+                                    className="text-center upload"
+                                    accept="image/*"
+                                    onChange={handleImageChange} // Call the function on file change
+                                  />
+                                </label>
+                                {/* Image Preview */}
+                                {previewSrc && (
+                                  <div className="image-preview">
+                                    <img src={previewSrc} alt="Selected Preview" className="img-thumbnail" />
+                                  </div>
+                                )}
+                              </div>
+
                             </div>
                           </div>
                           <div className="row">
@@ -282,7 +342,7 @@ function Settings() {
                                 <input
                                   type="password"
                                   className="form-control"
-                                  id="settingsCurrentPassword"
+                                  name="currentpassword"
                                   placeholder="Current Password"
                                 />
                               </div>
@@ -295,14 +355,12 @@ function Settings() {
                                 <input
                                   type="password"
                                   className="form-control"
-                                  id="settingsNewPassword"
-                                  aria-describedby="passwordHelp"
+                                  name="settingsNewPassword"
                                   placeholder="New Password"
+                                  value={newPassword}
+                                  onChange={handlePasswordChange}
                                 />
-                                <small className="form-text text-muted">
-                                  <i className="bx bx-check success" /> It's a good idea to use a strong password that
-                                  you're not using elsewhere.
-                                </small>
+
                               </div>
                             </div>
                             <div className="col-md-3">
@@ -313,15 +371,16 @@ function Settings() {
                                 <input
                                   type="password"
                                   className="form-control"
-                                  id="settingsRetypePassword"
+                                  name="settingsRetypePassword"
                                   placeholder="Re-type New Password"
+                                  value={retypePassword}
+                                  onChange={handlePasswordChange}
                                 />
-                                <div className="progress w-100 mt-2">
+                                {!passwordsMatch && (
                                   <small className="text-danger">
-                                    <i className="bx bx-x error" /> Passwords do not
-                                    match
+                                    <i className="bx bx-x error" /> Passwords do not match
                                   </small>
-                                </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -334,7 +393,9 @@ function Settings() {
                                 <input
                                   type="text"
                                   className="form-control"
-                                  id="settingsPhoneNumber"
+                                  name="phoneNum"
+                                  value={formData.phoneNum || ''}
+                                  onChange={handleInputChange}
                                   placeholder="Phone Number"
                                 />
                               </div>
@@ -348,22 +409,11 @@ function Settings() {
                                   <input
                                     type="email"
                                     className="form-control"
-                                    id="settingsEmailAddress"
-                                    aria-describedby="emailHelp"
-                                    defaultValue="emailaddress@gmail.com"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
                                     placeholder="Email Address"
                                   />
-                                  <small
-                                    id="emailHelp"
-                                    className="form-text text-muted"
-                                  >
-                                    Updating this email will only change where you
-                                    receive notifications.
-                                  </small>
-                                  <small className="form-text text-muted">
-                                    <i className="bx bx-check success" /> Email
-                                    Address is available
-                                  </small>
                                 </div>
                               </div>
                             </div>
