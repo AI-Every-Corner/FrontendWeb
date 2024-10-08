@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
 import axios from 'axios';
+import { data } from 'jquery';
 
 function Profile() {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ function Profile() {
     });
     const { userId, setAvatarUrl } = useContext(UserContext);
 
+    const [moodData,setMoodData]=useState();
     useEffect(() => {
         console.log('Fetched userId:', userId);
 
@@ -46,7 +48,31 @@ function Profile() {
         alert('登出成功');
         navigate('/sign-in');
     };
+ // 這裡的函數需要被立即調用
+ const fetchData = async () => {
+    try {
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token");
 
+        const response = await axios.post(
+        `http://localhost:8080/yearReview/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // 設置 Authorization 標頭
+          },
+        }
+      );
+      console.log(response.data); // 請求成功後打印 response 的數據
+      setMoodData(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error); // 捕獲錯誤
+    }
+  };
+        useEffect(() => {
+          fetchData(); // 調用函數
+      
+        }, []); // 這裡添加空依賴數組，確保 useEffect 只運行一次
     return (
         <div className="Profile">
             <>
@@ -316,7 +342,7 @@ function Profile() {
                                                         <Container>
                                                             <Row>
                                                                 <Col md={1} lg={1} xl={1}></Col>
-                                                                <Col>  <CalendarChart /></Col>
+                                                                <Col>  <CalendarChart moodData={moodData}/></Col>
                                                                 <Col md={1} lg={1} xl={1}></Col>
                                                             </Row>
 
@@ -730,7 +756,7 @@ function Profile() {
                                                                                                 <div className="commentLR">
                                                                                                     <button
                                                                                                         type="button"
-                                                                                                        className="btn btn-link fs-8"
+                                                                                                         className="btn btn-link fs-8"
                                                                                                     >
                                                                                                         Like
                                                                                                     </button>
@@ -1166,26 +1192,29 @@ function Profile() {
     );
 }
 
-function CalendarChart() {
-    const data = [
-        [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
-        [new Date(2024, 5, 12), 3],
-        [new Date(2024, 8, 5), 10],
-        [new Date(2024, 0, 16), 4],
-        [new Date(2024, 5, 16), 9],
-        [new Date(2024, 9, 18), 5],
-        [new Date(2024, 10, 18), 5],
-        [new Date(2024, 10, 26), 3],
-        [new Date(2024, 4, 8), 9],
-        [new Date(2024, 1, 16), 8],
-        [new Date(2024, 5, 1), 9],
-        [new Date(2024, 8, 2), 8],
-        [new Date(2024, 11, 15), 5],
-        [new Date(2024, 5, 11), 2],
-        [new Date(2024, 6, 18), 9],
+function CalendarChart({moodData}) {
+        const newData = [
+          [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
+        ];
+      
+        if(moodData!=null){
+   // 使用 for 循環來處理資料
+   for (const [dateString, moodScore] of Object.entries(moodData)) {
+    // 提取出年月日部分，格式類似於：2024-10-08T12:00:00
+    const [year, month, day] = dateString.split('T')[0].split('-');
 
-    ];
+    // 將日期轉換為 new Date(年, 月 - 1, 日) 格式（月份要減 1）
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
 
+    // 將 [new Date(年, 月, 日), 分數] push 進 newData
+    newData.push([date, moodScore]);
+  }
+
+  // 測試用，將轉換後的資料輸出到 console
+  console.log(newData);
+
+        }
+     
 
     const options = {
         title: "Your Mood for 2024",
@@ -1222,7 +1251,7 @@ function CalendarChart() {
         }}>
             <Chart
                 chartType="Calendar"
-                data={data}
+                data={newData}
                 options={options}
                 width="100%"  // 寬度設為 100%
                 height="100%"  // 高度設為 100%
