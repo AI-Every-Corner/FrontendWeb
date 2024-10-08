@@ -1,21 +1,38 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useEffect, useState, useContext } from 'react'
+import { UserContext } from './context';
+import axios from 'axios';
 
 function Friends() {
 
-  // State to manage the visibility of the dropdown menu
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
+  const { avatarUrl } = useContext(UserContext);
+  const [formData, setFormData] = useState({
+    nickName: '',
+    username: ''
+  });
+  const { userId, setAvatarUrl } = useContext(UserContext);
 
-  // Function to toggle dropdown visibility
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
-  };
+  useEffect(() => {
+    console.log('Fetched userId:', userId);
 
-  // Function to toggle notification dropdown visibility
-  const toggleNotificationDropdown = () => {
-    setNotificationDropdownVisible(!notificationDropdownVisible);
-  };
+    // 從後端獲取用戶資料
+    const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
+
+    axios.get(`http://localhost:8080/api/auth/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}` // 設置 Authorization 標頭
+      }
+    })
+      .then(response => {
+        const userData = response.data;
+        setFormData({
+          nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
+          username: userData.username
+        });
+      })
+      .catch(error => {
+        console.error("獲取用戶資料時發生錯誤:", error);
+      });
+  }, [userId]);
 
   return (
     <div className="Friends">
@@ -63,8 +80,13 @@ function Friends() {
                     <div className="profile-info-left">
                       <div className="text-center">
                         <div className="profile-img w-shadow">
-                          <div className="profile-img-overlay"></div>
-                          <img src="assets/images/users/user-4.jpg" alt="Avatar" className="avatar img-circle" />
+                          <div className="profile-img-overlay">
+                            <img
+                              src={avatarUrl}
+                              alt="Avatar"
+                              className="avatar img-circle"
+                            />
+                          </div>
                           <div className="profile-img-caption">
                             <label for="updateProfilePic" className="upload">
                               <i className='bx bxs-camera'></i> Update
@@ -72,8 +94,8 @@ function Friends() {
                             </label>
                           </div>
                         </div>
-                        <p className="profile-fullname mt-3">Arthur Minasyan</p>
-                        <p className="profile-username mb-3 text-muted">@arthur_minasyan</p>
+                        <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
+                        <p className="profile-username mb-3 text-muted">@{formData.username || 'username'}</p>
                       </div>
                       <div className="intro mt-4">
                         <div className="d-flex">
