@@ -1,21 +1,39 @@
-import React, { useEffect, useState } from 'react'
-
+import React, { useEffect, useState, useContext } from 'react'
+import { UserContext } from './context';
+import axios from 'axios';
 
 function Photo() {
 
-    // State to manage the visibility of the dropdown menu
-    const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
+    const { avatarUrl } = useContext(UserContext);
 
-    // Function to toggle dropdown visibility
-    const toggleDropdown = () => {
-        setDropdownVisible(!dropdownVisible);
-    };
+    const [formData, setFormData] = useState({
+        nickName: '',
+        username: ''
+    });
+    const { userId, setAvatarUrl } = useContext(UserContext);
 
-    // Function to toggle notification dropdown visibility
-    const toggleNotificationDropdown = () => {
-        setNotificationDropdownVisible(!notificationDropdownVisible);
-    };
+    useEffect(() => {
+        console.log('Fetched userId:', userId);
+
+        // 從後端獲取用戶資料
+        const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
+
+        axios.get(`http://localhost:8080/api/auth/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}` // 設置 Authorization 標頭
+            }
+        })
+            .then(response => {
+                const userData = response.data;
+                setFormData({
+                    nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
+                    username: userData.username
+                });
+            })
+            .catch(error => {
+                console.error("獲取用戶資料時發生錯誤:", error);
+            });
+    }, [userId]);
 
     return (
         <div className="Profile">
@@ -47,7 +65,7 @@ function Photo() {
                 <div className="container-fluid newsfeed d-flex" id="wrapper">
                     <div className="row newsfeed-size">
                         <div className="col-md-12 p-0">
-                            
+
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
                                     <div className="profile-header-background">
@@ -71,7 +89,7 @@ function Photo() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src="assets/images/users/user-4.jpg"
+                                                            src={avatarUrl}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
@@ -86,9 +104,9 @@ function Photo() {
                                                             </label>
                                                         </div>
                                                     </div>
-                                                    <p className="profile-fullname mt-3">Arthur Minasyan</p>
+                                                    <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
                                                     <p className="profile-username mb-3 text-muted">
-                                                        @arthur_minasyan
+                                                        @{formData.username || 'username'}
                                                     </p>
                                                 </div>
                                                 <div className="intro mt-4">
@@ -285,119 +303,119 @@ function Photo() {
                                                             </li>
                                                         </ul>
                                                         <ul className="list-group list-group-horizontal types-list fs-8">
-                                                        <form className="list-group-item d-flex w-100 align-items-center p-0 form-inline dropdown search-form">
-                                                            <div className="input-group w-95" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="searchDropdown">
-                                                                <input type="text" className="form-control search-input" placeholder="Search for photo" aria-label="Search" aria-describedby="search-addon" />
-                                                                <div className="input-group-append">
-                                                                    <button className="btn search-button" type="button">
-                                                                        <i className='bx bx-search'></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <ul className="dropdown-menu notify-drop nav-drop shadow-sm" aria-labelledby="searchDropdown">
-                                                                <div className="notify-drop-title">
-                                                                    <div className="row">
-                                                                        <div className="col-md-6 col-sm-6 col-xs-6 fs-8">Search Results
-                                                                            <span className="badge badge-pill badge-primary ml-2">29</span>
-                                                                        </div>
+                                                            <form className="list-group-item d-flex w-100 align-items-center p-0 form-inline dropdown search-form">
+                                                                <div className="input-group w-95" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="searchDropdown">
+                                                                    <input type="text" className="form-control search-input" placeholder="Search for photo" aria-label="Search" aria-describedby="search-addon" />
+                                                                    <div className="input-group-append">
+                                                                        <button className="btn search-button" type="button">
+                                                                            <i className='bx bx-search'></i>
+                                                                        </button>
                                                                     </div>
                                                                 </div>
+                                                                <ul className="dropdown-menu notify-drop nav-drop shadow-sm" aria-labelledby="searchDropdown">
+                                                                    <div className="notify-drop-title">
+                                                                        <div className="row">
+                                                                            <div className="col-md-6 col-sm-6 col-xs-6 fs-8">Search Results
+                                                                                <span className="badge badge-pill badge-primary ml-2">29</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
-                                                                <div className="drop-content">
-                                                                    <h6 className="dropdown-header">Peoples</h6>
-                                                                    <li className="dropdown-item">
-                                                                        <div className="col-md-2 col-sm-2 col-xs-2">
-                                                                            <div className="notify-img">
-                                                                                <img src="assets/images/users/user-6.png" alt="Search result" />
+                                                                    <div className="drop-content">
+                                                                        <h6 className="dropdown-header">Peoples</h6>
+                                                                        <li className="dropdown-item">
+                                                                            <div className="col-md-2 col-sm-2 col-xs-2">
+                                                                                <div className="notify-img">
+                                                                                    <img src="assets/images/users/user-6.png" alt="Search result" />
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div className="col-md-10 col-sm-10 col-xs-10">
-                                                                            <a href="#" className="notification-user">Susan P. Jarvis</a>
-                                                                            <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                                                                Add Friend
-                                                                            </a>
-                                                                            <p className="time">6 Mutual friends</p>
-                                                                        </div>
-                                                                    </li>
-                                                                    <li className="dropdown-item">
-                                                                        <div className="col-md-2 col-sm-2 col-xs-2">
-                                                                            <div className="notify-img">
-                                                                                <img src="assets/images/users/user-5.png" alt="Search result" />
+                                                                            <div className="col-md-10 col-sm-10 col-xs-10">
+                                                                                <a href="#" className="notification-user">Susan P. Jarvis</a>
+                                                                                <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
+                                                                                    Add Friend
+                                                                                </a>
+                                                                                <p className="time">6 Mutual friends</p>
                                                                             </div>
-                                                                        </div>
-                                                                        <div className="col-md-10 col-sm-10 col-xs-10">
-                                                                            <a href="#" className="notification-user">Ruth D. Greene</a>
-                                                                            <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                                                                Add Friend
-                                                                            </a>
-                                                                        </div>
-                                                                    </li>
-                                                                    <h6 className="dropdown-header">Groups</h6>
-                                                                    <li className="dropdown-item">
-                                                                        <div className="col-md-2 col-sm-2 col-xs-2">
-                                                                            <div className="notify-img">
-                                                                                <img src="assets/images/groups/group-2.jpg" alt="Search result" />
+                                                                        </li>
+                                                                        <li className="dropdown-item">
+                                                                            <div className="col-md-2 col-sm-2 col-xs-2">
+                                                                                <div className="notify-img">
+                                                                                    <img src="assets/images/users/user-5.png" alt="Search result" />
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div className="col-md-10 col-sm-10 col-xs-10">
-                                                                            <a href="#" className="notification-user">Tourism</a>
-                                                                            <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                                                                Join
-                                                                            </a>
-                                                                            <p className="time">2.5k Members 35+ post a week</p>
-                                                                        </div>
-                                                                    </li>
-                                                                    <li className="dropdown-item">
-                                                                        <div className="col-md-2 col-sm-2 col-xs-2">
-                                                                            <div className="notify-img">
-                                                                                <img src="assets/images/groups/group-1.png" alt="Search result" />
+                                                                            <div className="col-md-10 col-sm-10 col-xs-10">
+                                                                                <a href="#" className="notification-user">Ruth D. Greene</a>
+                                                                                <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
+                                                                                    Add Friend
+                                                                                </a>
                                                                             </div>
-                                                                        </div>
-                                                                        <div className="col-md-10 col-sm-10 col-xs-10">
-                                                                            <a href="#" className="notification-user">Argon Social Network
-                                                                                <img src="assets/images/theme/verify.png" width="10px" className="verify" alt="Group verified" />
-                                                                            </a>
-                                                                            <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                                                                Join
-                                                                            </a>
-                                                                            <p className="time">10k Members 20+ post a week</p>
-                                                                        </div>
-                                                                    </li>
+                                                                        </li>
+                                                                        <h6 className="dropdown-header">Groups</h6>
+                                                                        <li className="dropdown-item">
+                                                                            <div className="col-md-2 col-sm-2 col-xs-2">
+                                                                                <div className="notify-img">
+                                                                                    <img src="assets/images/groups/group-2.jpg" alt="Search result" />
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="col-md-10 col-sm-10 col-xs-10">
+                                                                                <a href="#" className="notification-user">Tourism</a>
+                                                                                <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
+                                                                                    Join
+                                                                                </a>
+                                                                                <p className="time">2.5k Members 35+ post a week</p>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li className="dropdown-item">
+                                                                            <div className="col-md-2 col-sm-2 col-xs-2">
+                                                                                <div className="notify-img">
+                                                                                    <img src="assets/images/groups/group-1.png" alt="Search result" />
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="col-md-10 col-sm-10 col-xs-10">
+                                                                                <a href="#" className="notification-user">Argon Social Network
+                                                                                    <img src="assets/images/theme/verify.png" width="10px" className="verify" alt="Group verified" />
+                                                                                </a>
+                                                                                <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
+                                                                                    Join
+                                                                                </a>
+                                                                                <p className="time">10k Members 20+ post a week</p>
+                                                                            </div>
+                                                                        </li>
+                                                                    </div>
+                                                                    <div className="notify-drop-footer text-center">
+                                                                        <a href="#">See More</a>
+                                                                    </div>
+                                                                </ul>
+                                                            </form>
+                                                        </ul>
+                                                        <div className="bg-white py-3 px-4 shadow-sm">
+                                                            <div className="card-head d-flex justify-content-between">
+                                                                <h5 className="mb-4">Photo</h5>
+                                                                <a href="#" className="btn btn-link">See All</a>
+                                                            </div>
+                                                            <div className="row">
+                                                                <div className="col-md-4 col-sm-6">
+                                                                    <div className="card group-card shadow-sm">
+                                                                        <img src="assets/images/groups/group-1.png" className="card-img-top group-card-image" alt="Group image" />
+                                                                    </div>
                                                                 </div>
-                                                                <div className="notify-drop-footer text-center">
-                                                                    <a href="#">See More</a>
+                                                                <div className="col-md-4 col-sm-6">
+                                                                    <div className="card group-card shadow-sm">
+                                                                        <img src="assets/images/groups/group-2.jpg" className="card-img-top group-card-image" alt="Group image" />
+                                                                    </div>
                                                                 </div>
-                                                            </ul>
-                                                        </form>
-                                                    </ul>
-                                                    <div className="bg-white py-3 px-4 shadow-sm">
-                                                        <div className="card-head d-flex justify-content-between">
-                                                            <h5 className="mb-4">Photo</h5>
-                                                            <a href="#" className="btn btn-link">See All</a>
+                                                                <div className="col-md-4 col-sm-6">
+                                                                    <div className="card group-card shadow-sm">
+                                                                        <img src="assets/images/groups/group-3.jpg" className="card-img-top group-card-image" alt="Group image" />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-4 col-sm-6">
+                                                                    <div className="card group-card shadow-sm">
+                                                                        <img src="assets/images/groups/group-4.jpg" className="card-img-top group-card-image" alt="Group image" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="row">
-                                                            <div className="col-md-4 col-sm-6">
-                                                                <div className="card group-card shadow-sm">
-                                                                    <img src="assets/images/groups/group-1.png" className="card-img-top group-card-image" alt="Group image" />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-4 col-sm-6">
-                                                                <div className="card group-card shadow-sm">
-                                                                    <img src="assets/images/groups/group-2.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-4 col-sm-6">
-                                                                <div className="card group-card shadow-sm">
-                                                                    <img src="assets/images/groups/group-3.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-4 col-sm-6">
-                                                                <div className="card group-card shadow-sm">
-                                                                    <img src="assets/images/groups/group-4.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                     </div>
                                                     <div className="col-md-3 profile-quick-media">
                                                         <h6 className="text-muted timeline-title">
