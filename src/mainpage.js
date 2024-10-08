@@ -155,7 +155,7 @@ function MainPage() {
       </div>
       </div>
       <div className="col-md-6 second-section" id="page-content-wrapper">
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <div className="btn-group d-flex">
         <Link
           to="/"
@@ -185,8 +185,8 @@ function MainPage() {
           <span className="fs-8">Watch</span>
         </Link>
         </div>
-      </div>
-      <ul className="list-unstyled" style={{ marginBottom: 0 }}>
+      </div> */}
+      <ul className="list-unstyled mt-3" style={{ marginBottom: 0 }}>
         <PostForm />
         {/* <li className="media post-form w-shadow">
         <div className="media-body">
