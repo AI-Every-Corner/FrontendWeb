@@ -2,43 +2,14 @@ import { Chart } from 'react-google-charts';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React,{ useState, useEffect, useContext } from 'react';
+import { useNavigate} from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
-import axios from 'axios';
 
 function Profile() {
     const navigate = useNavigate();
     const { avatarUrl } = useContext(UserContext);
-    const [formData, setFormData] = useState({
-        nickName: '',
-        username: ''
-    });
-    const { userId, setAvatarUrl } = useContext(UserContext);
-
-    useEffect(() => {
-        console.log('Fetched userId:', userId);
-
-        // 從後端獲取用戶資料
-        const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
-
-        axios.get(`http://localhost:8080/api/auth/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}` // 設置 Authorization 標頭
-            }
-        })
-            .then(response => {
-                const userData = response.data;
-                setFormData({
-                    nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
-                    username: userData.username
-                });
-            })
-            .catch(error => {
-                console.error("獲取用戶資料時發生錯誤:", error);
-            });
-    }, [userId]);
 
     // Function to handle logout
     const handleLogout = async () => {
@@ -115,9 +86,9 @@ function Profile() {
                                                             </label>
                                                         </div>
                                                     </div>
-                                                    <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
+                                                    <p className="profile-fullname mt-3">Arthur Minasyan</p>
                                                     <p className="profile-username mb-3 text-muted">
-                                                        @{formData.username || 'username'}
+                                                        @arthur_minasyan
                                                     </p>
                                                 </div>
                                                 <div className="intro mt-4">
@@ -314,14 +285,14 @@ function Profile() {
                                                             </li>
                                                         </ul>
                                                         <Container>
-                                                            <Row>
-                                                                <Col md={1} lg={1} xl={1}></Col>
-                                                                <Col>  <CalendarChart /></Col>
-                                                                <Col md={1} lg={1} xl={1}></Col>
-                                                            </Row>
-
+                                                        <Row>
+                                                            <Col md={1} lg={1} xl={1}></Col>
+                                                            <Col>  <CalendarChart /></Col>
+                                                            <Col md={1} lg={1} xl={1}></Col>
+                                                        </Row>
+                                                      
                                                         </Container>
-
+                                                     
                                                         <div className="bg-white profile-posts-options mt-5 mb-4 py-3 d-flex justify-content-between shadow-sm">
                                                             <div className="col-md-3 col-sm-12">
                                                                 <h6 className="timeline-title">Posts</h6>
@@ -1162,74 +1133,73 @@ function Profile() {
                 {/* Optional */}
             </>
 
-        </div>
-    );
+    </div>
+  );
 }
 
 function CalendarChart() {
-    const data = [
-        [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
-        [new Date(2024, 5, 12), 3],
-        [new Date(2024, 8, 5), 10],
-        [new Date(2024, 0, 16), 4],
-        [new Date(2024, 5, 16), 9],
-        [new Date(2024, 9, 18), 5],
-        [new Date(2024, 10, 18), 5],
-        [new Date(2024, 10, 26), 3],
-        [new Date(2024, 4, 8), 9],
-        [new Date(2024, 1, 16), 8],
-        [new Date(2024, 5, 1), 9],
-        [new Date(2024, 8, 2), 8],
-        [new Date(2024, 11, 15), 5],
-        [new Date(2024, 5, 11), 2],
-        [new Date(2024, 6, 18), 9],
+  const data = [
+    [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
+    [new Date(2024, 5, 12), 3],
+    [new Date(2024, 8, 5), 10],
+    [new Date(2024, 0, 16), 4],
+    [new Date(2024, 5, 16), 9],
+    [new Date(2024, 9, 18), 5],
+    [new Date(2024, 10, 18), 5],
+    [new Date(2024, 10, 26), 3],
+    [new Date(2024, 4, 8), 9],
+    [new Date(2024, 1, 16), 8],
+    [new Date(2024, 5, 1), 9],
+    [new Date(2024, 8, 2), 8],
+    [new Date(2024, 11, 15), 5],
+    [new Date(2024, 5, 11), 2],
+    [new Date(2024, 6, 18), 9],
+  
+  ];
+  
 
-    ];
+  const options = {
+    title: "Your Mood for 2024",
+    height: 350,
+    calendar: {
+      cellSize: 11,  // 單元格大小
+      dayOfWeekLabel: {
+        fontName: 'Arial',
+        fontSize: 14,
+        color: '#666',
+      },
+      monthLabel: {
+        fontName: 'Arial',
+        fontSize: 18,
+        color: '#333',
+      },
+      focusedCellColor: {
+        stroke: '#ff0000',
+        strokeOpacity: 0.8,
+      },
+      colorAxis: {
+        minValue: 0,
+        maxValue: 10,
+        colors: ['#ffffff', '#00008b'],  // 白色到深藍色
+      },
+    },
+  };
 
+  return (
+    <div style={{ width: '100%', 
+      aspectRatio: '6 / 1' ,
 
-    const options = {
-        title: "Your Mood for 2024",
-        height: 350,
-        calendar: {
-            cellSize: 11,  // 單元格大小
-            dayOfWeekLabel: {
-                fontName: 'Arial',
-                fontSize: 14,
-                color: '#666',
-            },
-            monthLabel: {
-                fontName: 'Arial',
-                fontSize: 18,
-                color: '#333',
-            },
-            focusedCellColor: {
-                stroke: '#ff0000',
-                strokeOpacity: 0.8,
-            },
-            colorAxis: {
-                minValue: 0,
-                maxValue: 10,
-                colors: ['#ffffff', '#00008b'],  // 白色到深藍色
-            },
-        },
-    };
-
-    return (
-        <div style={{
-            width: '100%',
-            aspectRatio: '6 / 1',
-
-        }}>
-            <Chart
-                chartType="Calendar"
-                data={data}
-                options={options}
-                width="100%"  // 寬度設為 100%
-                height="100%"  // 高度設為 100%
-                loader={<div>Loading Chart...</div>}
-            />
-        </div>
-    );
+      }}>
+      <Chart
+        chartType="Calendar"
+        data={data}
+        options={options}
+        width="100%"  // 寬度設為 100%
+        height="100%"  // 高度設為 100%
+        loader={<div>Loading Chart...</div>}
+      />
+    </div>
+  );
 }
 
 export default Profile;

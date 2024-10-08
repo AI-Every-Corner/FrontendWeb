@@ -15,16 +15,21 @@ const PostList = () => {
 
       const token = localStorage.getItem('token');
       
+
         try {
+            const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
             const response = await axios.get(`http://localhost:8080/posts`,{
               headers: {
                 'Authorization': `Bearer ${token}` // 添加 Authorization header
               }
             }, {
+              headers: {
+                'Authorization': `Bearer ${token}` // 添加 Authorization header
+              },
                 params: {
                   page: 0,
                   size: 10
-                },
+                }
             });
             console.log(response);
             setPosts([...posts, ...response.data.postsList]);  // Append new posts
