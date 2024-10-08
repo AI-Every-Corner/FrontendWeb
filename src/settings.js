@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { logout } from './api';
 import { UserContext } from './context';
+import { useDropzone } from 'react-dropzone';
 
 function Settings() {
 
@@ -12,6 +12,7 @@ function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [retypePassword, setRetypePassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [imageUploaded, setImageUploaded] = useState(false); // 照片上傳狀態
 
   useEffect(() => {
     setPasswordsMatch(newPassword === retypePassword);
@@ -27,7 +28,7 @@ function Settings() {
   });
 
   const navigate = useNavigate();
-  const { userId } = useContext(UserContext); // 從 UserContext 中獲取 userId
+  const { userId, setAvatarUrl } = useContext(UserContext);
 
   useEffect(() => {
 
@@ -37,11 +38,11 @@ function Settings() {
 
     // 這裡可以用 GET 請求獲取用戶信息並設置到 formData 中
     //  API 地址
-    axios.get(`http://localhost:8080/api/auth/${userId}`,{
+    axios.get(`http://localhost:8080/api/auth/${userId}`, {
       headers: {
         'Authorization': `Bearer ${token}` // 添加 Authorization header
       }
-    }) 
+    })
       .then(response => {
         console.log(response.data); // 檢查返回的資料
         const userData = response.data;
@@ -72,20 +73,24 @@ function Settings() {
     }));
   };
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewSrc(reader.result); // Set the image source to the preview
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setPreviewSrc(null); // Clear the preview if no file is selected
-    }
+  // 使用react-dropzone處理圖片拖放上傳和預覽
+  const onDrop = (acceptedFiles) => {
+    const file = acceptedFiles[0];
+    setFormData(prevData => ({ ...prevData, image: file }));
+
+    // 建立圖片預覽的URL
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewSrc(previewUrl);
+    setImageUploaded(true); // 設置照片上傳狀態為已上傳
   };
 
-  // Password change handler
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: 'image/*',
+    multiple: false
+  });
+
+  // 密碼變更處理器
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     if (name === 'settingsNewPassword') {
@@ -98,28 +103,51 @@ function Settings() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 複製 formData 來發送到後端
-    const updatedData = { ...formData };
-
-    // 如果有新密碼，則添加到要發送的資料中
-    if (newPassword) {
-      updatedData.password = newPassword;
-    }
-
     const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
 
+    // 使用 FormData 來處理包含文件的表單數據
+    const formDataToSend = new FormData();
+
+    // 將表單的其他資料加入到 FormData 中
+    formDataToSend.append("nickName", formData.nickName);
+    formDataToSend.append("gender", formData.gender);
+    formDataToSend.append("birth", formData.birth);
+    formDataToSend.append("phoneNum", formData.phoneNum);
+    formDataToSend.append("email", formData.email);
+
+    // 如果有新密碼，將其加入到 FormData 中
+    if (newPassword) {
+      formDataToSend.append("password", newPassword);
+    }
+
+    // 如果有圖片文件，將圖片加入到 FormData 中
+    if (formData.image) {
+      formDataToSend.append("image", formData.image);
+    }
+
     // 這裡可以發送 PUT 請求來更新用戶數據，使用 username 來動態構建 PUT API 地址
-    axios.put(`http://localhost:8080/api/auth/${userId}`, updatedData, {
+    axios.put(`http://localhost:8080/api/auth/${userId}`, formDataToSend, {
       headers: {
-        'Authorization': `Bearer ${token}` // 添加 Authorization header
+        'Authorization': `Bearer ${token}`,// 添加 Authorization header
+        'Content-Type': 'multipart/form-data' // 確保這裡的 Content-Type 是正確的
       }
     })
       .then(response => {
         alert('資料更新成功！');
 
+        const updatedImagePath = response.data.imagePath; // 從後端的回應中提取新的圖片路徑
+
+        // 更新 localStorage 中的圖片路徑
+        if (updatedImagePath) {
+          const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+          const fullImageUrl = `${baseUrl}${updatedImagePath}`;
+          localStorage.setItem('userImage', updatedImagePath); // 更新 localStorage 中的 userImage
+          setAvatarUrl(fullImageUrl); // 更新 UserContext 中的 avatarUrl
+        }
+
         // 清空密碼欄位
-      setNewPassword('');
-      setRetypePassword('');
+        setNewPassword('');
+        setRetypePassword('');
       })
       .catch(error => {
         console.error('Error updating data:', error);
@@ -129,7 +157,6 @@ function Settings() {
   return (
     <div className="Settings">
       <>
-        <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta
           name="viewport"
@@ -178,82 +205,6 @@ function Settings() {
                               <div className="meta">
                                 <p>Personal Information</p>
                               </div>
-                            </a>
-                          </li>
-
-                          <h6 className="p-3">Security &amp; Login</h6>
-                          <li className="contact">
-                            <a href="#" className="wrap d-flex align-items-center">
-                              <img
-                                src="assets/images/icons/settings/security-question.png"
-                                className="settings-icon"
-                                alt="Settings left sidebar"
-                              />
-                              <div className="meta">
-                                <p>Security Question</p>
-                              </div>
-                            </a>
-                          </li>
-                          <li className="contact">
-                            <a
-                              href="settings-fingerprint.html"
-                              className="wrap d-flex align-items-center"
-                            >
-                              <div className="meta" />
-                              <p>
-                                <img
-                                  src="assets/images/icons/settings/fingerprint.png"
-                                  className="settings-icon"
-                                  alt="Settings left sidebar"
-                                />{" "}
-                                Fingerprint Lock
-                              </p>
-                            </a>
-                          </li>
-                          <li className="contact">
-                            <a
-                              href="settings-location.html"
-                              className="wrap d-flex align-items-center"
-                            >
-                              <div className="meta" />
-                              <p>
-                                <img
-                                  src="assets/images/icons/settings/location.png"
-                                  className="settings-icon"
-                                  alt="Settings left sidebar"
-                                />{" "}
-                                Location
-                              </p>
-                            </a>
-                          </li>
-                          <h6 className="p-3">Billing &amp; Payment</h6>
-                          <li className="contact">
-                            <a
-                              href="settings-billing-method.html"
-                              className="wrap d-flex align-items-center"
-                            >
-                              <div className="meta" />
-                              <p>
-                                <img
-                                  src="assets/images/icons/settings/wallet.png"
-                                  className="settings-icon"
-                                  alt="Settings left sidebar"
-                                />{" "}
-                                Billing Method
-                              </p>
-                            </a>
-                          </li>
-                          <li className="contact">
-                            <a href="#" className="wrap d-flex align-items-center">
-                              <div className="meta" />
-                              <p>
-                                <img
-                                  src="assets/images/icons/settings/credit-card.png"
-                                  className="settings-icon"
-                                  alt="Settings left sidebar"
-                                />{" "}
-                                Automatic Payments
-                              </p>
                             </a>
                           </li>
                         </ul>
@@ -324,22 +275,22 @@ function Settings() {
                             </div>
                             <div className="col-md-4">
 
-                              <div className="profile-img-upload" />
-                              <div className="profile-img-section">
-                                <label htmlFor="updateProfilePic" className="upload">
-                                  <i className="bx bxs-camera" /> Upload image
-                                  <input
-                                    type="file"
-                                    name="updateProfilePicInput"
-                                    className="text-center upload"
-                                    accept="image/*"
-                                    onChange={handleImageChange} // Call the function on file change
-                                  />
-                                </label>
+                              <div className="form-group">
+                                {/* 使用react-dropzone來實現拖放上傳 */}
+                                {!imageUploaded && (
+                                  <div {...getRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
+                                    <input {...getInputProps()} />
+                                    {isDragActive ? (
+                                      <p>拖放圖片至此...</p>
+                                    ) : (
+                                      <p>拖拉或點擊上傳圖片</p>
+                                    )}
+                                  </div>
+                                )}
                                 {/* Image Preview */}
                                 {previewSrc && (
-                                  <div className="image-preview">
-                                    <img src={previewSrc} alt="Selected Preview" className="img-thumbnail" />
+                                  <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                    <img src={previewSrc} alt="預覽圖片" style={{ maxWidth: '100%', maxHeight: '200px' }} />
                                   </div>
                                 )}
                               </div>
