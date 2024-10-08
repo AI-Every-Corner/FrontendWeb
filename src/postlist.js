@@ -9,12 +9,17 @@ const PostList = () => {
     const [showImg, setShowImg] = useState(false);
 
     const fetchPosts = async () => {
+
         try {
+            const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
             const response = await axios.get(`http://localhost:8080/posts`, {
+              headers: {
+                'Authorization': `Bearer ${token}` // 添加 Authorization header
+              },
                 params: {
                   page,
                   size: 10
-                },
+                }
             });
             console.log(response);
             setPosts([...posts, ...response.data.postRes]);  // Append new posts
@@ -43,7 +48,7 @@ const PostList = () => {
         >
             {posts.map((post) => (
                 <div key={post.postId}>
-                  {console.log(typeof post.createdAt)}
+                  {console.log(post)}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <img
@@ -54,7 +59,7 @@ const PostList = () => {
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
       <a href="#" className="text-gray-dark post-user-name">
-      <a className="h5">{post.username}</a>
+      <a className="h5">{post.nickname}</a>
       {/* {post.userId} */}
       </a>
       <div className="dropdown">
@@ -167,9 +172,9 @@ const PostList = () => {
 </div>
 <div className="d-block mt-3">
   <img
-  src={post.img}
+  src={post.imagePath}
   className="post-content"
-  alt="post image"
+  alt="a post image"
   />
 </div>
 <div className="mb-3">
