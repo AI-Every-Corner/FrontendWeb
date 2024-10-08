@@ -80,17 +80,20 @@ function Friends() {
                     <div className="profile-info-left">
                       <div className="text-center">
                         <div className="profile-img w-shadow">
-                          <div className="profile-img-overlay">
-                            <img
-                              src={avatarUrl}
-                              alt="Avatar"
-                              className="avatar img-circle"
-                            />
-                          </div>
+                          <div className="profile-img-overlay" />
+                          <img
+                            src={avatarUrl}
+                            alt="Avatar"
+                            className="avatar img-circle"
+                          />
                           <div className="profile-img-caption">
-                            <label for="updateProfilePic" className="upload">
-                              <i className='bx bxs-camera'></i> Update
-                              <input type="file" id="updateProfilePicInput" className="text-center upload" />
+                            <label htmlFor="updateProfilePic" className="upload">
+                              <i className="bx bxs-camera" /> Update
+                              <input
+                                type="file"
+                                id="updateProfilePicInput"
+                                className="text-center upload"
+                              />
                             </label>
                           </div>
                         </div>

@@ -16,6 +16,7 @@ function Profile() {
         username: ''
     });
     const { userId, setAvatarUrl } = useContext(UserContext);
+    const [posts, setPosts] = useState([]);  // New state for posts
 
     useEffect(() => {
         console.log('Fetched userId:', userId);
@@ -38,14 +39,20 @@ function Profile() {
             .catch(error => {
                 console.error("獲取用戶資料時發生錯誤:", error);
             });
+
+        // Fetch posts by user ID
+        axios.get(`http://localhost:8080/posts/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(response => {
+            setPosts(response.data);  // Update the posts state with the response
+        }).catch(error => {
+            console.error("Error fetching posts:", error);
+        });
+
     }, [userId]);
 
-    // Function to handle logout
-    const handleLogout = async () => {
-        await logout();
-        alert('登出成功');
-        navigate('/sign-in');
-    };
 
     return (
         <div className="Profile">
@@ -350,145 +357,183 @@ function Profile() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="post border-bottom p-3 bg-white w-shadow">
-                                                            <div className="media text-muted pt-3">
-                                                                <img
-                                                                    src={avatarUrl}
-                                                                    alt="Online user"
-                                                                    className="mr-3 post-user-image"
-                                                                />
-                                                                <div className="media-body pb-3 mb-0 small lh-125">
-                                                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                                                        <span className="post-type text-muted">
-                                                                            <a
-                                                                                href="#"
-                                                                                className="text-gray-dark post-user-name mr-2"
-                                                                            >
-                                                                                Arthur Minasyan
-                                                                            </a>{" "}
-                                                                            updated his cover photo.
-                                                                        </span>
-                                                                        <div className="dropdown">
-                                                                            <a
-                                                                                href="#"
-                                                                                className="post-more-settings"
-                                                                                role="button"
-                                                                                data-toggle="dropdown"
-                                                                                id="postOptions"
-                                                                                aria-haspopup="true"
-                                                                                aria-expanded="false"
-                                                                            >
-                                                                                <i className="bx bx-dots-horizontal-rounded" />
-                                                                            </a>
-                                                                            <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="dropdown-item"
-                                                                                    aria-describedby="savePost"
-                                                                                >
-                                                                                    <div className="row">
-                                                                                        <div className="col-md-2">
-                                                                                            <i className="bx bx-bookmark-plus post-option-icon" />
-                                                                                        </div>
-                                                                                        <div className="col-md-10">
-                                                                                            <span className="fs-9">Save post</span>
-                                                                                            <small
-                                                                                                id="savePost"
-                                                                                                className="form-text text-muted"
+                                                        <Row>
+                                                            {posts.length > 0 ? (
+                                                                posts.map(post => (
+                                                                    <Col md={12} className="col-md-9 profile-center" key={post.postId}>
+                                                                        <div className="post border-bottom p-3 bg-white w-shadow">
+                                                                            <div className="media text-muted pt-3">
+                                                                                <img
+                                                                                    src={avatarUrl}
+                                                                                    alt="User avatar"
+                                                                                    className="mr-3 post-user-image"
+                                                                                />
+                                                                                <div className="media-body pb-3 mb-0 small lh-125">
+                                                                                    <div className="d-flex justify-content-between align-items-center w-100">
+                                                                                        <span className="post-type text-muted">
+                                                                                            <p className="profile-fullname mt-3">
+                                                                                                {formData.nickName || 'Your Nickname'}
+                                                                                            </p>{' '}
+                                                                                            updated his cover photo.
+                                                                                        </span>
+                                                                                        <div className="dropdown">
+                                                                                            <a
+                                                                                                href="#"
+                                                                                                className="post-more-settings"
+                                                                                                role="button"
+                                                                                                data-toggle="dropdown"
+                                                                                                id="postOptions"
+                                                                                                aria-haspopup="true"
+                                                                                                aria-expanded="false"
                                                                                             >
-                                                                                                Add this to your saved items
-                                                                                            </small>
+                                                                                                <i className="bx bx-dots-horizontal-rounded" />
+                                                                                            </a>
+                                                                                            <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
+                                                                                                <a href="#" className="dropdown-item">
+                                                                                                    Save post
+                                                                                                </a>
+                                                                                                <a href="#" className="dropdown-item">
+                                                                                                    Hide post
+                                                                                                </a>
+                                                                                                <a href="#" className="dropdown-item">
+                                                                                                    Report post
+                                                                                                </a>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
+                                                                                    <span className="d-block">
+                                                                                        {new Date(post.createdAt).toLocaleString()}{' '}
+                                                                                        <i className="bx bx-globe ml-3" />
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="mt-3">
+                                                                                <p>{post.content}</p>
+                                                                            </div>
+                                                                            {post.imagePath && (
+                                                                                <div className="d-block mt-3">
+                                                                                    <img
+                                                                                        src={post.imagePath}
+                                                                                        className="w-100 mb-3"
+                                                                                        alt="Post image"
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                            <div className="mb-2">
+                                                                                <div className="argon-reaction">
+                                                                                    <span className="like-btn">
+                                                                                        <a href="#" className="post-card-buttons">
+                                                                                            <i className="bx bxs-like mr-2" /> 67
+                                                                                        </a>
+                                                                                        <ul className="reactions-box dropdown-shadow">
+                                                                                            <li
+                                                                                                className="reaction reaction-like"
+                                                                                                data-reaction="Like"
+                                                                                            />
+                                                                                            <li
+                                                                                                className="reaction reaction-love"
+                                                                                                data-reaction="Love"
+                                                                                            />
+                                                                                            <li
+                                                                                                className="reaction reaction-haha"
+                                                                                                data-reaction="HaHa"
+                                                                                            />
+                                                                                            <li
+                                                                                                className="reaction reaction-wow"
+                                                                                                data-reaction="Wow"
+                                                                                            />
+                                                                                            <li
+                                                                                                className="reaction reaction-sad"
+                                                                                                data-reaction="Sad"
+                                                                                            />
+                                                                                            <li
+                                                                                                className="reaction reaction-angry"
+                                                                                                data-reaction="Angry"
+                                                                                            />
+                                                                                        </ul>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <a href="#" className="post-card-buttons">
+                                                                                    <i className="bx bx-message-rounded mr-2" /> 5
                                                                                 </a>
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="dropdown-item"
-                                                                                    aria-describedby="hidePost"
-                                                                                >
-                                                                                    <div className="row">
-                                                                                        <div className="col-md-2">
-                                                                                            <i className="bx bx-hide post-option-icon" />
-                                                                                        </div>
-                                                                                        <div className="col-md-10">
-                                                                                            <span className="fs-9">Hide post</span>
-                                                                                            <small
-                                                                                                id="hidePost"
-                                                                                                className="form-text text-muted"
-                                                                                            >
-                                                                                                See fewer posts like this
-                                                                                            </small>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </a>
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="dropdown-item"
-                                                                                    aria-describedby="snoozePost"
-                                                                                >
-                                                                                    <div className="row">
-                                                                                        <div className="col-md-2">
-                                                                                            <i className="bx bx-time post-option-icon" />
-                                                                                        </div>
-                                                                                        <div className="col-md-10">
-                                                                                            <span className="fs-9">
-                                                                                                Snooze Arthur for 30 days
-                                                                                            </span>
-                                                                                            <small
-                                                                                                id="snoozePost"
-                                                                                                className="form-text text-muted"
-                                                                                            >
-                                                                                                Temporarily stop seeing posts
-                                                                                            </small>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </a>
-                                                                                <a
-                                                                                    href="#"
-                                                                                    className="dropdown-item"
-                                                                                    aria-describedby="reportPost"
-                                                                                >
-                                                                                    <div className="row">
-                                                                                        <div className="col-md-2">
-                                                                                            <i className="bx bx-block post-option-icon" />
-                                                                                        </div>
-                                                                                        <div className="col-md-10">
-                                                                                            <span className="fs-9">Report</span>
-                                                                                            <small
-                                                                                                id="reportPost"
-                                                                                                className="form-text text-muted"
-                                                                                            >
-                                                                                                I'm concerned about this post
-                                                                                            </small>
-                                                                                        </div>
-                                                                                    </div>
+
+                                                                                <a href="#" className="post-card-buttons">
+                                                                                    <i className="bx bx-share-alt mr-2" /> Share
                                                                                 </a>
                                                                             </div>
                                                                         </div>
+                                                                    </Col>
+                                                                ))
+                                                            ) : (
+                                                                <p>No posts available</p>
+                                                            )}
+
+                                                        </Row>
+
+                                                        <div
+                                                            className="border-top pt-3 hide-comments"
+                                                            style={{ display: "none" }}
+                                                        >
+                                                            <div className="row bootstrap snippets">
+                                                                <div className="col-md-12">
+                                                                    <div className="comment-wrapper">
+                                                                        <div className="panel panel-info">
+                                                                            <div className="panel-body">
+                                                                                <ul className="media-list comments-list">
+
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                    <span className="d-block">
-                                                                        3 hours ago <i className="bx bx-globe ml-3" />
-                                                                    </span>
                                                                 </div>
                                                             </div>
-                                                            <div className="mt-3">
-                                                                <p>
-                                                                    Lorem ipsum dolor sit amet, consectetur adipisicing
-                                                                    elit. Quis voluptatem veritatis harum, tenetur,
-                                                                    quibusdam voluptatum, incidunt saepe minus maiores
-                                                                    ea atque sequi illo veniam sint quaerat corporis
-                                                                    totam et. Culpa?
-                                                                </p>
+                                                        </div>
+                                                    </div>
+                                                    <Col md={3} className="col-md-3 profile-quick-media">
+                                                    <h6 className="text-muted timeline-title">
+                                                        Recent Media
+                                                    </h6>
+                                                    <div className="quick-media">
+                                                        <div className="media-overlay" />
+                                                        <a href="#" className="quick-media-img">
+                                                            <img
+                                                                src="assets/images/users/album/album-1.jpg"
+                                                                alt="Quick media"
+                                                            />
+                                                        </a>
+                                                        <div className="media-overlay-content">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div className="media-overlay-owner">
+                                                                    <img
+                                                                        src="assets/images/users/user-12.png"
+                                                                        alt="Media owner image"
+                                                                    />
+                                                                    <span className="overlay-owner-name fs-9">
+                                                                        Irwin M. Spelle
+                                                                    </span>
+                                                                </div>
+                                                                <div className="dropdown">
+                                                                    <a
+                                                                        href="#"
+                                                                        className="overlay-more"
+                                                                        data-toggle="dropdown"
+                                                                        role="button"
+                                                                        aria-haspopup="true"
+                                                                        aria-expanded="false"
+                                                                    >
+                                                                        <i className="bx bx-dots-horizontal-rounded" />
+                                                                    </a>
+                                                                    <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
+                                                                        <a className="dropdown-item" href="#">
+                                                                            Save post
+                                                                        </a>
+                                                                        <a className="dropdown-item" href="#">
+                                                                            Turn on notifications
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className="d-block mt-3">
-                                                                <img
-                                                                    src="assets/images/users/post/post-1.jpg"
-                                                                    className="w-100 mb-3"
-                                                                    alt="post image"
-                                                                />
-                                                            </div>
-                                                            <div className="mb-2">
-                                                                {/* Reactions */}
+                                                            <div className="overlay-bottom d-flex justify-content-between align-items-center">
                                                                 <div className="argon-reaction">
                                                                     <span className="like-btn">
                                                                         <a
@@ -496,7 +541,7 @@ function Profile() {
                                                                             className="post-card-buttons"
                                                                             id="reactions"
                                                                         >
-                                                                            <i className="bx bxs-like mr-2" /> 67
+                                                                            <i className="bx bxs-like mr-1" /> 67
                                                                         </a>
                                                                         <ul className="reactions-box dropdown-shadow">
                                                                             <li
@@ -526,582 +571,216 @@ function Profile() {
                                                                         </ul>
                                                                     </span>
                                                                 </div>
-                                                                <a
-                                                                    href="javascript:void(0)"
-                                                                    className="post-card-buttons"
-                                                                    id="show-comments"
-                                                                >
-                                                                    <i className="bx bx-message-rounded mr-2" /> 5
-                                                                </a>
-                                                                <div className="dropdown dropup share-dropup">
+                                                                <div className="liked-users">
+                                                                    <img
+                                                                        src="assets/images/users/user-9.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                    <img
+                                                                        src="assets/images/users/user-6.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                    <img
+                                                                        src="assets/images/users/user-12.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="quick-media">
+                                                        <div className="media-overlay" />
+                                                        <a href="#" className="quick-media-img">
+                                                            <img
+                                                                src="assets/images/users/album/album-2.jpg"
+                                                                alt="Quick media"
+                                                            />
+                                                        </a>
+                                                        <div className="media-overlay-content">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div className="media-overlay-owner">
+                                                                    <img
+                                                                        src="assets/images/users/user-12.png"
+                                                                        alt="Media owner image"
+                                                                    />
+                                                                    <span className="overlay-owner-name fs-9">
+                                                                        Irwin M. Spelle
+                                                                    </span>
+                                                                </div>
+                                                                <div className="dropdown">
                                                                     <a
                                                                         href="#"
-                                                                        className="post-card-buttons"
+                                                                        className="overlay-more"
                                                                         data-toggle="dropdown"
+                                                                        role="button"
                                                                         aria-haspopup="true"
                                                                         aria-expanded="false"
                                                                     >
-                                                                        <i className="bx bx-share-alt mr-2" /> Share
+                                                                        <i className="bx bx-dots-horizontal-rounded" />
                                                                     </a>
-                                                                    <div className="dropdown-menu post-dropdown-menu">
-                                                                        <a href="#" className="dropdown-item">
-                                                                            <div className="row">
-                                                                                <div className="col-md-2">
-                                                                                    <i className="bx bx-share-alt" />
-                                                                                </div>
-                                                                                <div className="col-md-10">
-                                                                                    <span>Share Now (Public)</span>
-                                                                                </div>
-                                                                            </div>
+                                                                    <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
+                                                                        <a className="dropdown-item" href="#">
+                                                                            Save post
                                                                         </a>
-                                                                        <a href="#" className="dropdown-item">
-                                                                            <div className="row">
-                                                                                <div className="col-md-2">
-                                                                                    <i className="bx bx-share-alt" />
-                                                                                </div>
-                                                                                <div className="col-md-10">
-                                                                                    <span>Share...</span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </a>
-                                                                        <a href="#" className="dropdown-item">
-                                                                            <div className="row">
-                                                                                <div className="col-md-2">
-                                                                                    <i className="bx bx-message" />
-                                                                                </div>
-                                                                                <div className="col-md-10">
-                                                                                    <span>Send as Message</span>
-                                                                                </div>
-                                                                            </div>
+                                                                        <a className="dropdown-item" href="#">
+                                                                            Turn on notifications
                                                                         </a>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div
-                                                                className="border-top pt-3 hide-comments"
-                                                                style={{ display: "none" }}
-                                                            >
-                                                                <div className="row bootstrap snippets">
-                                                                    <div className="col-md-12">
-                                                                        <div className="comment-wrapper">
-                                                                            <div className="panel panel-info">
-                                                                                <div className="panel-body">
-                                                                                    <ul className="media-list comments-list">
-                                                                                        <li className="media comment-form">
-                                                                                            <a href="#" className="pull-left">
-                                                                                                <img
-                                                                                                    src={avatarUrl}
-                                                                                                    alt=""
-                                                                                                    className="img-circle"
-                                                                                                />
-                                                                                            </a>
-                                                                                            <div className="media-body">
-                                                                                                <form action="" method="" role="form">
-                                                                                                    <div className="row">
-                                                                                                        <div className="col-md-12">
-                                                                                                            <div className="input-group">
-                                                                                                                <input
-                                                                                                                    type="text"
-                                                                                                                    className="form-control comment-input"
-                                                                                                                    placeholder="Write a comment..."
-                                                                                                                />
-                                                                                                                <div className="input-group-btn">
-                                                                                                                    <button
-                                                                                                                        type="button"
-                                                                                                                        className="btn comment-form-btn"
-                                                                                                                        data-toggle="tooltip"
-                                                                                                                        data-placement="top"
-                                                                                                                        title="Tooltip on top"
-                                                                                                                    >
-                                                                                                                        <i className="bx bxs-smiley-happy" />
-                                                                                                                    </button>
-                                                                                                                    <button
-                                                                                                                        type="button"
-                                                                                                                        className="btn comment-form-btn comment-form-btn"
-                                                                                                                        data-toggle="tooltip"
-                                                                                                                        data-placement="top"
-                                                                                                                        title="Tooltip on top"
-                                                                                                                    >
-                                                                                                                        <i className="bx bx-camera" />
-                                                                                                                    </button>
-                                                                                                                    <button
-                                                                                                                        type="button"
-                                                                                                                        className="btn comment-form-btn comment-form-btn"
-                                                                                                                        data-toggle="tooltip"
-                                                                                                                        data-placement="top"
-                                                                                                                        title="Tooltip on top"
-                                                                                                                    >
-                                                                                                                        <i className="bx bx-microphone" />
-                                                                                                                    </button>
-                                                                                                                    <button
-                                                                                                                        type="button"
-                                                                                                                        className="btn comment-form-btn"
-                                                                                                                        data-toggle="tooltip"
-                                                                                                                        data-placement="top"
-                                                                                                                        title="Tooltip on top"
-                                                                                                                    >
-                                                                                                                        <i className="bx bx-file-blank" />
-                                                                                                                    </button>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </form>
-                                                                                            </div>
-                                                                                        </li>
-                                                                                        <li className="media">
-                                                                                            <a href="#" className="pull-left">
-                                                                                                <img
-                                                                                                    src="assets/images/users/user-2.jpg"
-                                                                                                    alt=""
-                                                                                                    className="img-circle"
-                                                                                                />
-                                                                                            </a>
-                                                                                            <div className="media-body">
-                                                                                                <div className="d-flex justify-content-between align-items-center w-100">
-                                                                                                    <strong className="text-gray-dark">
-                                                                                                        <a href="#" className="fs-8">
-                                                                                                            Karen Minas
-                                                                                                        </a>
-                                                                                                    </strong>
-                                                                                                    <a href="#">
-                                                                                                        <i className="bx bx-dots-horizontal-rounded" />
-                                                                                                    </a>
-                                                                                                </div>
-                                                                                                <span className="d-block comment-created-time">
-                                                                                                    30 min ago
-                                                                                                </span>
-                                                                                                <p className="fs-8 pt-2">
-                                                                                                    Lorem ipsum dolor sit amet,
-                                                                                                    consectetur adipiscing elit. Lorem
-                                                                                                    ipsum dolor sit amet,{" "}
-                                                                                                    <a href="#">
-                                                                                                        #consecteturadipiscing{" "}
-                                                                                                    </a>
-                                                                                                    .
-                                                                                                </p>
-                                                                                                <div className="commentLR">
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        Like
-                                                                                                    </button>
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        Reply
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </li>
-                                                                                        <li className="media">
-                                                                                            <a href="#" className="pull-left">
-                                                                                                <img
-                                                                                                    src="https://bootdey.com/img/Content/user_2.jpg"
-                                                                                                    alt=""
-                                                                                                    className="img-circle"
-                                                                                                />
-                                                                                            </a>
-                                                                                            <div className="media-body">
-                                                                                                <div className="d-flex justify-content-between align-items-center w-100">
-                                                                                                    <strong className="text-gray-dark">
-                                                                                                        <a href="#" className="fs-8">
-                                                                                                            Lia Earnest
-                                                                                                        </a>
-                                                                                                    </strong>
-                                                                                                    <a href="#">
-                                                                                                        <i className="bx bx-dots-horizontal-rounded" />
-                                                                                                    </a>
-                                                                                                </div>
-                                                                                                <span className="d-block comment-created-time">
-                                                                                                    2 hours ago
-                                                                                                </span>
-                                                                                                <p className="fs-8 pt-2">
-                                                                                                    Lorem ipsum dolor sit amet,
-                                                                                                    consectetur adipiscing elit. Lorem
-                                                                                                    ipsum dolor sit amet,{" "}
-                                                                                                    <a href="#">
-                                                                                                        #consecteturadipiscing{" "}
-                                                                                                    </a>
-                                                                                                    .
-                                                                                                </p>
-                                                                                                <div className="commentLR">
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        Like
-                                                                                                    </button>
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        Reply
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </li>
-                                                                                        <li className="media">
-                                                                                            <a href="#" className="pull-left">
-                                                                                                <img
-                                                                                                    src="https://bootdey.com/img/Content/user_3.jpg"
-                                                                                                    alt=""
-                                                                                                    className="img-circle"
-                                                                                                />
-                                                                                            </a>
-                                                                                            <div className="media-body">
-                                                                                                <div className="d-flex justify-content-between align-items-center w-100">
-                                                                                                    <strong className="text-gray-dark">
-                                                                                                        <a href="#" className="fs-8">
-                                                                                                            Rusty Mickelsen
-                                                                                                        </a>
-                                                                                                    </strong>
-                                                                                                    <a href="#">
-                                                                                                        <i className="bx bx-dots-horizontal-rounded" />
-                                                                                                    </a>
-                                                                                                </div>
-                                                                                                <span className="d-block comment-created-time">
-                                                                                                    17 hours ago
-                                                                                                </span>
-                                                                                                <p className="fs-8 pt-2">
-                                                                                                    Lorem ipsum dolor sit amet,
-                                                                                                    consectetur adipiscing elit. Lorem
-                                                                                                    ipsum dolor sit amet,{" "}
-                                                                                                    <a href="#">
-                                                                                                        #consecteturadipiscing{" "}
-                                                                                                    </a>
-                                                                                                    .
-                                                                                                </p>
-                                                                                                <div className="commentLR">
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        Like
-                                                                                                    </button>
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        Reply
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </li>
-                                                                                        <li className="media">
-                                                                                            <div className="media-body">
-                                                                                                <div className="comment-see-more text-center">
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-link fs-8"
-                                                                                                    >
-                                                                                                        See More
-                                                                                                    </button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                            <div className="overlay-bottom d-flex justify-content-between align-items-center">
+                                                                <div className="argon-reaction">
+                                                                    <span className="like-btn">
+                                                                        <a
+                                                                            href="#"
+                                                                            className="post-card-buttons"
+                                                                            id="reactions"
+                                                                        >
+                                                                            <i className="bx bxs-like mr-1" /> 67
+                                                                        </a>
+                                                                        <ul className="reactions-box dropdown-shadow">
+                                                                            <li
+                                                                                className="reaction reaction-like"
+                                                                                data-reaction="Like"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-love"
+                                                                                data-reaction="Love"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-haha"
+                                                                                data-reaction="HaHa"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-wow"
+                                                                                data-reaction="Wow"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-sad"
+                                                                                data-reaction="Sad"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-angry"
+                                                                                data-reaction="Angry"
+                                                                            />
+                                                                        </ul>
+                                                                    </span>
+                                                                </div>
+                                                                <div className="liked-users">
+                                                                    <img
+                                                                        src="assets/images/users/user-9.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                    <img
+                                                                        src="assets/images/users/user-6.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                    <img
+                                                                        src="assets/images/users/user-12.png"
+                                                                        alt="Liked users"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-3 profile-quick-media">
-                                                        <h6 className="text-muted timeline-title">
-                                                            Recent Media
-                                                        </h6>
-                                                        <div className="quick-media">
-                                                            <div className="media-overlay" />
-                                                            <a href="#" className="quick-media-img">
-                                                                <img
-                                                                    src="assets/images/users/album/album-1.jpg"
-                                                                    alt="Quick media"
-                                                                />
-                                                            </a>
-                                                            <div className="media-overlay-content">
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div className="media-overlay-owner">
-                                                                        <img
-                                                                            src="assets/images/users/user-12.png"
-                                                                            alt="Media owner image"
-                                                                        />
-                                                                        <span className="overlay-owner-name fs-9">
-                                                                            Irwin M. Spelle
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="dropdown">
-                                                                        <a
-                                                                            href="#"
-                                                                            className="overlay-more"
-                                                                            data-toggle="dropdown"
-                                                                            role="button"
-                                                                            aria-haspopup="true"
-                                                                            aria-expanded="false"
-                                                                        >
-                                                                            <i className="bx bx-dots-horizontal-rounded" />
-                                                                        </a>
-                                                                        <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                                                            <a className="dropdown-item" href="#">
-                                                                                Save post
-                                                                            </a>
-                                                                            <a className="dropdown-item" href="#">
-                                                                                Turn on notifications
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
+                                                    <div className="quick-media">
+                                                        <div className="media-overlay" />
+                                                        <a href="#" className="quick-media-img">
+                                                            <img
+                                                                src="assets/images/users/album/album-3.jpg"
+                                                                alt="Quick media"
+                                                            />
+                                                        </a>
+                                                        <div className="media-overlay-content">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div className="media-overlay-owner">
+                                                                    <img
+                                                                        src="assets/images/users/user-12.png"
+                                                                        alt="Media owner image"
+                                                                    />
+                                                                    <span className="overlay-owner-name fs-9">
+                                                                        Irwin M. Spelle
+                                                                    </span>
                                                                 </div>
-                                                                <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                                                    <div className="argon-reaction">
-                                                                        <span className="like-btn">
-                                                                            <a
-                                                                                href="#"
-                                                                                className="post-card-buttons"
-                                                                                id="reactions"
-                                                                            >
-                                                                                <i className="bx bxs-like mr-1" /> 67
-                                                                            </a>
-                                                                            <ul className="reactions-box dropdown-shadow">
-                                                                                <li
-                                                                                    className="reaction reaction-like"
-                                                                                    data-reaction="Like"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-love"
-                                                                                    data-reaction="Love"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-haha"
-                                                                                    data-reaction="HaHa"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-wow"
-                                                                                    data-reaction="Wow"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-sad"
-                                                                                    data-reaction="Sad"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-angry"
-                                                                                    data-reaction="Angry"
-                                                                                />
-                                                                            </ul>
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="liked-users">
-                                                                        <img
-                                                                            src="assets/images/users/user-9.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                        <img
-                                                                            src="assets/images/users/user-6.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                        <img
-                                                                            src="assets/images/users/user-12.png"
-                                                                            alt="Liked users"
-                                                                        />
+                                                                <div className="dropdown">
+                                                                    <a
+                                                                        href="#"
+                                                                        className="overlay-more"
+                                                                        data-toggle="dropdown"
+                                                                        role="button"
+                                                                        aria-haspopup="true"
+                                                                        aria-expanded="false"
+                                                                    >
+                                                                        <i className="bx bx-dots-horizontal-rounded" />
+                                                                    </a>
+                                                                    <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
+                                                                        <a className="dropdown-item" href="#">
+                                                                            Save post
+                                                                        </a>
+                                                                        <a className="dropdown-item" href="#">
+                                                                            Turn on notifications
+                                                                        </a>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="quick-media">
-                                                            <div className="media-overlay" />
-                                                            <a href="#" className="quick-media-img">
-                                                                <img
-                                                                    src="assets/images/users/album/album-2.jpg"
-                                                                    alt="Quick media"
-                                                                />
-                                                            </a>
-                                                            <div className="media-overlay-content">
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div className="media-overlay-owner">
-                                                                        <img
-                                                                            src="assets/images/users/user-12.png"
-                                                                            alt="Media owner image"
-                                                                        />
-                                                                        <span className="overlay-owner-name fs-9">
-                                                                            Irwin M. Spelle
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="dropdown">
+                                                            <div className="overlay-bottom d-flex justify-content-between align-items-center">
+                                                                <div className="argon-reaction">
+                                                                    <span className="like-btn">
                                                                         <a
                                                                             href="#"
-                                                                            className="overlay-more"
-                                                                            data-toggle="dropdown"
-                                                                            role="button"
-                                                                            aria-haspopup="true"
-                                                                            aria-expanded="false"
+                                                                            className="post-card-buttons"
+                                                                            id="reactions"
                                                                         >
-                                                                            <i className="bx bx-dots-horizontal-rounded" />
+                                                                            <i className="bx bxs-like mr-1" /> 67
                                                                         </a>
-                                                                        <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                                                            <a className="dropdown-item" href="#">
-                                                                                Save post
-                                                                            </a>
-                                                                            <a className="dropdown-item" href="#">
-                                                                                Turn on notifications
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
+                                                                        <ul className="reactions-box dropdown-shadow">
+                                                                            <li
+                                                                                className="reaction reaction-like"
+                                                                                data-reaction="Like"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-love"
+                                                                                data-reaction="Love"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-haha"
+                                                                                data-reaction="HaHa"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-wow"
+                                                                                data-reaction="Wow"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-sad"
+                                                                                data-reaction="Sad"
+                                                                            />
+                                                                            <li
+                                                                                className="reaction reaction-angry"
+                                                                                data-reaction="Angry"
+                                                                            />
+                                                                        </ul>
+                                                                    </span>
                                                                 </div>
-                                                                <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                                                    <div className="argon-reaction">
-                                                                        <span className="like-btn">
-                                                                            <a
-                                                                                href="#"
-                                                                                className="post-card-buttons"
-                                                                                id="reactions"
-                                                                            >
-                                                                                <i className="bx bxs-like mr-1" /> 67
-                                                                            </a>
-                                                                            <ul className="reactions-box dropdown-shadow">
-                                                                                <li
-                                                                                    className="reaction reaction-like"
-                                                                                    data-reaction="Like"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-love"
-                                                                                    data-reaction="Love"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-haha"
-                                                                                    data-reaction="HaHa"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-wow"
-                                                                                    data-reaction="Wow"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-sad"
-                                                                                    data-reaction="Sad"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-angry"
-                                                                                    data-reaction="Angry"
-                                                                                />
-                                                                            </ul>
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="liked-users">
-                                                                        <img
-                                                                            src="assets/images/users/user-9.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                        <img
-                                                                            src="assets/images/users/user-6.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                        <img
-                                                                            src="assets/images/users/user-12.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="quick-media">
-                                                            <div className="media-overlay" />
-                                                            <a href="#" className="quick-media-img">
-                                                                <img
-                                                                    src="assets/images/users/album/album-3.jpg"
-                                                                    alt="Quick media"
-                                                                />
-                                                            </a>
-                                                            <div className="media-overlay-content">
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div className="media-overlay-owner">
-                                                                        <img
-                                                                            src="assets/images/users/user-12.png"
-                                                                            alt="Media owner image"
-                                                                        />
-                                                                        <span className="overlay-owner-name fs-9">
-                                                                            Irwin M. Spelle
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="dropdown">
-                                                                        <a
-                                                                            href="#"
-                                                                            className="overlay-more"
-                                                                            data-toggle="dropdown"
-                                                                            role="button"
-                                                                            aria-haspopup="true"
-                                                                            aria-expanded="false"
-                                                                        >
-                                                                            <i className="bx bx-dots-horizontal-rounded" />
-                                                                        </a>
-                                                                        <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                                                            <a className="dropdown-item" href="#">
-                                                                                Save post
-                                                                            </a>
-                                                                            <a className="dropdown-item" href="#">
-                                                                                Turn on notifications
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                                                    <div className="argon-reaction">
-                                                                        <span className="like-btn">
-                                                                            <a
-                                                                                href="#"
-                                                                                className="post-card-buttons"
-                                                                                id="reactions"
-                                                                            >
-                                                                                <i className="bx bxs-like mr-1" /> 67
-                                                                            </a>
-                                                                            <ul className="reactions-box dropdown-shadow">
-                                                                                <li
-                                                                                    className="reaction reaction-like"
-                                                                                    data-reaction="Like"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-love"
-                                                                                    data-reaction="Love"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-haha"
-                                                                                    data-reaction="HaHa"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-wow"
-                                                                                    data-reaction="Wow"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-sad"
-                                                                                    data-reaction="Sad"
-                                                                                />
-                                                                                <li
-                                                                                    className="reaction reaction-angry"
-                                                                                    data-reaction="Angry"
-                                                                                />
-                                                                            </ul>
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="liked-users">
-                                                                        <img
-                                                                            src="assets/images/users/user-9.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                        <img
-                                                                            src="assets/images/users/user-6.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                        <img
-                                                                            src="assets/images/users/user-12.png"
-                                                                            alt="Liked users"
-                                                                        />
-                                                                    </div>
+                                                                <div className="liked-users">
+                                                                    <img
+                                                                        src="assets/images/users/user-9.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                    <img
+                                                                        src="assets/images/users/user-6.png"
+                                                                        alt="Liked users"
+                                                                    />
+                                                                    <img
+                                                                        src="assets/images/users/user-12.png"
+                                                                        alt="Liked users"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </Col>
                                                 </div>
+                                               
                                             </div>
                                         </div>
                                     </div>
@@ -1110,6 +789,7 @@ function Profile() {
                         </div>
                     </div>
                 </div>
+
                 {/* New message modal */}
                 <div
                     className="modal fade"
@@ -1162,7 +842,7 @@ function Profile() {
                 {/* Optional */}
             </>
 
-        </div>
+        </div >
     );
 }
 
