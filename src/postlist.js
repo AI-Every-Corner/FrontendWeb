@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
+import TimePassedComponent from "./timepassedcomponent";
 import ResponseList from "./responselist";
 import { Link } from "react-router-dom";
 
@@ -8,30 +9,23 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [ViewComments, setViewComments] = useState(true);
 
     const fetchPosts = async () => {
-
-      const token = localStorage.getItem('token');
-      
-
         try {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
             const response = await axios.get(`http://localhost:8080/posts`,{
               headers: {
                 'Authorization': `Bearer ${token}` // 添加 Authorization header
-              }
-            }, {
-              headers: {
-                'Authorization': `Bearer ${token}` // 添加 Authorization header
               },
-                params: {
-                  page: 0,
-                  size: 10
-                }
+              params: {
+                page: 0,
+                size: 10
+              }
             });
             console.log(response);
             setPosts([...posts, ...response.data.postsList]);  // Append new posts
-            
+
             if (response.data.last) {
               setHasMore(false);  // No more posts to load
             }
@@ -48,6 +42,10 @@ const PostList = () => {
       fetchPosts();
     }, [page]);
 
+    const handleViewComments = () => {
+      setViewComments(false);
+    }
+
     return (
         <InfiniteScroll
           dataLength={posts.length}
@@ -56,9 +54,9 @@ const PostList = () => {
           loader={<h4>Loading...</h4>}
           endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
         >
+          {console.log(page)}
           {posts.map((post) => (
             <div key={post.postId}>
-              {console.log(typeof post.createdAt)}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <img
@@ -171,7 +169,7 @@ const PostList = () => {
       </div>
     </div>
     <span className="d-block">
-      3 hours ago, {post.createdAt}<i className="bx bx-globe ml-3" />
+      <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
     </span>
     </div>
   </div>
@@ -274,7 +272,21 @@ const PostList = () => {
   </div>
   </div>
 </div>
-<ResponseList postId={post.postId}/>
+<div className="media-body">
+  <div className="comment-see-more text-center" onClick={handleViewComments}>
+    {ViewComments ? 
+    <div>
+      <hr></hr>
+      <button
+        type="button"
+        className="btn btn-link fs-8"
+      >
+        See comments
+      </button>
+    </div> : <ResponseList postId={post.postId}/>
+    }
+  </div>
+</div>
 </div>
 
 </div>
