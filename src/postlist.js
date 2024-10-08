@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
+import TimePassedComponent from "./timepassedcomponent";
 import ResponseList from "./responselist";
 import { Link } from "react-router-dom";
 
@@ -8,6 +9,7 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [ViewComments, setViewComments] = useState(false);
 
     const fetchPosts = async () => {
 
@@ -26,7 +28,7 @@ const PostList = () => {
             });
             console.log(response);
             setPosts([...posts, ...response.data.postsList]);  // Append new posts
-            
+
             if (response.data.last) {
               setHasMore(false);  // No more posts to load
             }
@@ -53,7 +55,6 @@ const PostList = () => {
         >
           {posts.map((post) => (
             <div key={post.postId}>
-              {console.log(typeof post.createdAt)}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <img
@@ -166,7 +167,7 @@ const PostList = () => {
       </div>
     </div>
     <span className="d-block">
-      3 hours ago, {post.createdAt}<i className="bx bx-globe ml-3" />
+      <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
     </span>
     </div>
   </div>
@@ -267,6 +268,17 @@ const PostList = () => {
     </div>
     </a>
   </div>
+  </div>
+</div>
+<div className="media-body">
+  <hr></hr>
+  <div className="comment-see-more text-center">
+    <button
+      type="button"
+      className="btn btn-link fs-8"
+    >
+      See comments
+    </button>
   </div>
 </div>
 <ResponseList postId={post.postId}/>
