@@ -10,12 +10,19 @@ const PostList = () => {
     const [showImg, setShowImg] = useState(false);
 
     const fetchPosts = async () => {
+
+      const token = localStorage.getItem('token');
+      
         try {
-            const response = await axios.get(`http://localhost:8080/posts`, {
-              params: {
-                page,
-                size: 10
-              },
+            const response = await axios.get(`http://localhost:8080/posts`,{
+              headers: {
+                'Authorization': `Bearer ${token}` // 添加 Authorization header
+              }
+            }, {
+                params: {
+                  page: 0,
+                  size: 10
+                },
             });
             console.log(response);
             setPosts([...posts, ...response.data.postRes]);  // Append new posts
