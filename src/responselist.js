@@ -124,7 +124,7 @@ function ResponseList(postId) {
                 </a>
               </span>
               {reply ? 
-                <span className="reply-btn" onClick={handleReply}>
+                <span className="reply-btn mx-4 px-4" onClick={handleReply}>
                   <a className="text-primary">Reply</a>
                 </span> :
                 <span className="flex-grow-1 px-4">
