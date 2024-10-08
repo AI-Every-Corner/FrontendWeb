@@ -102,7 +102,7 @@ function SignUp() {
   }, []);
   
   const fetchWeather = async () => {
-    const API_KEY = 'a098be11dc4058acf0f1328ed53480ff';
+    const API_KEY = '';
 
     const city_name = 'Taipei'; // 或者使用地理位置API獲取用戶當前位置
     try {
