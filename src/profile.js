@@ -1204,7 +1204,7 @@ function CalendarChart({moodData}) {
     const [year, month, day] = dateString.split('T')[0].split('-');
 
     // 將日期轉換為 new Date(年, 月 - 1, 日) 格式（月份要減 1）
-    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
     // 將 [new Date(年, 月, 日), 分數] push 進 newData
     newData.push([date, moodScore]);
