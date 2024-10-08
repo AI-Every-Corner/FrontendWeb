@@ -28,13 +28,18 @@ function Settings() {
 
   const navigate = useNavigate();
   const { userId } = useContext(UserContext); // 從 UserContext 中獲取 userId
+  const token = localStorage.getItem('token'); // 從 localStorage 獲取 JWT token
 
   useEffect(() => {
 
     console.log('Fetched userId:', userId);
 
     // 這裡可以用 GET 請求獲取用戶信息並設置到 formData 中
-    axios.get(`http://localhost:8080/api/auth/${userId}`) //  API 地址
+    axios.get(`http://localhost:8080/api/auth/${userId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }) //  API 地址
       .then(response => {
 
         const userData = response.data;
@@ -100,7 +105,11 @@ function Settings() {
     }
 
     // 這裡可以發送 PUT 請求來更新用戶數據，使用 username 來動態構建 PUT API 地址
-    axios.put(`http://localhost:8080/api/auth/${userId}`, updatedData)
+    axios.put(`http://localhost:8080/api/auth/${userId}`, updatedData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }) 
       .then(response => {
         alert('資料更新成功！');
 

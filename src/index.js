@@ -11,8 +11,8 @@ import Messages from './messages';
 import Modal from './modal';
 import NewsFeed2 from './newsfeed-2';
 import Profile from './profile';
-import About from './About';
-import Photo from './Photo';
+import About from './about';
+import Photo from './photo';
 import Settings from './settings';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
@@ -20,7 +20,7 @@ import SignUp from './sign-up';
 import reportWebVitals from './reportWebVitals';
 import PrivateRoute from './PrivateRoute';
 import { UserProvider } from './context';
-import Header from './Header';
+import Header from './header';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -8,6 +8,7 @@ function SignUp() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
+    nickName: '',
     password: '',
     birth: '',
     gender: '',
@@ -101,7 +102,7 @@ function SignUp() {
   }, []);
   
   const fetchWeather = async () => {
-    const API_KEY = '';
+    const API_KEY = 'a098be11dc4058acf0f1328ed53480ff';
 
     const city_name = 'Taipei'; // 或者使用地理位置API獲取用戶當前位置
     try {
@@ -150,6 +151,11 @@ function SignUp() {
                 <div className="col-md-12">
                   <div className="form-group">
                     <input type="text" className="form-control" name="username" placeholder="Name" value={formData.username} onChange={handleChange} />
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <input type="text" className="form-control" name="nickName" placeholder="Nick Name" value={formData.nickName} onChange={handleChange} />
                   </div>
                 </div>
                 <div className="col-md-12">
