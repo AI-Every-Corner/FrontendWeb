@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
+import ResponseList from "./responselist";
+import { Link } from "react-router-dom";
 
 const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [showImg, setShowImg] = useState(false);
 
     const fetchPosts = async () => {
 
@@ -19,38 +20,40 @@ const PostList = () => {
               }
             }, {
                 params: {
-                  page,
+                  page: 0,
                   size: 10
                 },
             });
             console.log(response);
-            setPosts([...posts, ...response.data.postRes]);  // Append new posts
-            // if(response.data.img) {
-            //   setShowImg(true);
-            // }
+            setPosts([...posts, ...response.data.postsList]);  // Append new posts
+            
             if (response.data.last) {
-                setHasMore(false);  // No more posts to load
+              setHasMore(false);  // No more posts to load
+            }
+            
+            if (response.data.totalPages - 1 === page) {
+              setHasMore(false);  // No more pages to load
             }
         } catch (error) {
-            console.error("Failed to load posts", error);
+          console.error("Failed to load posts", error);
         }
     };
 
     useEffect(() => {
-        fetchPosts();
+      fetchPosts();
     }, [page]);
 
     return (
         <InfiniteScroll
-            dataLength={posts.length}
-            next={() => setPage(page + 1)}  // Load next page
-            hasMore={hasMore}
-            loader={<h4>Loading...</h4>}
-            endMessage={<p>No more posts</p>}
+          dataLength={posts.length}
+          next={() => setPage(page + 1)}  // Load next page
+          hasMore={hasMore}
+          loader={<h4>Loading...</h4>}
+          endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
         >
-            {posts.map((post) => (
-                <div key={post.postId}>
-                  {console.log(typeof post.createdAt)}
+          {posts.map((post) => (
+            <div key={post.postId}>
+              {console.log(typeof post.createdAt)}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <img
@@ -61,8 +64,8 @@ const PostList = () => {
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
       <a href="#" className="text-gray-dark post-user-name">
-      <a className="h5">{post.username}</a>
-      {/* {post.userId} */}
+        <a className="h5">{post.nickname}</a>
+        <Link to="/profile"/>
       </a>
       <div className="dropdown">
       <a
@@ -174,9 +177,10 @@ const PostList = () => {
 </div>
 <div className="d-block mt-3">
   <img
-  src={post.img}
+  src={post.imagePath}
   className="post-content"
   alt="post image"
+  style={{ display: post.imagePath === "" ? "none" : "block" }} 
   />
 </div>
 <div className="mb-3">
@@ -265,226 +269,7 @@ const PostList = () => {
   </div>
   </div>
 </div>
-<div
-  className="border-top pt-3 hide-comments"
-  style={{ display: "none" }}
->
-  <div className="row bootstrap snippets">
-  <div className="col-md-12">
-    <div className="comment-wrapper">
-    <div className="panel panel-info">
-      <div className="panel-body">
-      <ul className="media-list comments-list">
-        <li className="media comment-form">
-        <a href="#" className="pull-left">
-          <img
-          src="assets/images/users/user-4.jpg"
-          alt=""
-          className="img-circle"
-          />
-        </a>
-        <div className="media-body">
-          <form action="" method="" role="form">
-          <div className="row">
-            <div className="col-md-12">
-            <div className="input-group">
-              <input
-              type="text"
-              className="form-control comment-input"
-              placeholder="Write a comment..."
-              />
-              <div className="input-group-btn">
-              <button
-                type="button"
-                className="btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bxs-smiley-happy" />
-              </button>
-              <button
-                type="button"
-                className="btn comment-form-btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bx-camera" />
-              </button>
-              <button
-                type="button"
-                className="btn comment-form-btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bx-microphone" />
-              </button>
-              <button
-                type="button"
-                className="btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bx-file-blank" />
-              </button>
-              </div>
-            </div>
-            </div>
-          </div>
-          </form>
-        </div>
-        </li>
-        <li className="media">
-        <a href="#" className="pull-left">
-          <img
-          src="assets/images/users/user-2.jpg"
-          alt=""
-          className="img-circle"
-          />
-        </a>
-        <div className="media-body">
-          <div className="d-flex justify-content-between align-items-center w-100">
-          <strong className="text-gray-dark">
-            <a href="#" className="fs-8">
-            Karen Minas
-            </a>
-          </strong>
-          <a href="#">
-            <i className="bx bx-dots-horizontal-rounded" />
-          </a>
-          </div>
-          <span className="d-block comment-created-time">
-          30 min ago
-          </span>
-          <p className="fs-8 pt-2">
-          Lorem ipsum dolor sit amet, consectetur
-          adipiscing elit. Lorem ipsum dolor sit amet,{" "}
-          <a href="#">#consecteturadipiscing </a>.
-          </p>
-          <div className="commentLR">
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Like
-          </button>
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Reply
-          </button>
-          </div>
-        </div>
-        </li>
-        <li className="media">
-        <a href="#" className="pull-left">
-          <img
-          src="https://bootdey.com/img/Content/user_2.jpg"
-          alt=""
-          className="img-circle"
-          />
-        </a>
-        <div className="media-body">
-          <div className="d-flex justify-content-between align-items-center w-100">
-          <strong className="text-gray-dark">
-            <a href="#" className="fs-8">
-            Lia Earnest
-            </a>
-          </strong>
-          <a href="#">
-            <i className="bx bx-dots-horizontal-rounded" />
-          </a>
-          </div>
-          <span className="d-block comment-created-time">
-          2 hours ago
-          </span>
-          <p className="fs-8 pt-2">
-          Lorem ipsum dolor sit amet, consectetur
-          adipiscing elit. Lorem ipsum dolor sit amet,{" "}
-          <a href="#">#consecteturadipiscing </a>.
-          </p>
-          <div className="commentLR">
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Like
-          </button>
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Reply
-          </button>
-          </div>
-        </div>
-        </li>
-        <li className="media">
-        <a href="#" className="pull-left">
-          <img
-          src="https://bootdey.com/img/Content/user_3.jpg"
-          alt=""
-          className="img-circle"
-          />
-        </a>
-        <div className="media-body">
-          <div className="d-flex justify-content-between align-items-center w-100">
-          <strong className="text-gray-dark">
-            <a href="#" className="fs-8">
-            Rusty Mickelsen
-            </a>
-          </strong>
-          <a href="#">
-            <i className="bx bx-dots-horizontal-rounded" />
-          </a>
-          </div>
-          <span className="d-block comment-created-time">
-          17 hours ago
-          </span>
-          <p className="fs-8 pt-2">
-          Lorem ipsum dolor sit amet, consectetur
-          adipiscing elit. Lorem ipsum dolor sit amet,{" "}
-          <a href="#">#consecteturadipiscing </a>.
-          </p>
-          <div className="commentLR">
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Like
-          </button>
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Reply
-          </button>
-          </div>
-        </div>
-        </li>
-        <li className="media">
-        <div className="media-body">
-          <div className="comment-see-more text-center">
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            See More
-          </button>
-          </div>
-        </div>
-        </li>
-      </ul>
-      </div>
-    </div>
-    </div>
-  </div>
-  </div>
-</div>
+<ResponseList postId={post.postId}/>
 </div>
 
 </div>
