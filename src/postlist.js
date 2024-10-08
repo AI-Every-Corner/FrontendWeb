@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import ResponseList from "./responselist";
+import { Link } from "react-router-dom";
 
 const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [showImg, setShowImg] = useState(false);
 
     const fetchPosts = async () => {
 
@@ -25,12 +25,14 @@ const PostList = () => {
                 },
             });
             console.log(response);
-            setPosts([...posts, ...response.data.postRes]);  // Append new posts
-            // if(response.data.img) {
-            //   setShowImg(true);
-            // }
+            setPosts([...posts, ...response.data.postsList]);  // Append new posts
+            
             if (response.data.last) {
               setHasMore(false);  // No more posts to load
+            }
+            
+            if (response.data.totalPages - 1 === page) {
+              setHasMore(false);  // No more pages to load
             }
         } catch (error) {
           console.error("Failed to load posts", error);
@@ -47,7 +49,7 @@ const PostList = () => {
           next={() => setPage(page + 1)}  // Load next page
           hasMore={hasMore}
           loader={<h4>Loading...</h4>}
-          endMessage={<p>No more posts</p>}
+          endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
         >
           {posts.map((post) => (
             <div key={post.postId}>
@@ -62,8 +64,8 @@ const PostList = () => {
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
       <a href="#" className="text-gray-dark post-user-name">
-      <a className="h5">{post.username}</a>
-      {/* {post.userId} */}
+        <a className="h5">{post.nickname}</a>
+        <Link to="/profile"/>
       </a>
       <div className="dropdown">
       <a
