@@ -9,7 +9,7 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [ViewComments, setViewComments] = useState(false);
+    const [ViewComments, setViewComments] = useState(true);
 
     const fetchPosts = async () => {
 
@@ -21,15 +21,11 @@ const PostList = () => {
             const response = await axios.get(`http://localhost:8080/posts`,{
               headers: {
                 'Authorization': `Bearer ${token}` // 添加 Authorization header
-              }
-            }, {
-              headers: {
-                'Authorization': `Bearer ${token}` // 添加 Authorization header
               },
-                params: {
-                  page: 0,
-                  size: 10
-                }
+              params: {
+                page: 0,
+                size: 10
+              }
             });
             console.log(response);
             setPosts([...posts, ...response.data.postsList]);  // Append new posts
@@ -49,6 +45,10 @@ const PostList = () => {
     useEffect(() => {
       fetchPosts();
     }, [page]);
+
+    const handleViewComments = () => {
+      setViewComments(false);
+    }
 
     return (
         <InfiniteScroll
@@ -276,17 +276,20 @@ const PostList = () => {
   </div>
 </div>
 <div className="media-body">
-  <hr></hr>
-  <div className="comment-see-more text-center">
-    <button
-      type="button"
-      className="btn btn-link fs-8"
-    >
-      See comments
-    </button>
+  <div className="comment-see-more text-center" onClick={handleViewComments}>
+    {ViewComments ? 
+    <div>
+      <hr></hr>
+      <button
+        type="button"
+        className="btn btn-link fs-8"
+      >
+        See comments
+      </button>
+    </div> : <ResponseList postId={post.postId}/>
+    }
   </div>
 </div>
-<ResponseList postId={post.postId}/>
 </div>
 
 </div>

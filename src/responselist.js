@@ -3,6 +3,11 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
 function ResponseList(postId) {
+  const [reply, setReply] = useState(true);
+
+  const handleReply = () => {
+    setReply(false);
+  }
 
   return (
     <div className="App">
@@ -87,37 +92,50 @@ function ResponseList(postId) {
           />
         </a>
         <div className="media-body">
-          <div className="d-flex justify-content-between align-items-center w-100">
-          <strong className="text-gray-dark">
-            <a href="#" className="fs-8">
-            Karen Minas
+          <div className="d-flex justify-content-between w-100">
+            <div className="d-flex flex-row justify-content-around">
+              <div className="me-2">
+                <strong className="text-gray-dark">
+                  <a className="fs-8">
+                    Karen Minas
+                  </a>
+                </strong>
+              </div>
+              <div>
+                <a className="comment-created-time">
+                &nbsp; 30 min ago
+                </a>
+              </div>
+            </div>
+            <a href="#">
+              <i className="bx bx-dots-horizontal-rounded" />
             </a>
-          </strong>
-          <a href="#">
-            <i className="bx bx-dots-horizontal-rounded" />
-          </a>
           </div>
-          <span className="d-block comment-created-time">
-          30 min ago
-          </span>
           <p className="fs-8 pt-2">
           Lorem ipsum dolor sit amet, consectetur
           adipiscing elit. Lorem ipsum dolor sit amet,{" "}
-          <a href="#">#consecteturadipiscing </a>.
+          consecteturadipiscing.
           </p>
-          <div className="commentLR">
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Like
-          </button>
-          <button
-            type="button"
-            className="btn btn-link fs-8"
-          >
-            Reply
-          </button>
+          <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex align-items-center w-100 commentLR mb-3">
+              <span className="like-btn">
+                <a className="post-card-buttons p-1" id="reactions">
+                  <i className="bx bxs-like mr-2 text-start" /> 67
+                </a>
+              </span>
+              {reply ? 
+                <span className="reply-btn" onClick={handleReply}>
+                  <a className="text-primary">Reply</a>
+                </span> :
+                <span className="flex-grow-1 px-4">
+                  <input
+                  type="text"
+                  className="form-control comment-input"
+                  placeholder="Write a reply..."
+                  />
+                </span>
+              }
+            </div>
           </div>
         </div>
         </li>
