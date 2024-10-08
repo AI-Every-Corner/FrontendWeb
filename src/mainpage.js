@@ -13,6 +13,7 @@ import Settings from './settings';
 import SignIn from './sign-in';
 import SignUp from './sign-up';
 import PostList from './postlist';
+import PostForm from './postform';
 // import Widgets from './widgets';
 import { UserContext } from './context';
 import { useContext, useState } from 'react';
@@ -199,7 +200,8 @@ function MainPage() {
         </div>
       </div>
       <ul className="list-unstyled" style={{ marginBottom: 0 }}>
-        <li className="media post-form w-shadow">
+        <PostForm />
+        {/* <li className="media post-form w-shadow">
         <div className="media-body">
           <div className="form-group post-input">
           <textarea
@@ -250,7 +252,7 @@ function MainPage() {
           </div>
           </div>
         </div>
-        </li>
+        </li> */}
       </ul>
       {/* Posts */}
       <div className="posts-section mb-5">

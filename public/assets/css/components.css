@@ -202,6 +202,11 @@
     display: none;
 }
 
+.shorter {
+    width: 164px;
+}
+
+
 .reaction {
     list-style-type: none;
     cursor: pointer;
@@ -222,13 +227,13 @@
 }
 
 .reaction-like {
-    left: 10px;
+    left: 200px;
     transition-delay: 0s;
     background-image: url('../images/icons/reactions/like.gif');
 }
 
 .reaction-love {
-    left: 48px;
+    left: 162px;
     transition-delay: .05s;
     background-image: url('../images/icons/reactions/love.gif');
 }
@@ -246,13 +251,13 @@
 }
 
 .reaction-sad {
-    left: 162px;
+    left: 10px;
     transition-delay: .2s;
     background-image: url('../images/icons/reactions/sad.gif');
 }
 
 .reaction-angry {
-    left: 200px;
+    left: 48px;
     transition-delay: .25s;
     background-image: url('../images/icons/reactions/angry.gif');
 }
