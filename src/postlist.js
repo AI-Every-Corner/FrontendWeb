@@ -12,10 +12,6 @@ const PostList = () => {
     const [ViewComments, setViewComments] = useState(true);
 
     const fetchPosts = async () => {
-
-      const token = localStorage.getItem('token');
-      
-
         try {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
             const response = await axios.get(`http://localhost:8080/posts`,{
@@ -58,6 +54,7 @@ const PostList = () => {
           loader={<h4>Loading...</h4>}
           endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
         >
+          {console.log(page)}
           {posts.map((post) => (
             <div key={post.postId}>
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>

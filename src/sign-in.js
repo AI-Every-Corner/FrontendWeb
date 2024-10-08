@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ function SignIn() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [weather, setWeather] = useState({ temp: '', city: '', icon: '' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +41,28 @@ function SignIn() {
     }
   };
 
+  useEffect(() => {
+    fetchWeather();
+  }, []);
+  
+  const fetchWeather = async () => {
+    const API_KEY = '';
+
+    const city_name = 'Taipei'; // 或者使用地理位置API獲取用戶當前位置
+    try {
+      const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=${API_KEY}&units=metric`);
+      setWeather({
+        temp: Math.round(response.data.main.temp),
+        city: response.data.name,
+        icon: response.data.weather[0].icon
+      });
+    } catch (error) {
+      console.error('獲取天氣數據失敗:', error);
+    }
+  };
+
   return (
+
     <div className="App">
 <>
   <meta charSet="utf-8" />
@@ -119,37 +141,14 @@ function SignIn() {
                 </div>
               </div>
             )}
-            <div className="col-md-12 mb-3">
-              <a href="forgot-password.html">Forgot password?</a>
-            </div>
-            <div className="col-md-6">
-              <label className="custom-control material-checkbox">
-                <input type="checkbox" className="material-control-input" />
-                <span className="material-control-indicator" />
-                <span className="material-control-description">
-                  Remember Me
-                </span>
-              </label>
-            </div>
-            <div className="col-md-6 text-right">
+            <div className="col-md-12 text-center">
               <div className="form-group">
                 <button type="submit" className="btn btn-primary sign-up">
                   Sign In
                 </button>
               </div>
             </div>
-            <div className="col-md-12 text-center mt-4">
-              <p className="text-muted">Start using your fingerprint</p>
-              <a
-                href="#"
-                className="btn btn-outline-primary btn-sm sign-up"
-                data-toggle="modal"
-                data-target="#fingerprintModal"
-              >
-                Use Fingerprint
-              </a>
-            </div>
-            <div className="col-md-12 text-center mt-5">
+            <div className="col-md-12 text-center mt-3">
               <span className="go-login">
                 Not yet a member? <Link to="/sign-up">Sign Up</Link>
               </span>
@@ -162,9 +161,9 @@ function SignIn() {
       <div className="auth-left-content mt-5 mb-5 text-center">
         <div className="weather-small text-white">
           <p className="current-weather">
-            <i className="bx bx-sun" /> <span>14°</span>
+          <img src={`http://openweathermap.org/img/wn/${weather.icon}@2x.png`} alt="Weather icon" /> <span>{weather.temp}°</span>
           </p>
-          <p className="weather-city">Gyumri</p>
+          <p className="weather-city">{weather.city}</p>
         </div>
         <div className="text-white mt-5 mb-5">
           <h2 className="create-account mb-3">Welcome Back</h2>
