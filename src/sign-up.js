@@ -22,6 +22,7 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState('');
   const [imageUploaded, setImageUploaded] = useState(false); // 照片上傳狀態
   const [weather, setWeather] = useState({ temp: '', city: '', icon: '' });
+  const [errors, setErrors] = useState({});
 
   // 處理表單輸入
   const handleChange = (e) => {
@@ -38,6 +39,8 @@ function SignUp() {
         setPasswordError('');
       }
     }
+    // 清除該字段的錯誤
+    setErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
   };
 
   // 使用react-dropzone處理圖片拖放上傳和預覽
@@ -55,6 +58,23 @@ function SignUp() {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setPasswordError('密碼不匹配');
+      return;
+    }
+    // 表單驗證
+    const newErrors = {};
+    if (!formData.username.trim()) newErrors.username = "Name is required";
+    if (!formData.nickName.trim()) newErrors.nickName = "Nickname is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm Password is required";
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+    if (!formData.birth) newErrors.birth = "Date of Birth is required";
+    if (!formData.gender) newErrors.gender = "Gender is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.phoneNum) newErrors.phoneNum = "Phone Number is required";
+    if (!formData.image) newErrors.image = "Profile picture is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
     try {
@@ -148,89 +168,80 @@ function SignUp() {
             </div>
             <form onSubmit={handleSubmit} className="pt-5">
               <div className="row">
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="text" className="form-control" name="username" placeholder="Name" value={formData.username} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="text" className={`form-control custom-input ${errors.username ? 'is-invalid' : ''}`} name="username" placeholder="Name" value={formData.username} onChange={handleChange} />
+                  {errors.username && <div className="invalid-feedback">{errors.username}</div>}
                 </div>
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="text" className="form-control" name="nickName" placeholder="Nick Name" value={formData.nickName} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="text" className={`form-control custom-input ${errors.nickName ? 'is-invalid' : ''}`} name="nickName" placeholder="Nickname" value={formData.nickName} onChange={handleChange} />
+                  {errors.nickName && <div className="invalid-feedback">{errors.nickName}</div>}
                 </div>
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="password" className="form-control" name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="password" className={`form-control custom-input ${errors.password ? 'is-invalid' : ''}`} name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
+                  {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="password" className="form-control" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="password" className={`form-control custom-input ${errors.confirmPassword ? 'is-invalid' : ''}`} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
+                  {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
                 </div>
                 {passwordError && (
-                  <div className="col-md-12">
+                  <div className="col-md-12 mb-3">
                     <p className="text-danger">{passwordError}</p>
                   </div>
                 )}
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="date" className="form-control" name="birth" placeholder="Birth Date" value={formData.birth} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="date" className={`form-control custom-input ${errors.birth ? 'is-invalid' : ''}`} name="birth" placeholder="Date of Birth" value={formData.birth} onChange={handleChange} />
+                  {errors.birth && <div className="invalid-feedback">{errors.birth}</div>}
                 </div>
-                <div className="col-md-6">
-                  <div className="form-group">
-                    <select name="gender" className="form-control" value={formData.gender} onChange={handleChange}>
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <select name="gender" className={`form-control custom-input ${errors.gender ? 'is-invalid' : ''}`} value={formData.gender} onChange={handleChange}>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                  {errors.gender && <div className="invalid-feedback">{errors.gender}</div>}
                 </div>
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="email" className="form-control" name="email" placeholder="Email Address" required value={formData.email} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="email" className={`form-control custom-input ${errors.email ? 'is-invalid' : ''}`} name="email" placeholder="Email Address" required value={formData.email} onChange={handleChange} />
+                  {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
-                <div className="col-md-12">
-                  <div className="form-group">
-                    <input type="tel" className="form-control" name="phoneNum" placeholder="Phone Number" value={formData.phoneNum} onChange={handleChange} />
-                  </div>
+                <div className="col-md-6 mb-3">
+                  <input type="tel" className={`form-control custom-input ${errors.phoneNum ? 'is-invalid' : ''}`} name="phoneNum" placeholder="Phone Number" value={formData.phoneNum} onChange={handleChange} />
+                  {errors.phoneNum && <div className="invalid-feedback">{errors.phoneNum}</div>}
                 </div>
                 <div className="col-md-12">
                   <div className="form-group">
-                    {/* 使用react-dropzone來實現拖放上傳 */}
+                    {/* Use react-dropzone for drag and drop upload */}
                     {!imageUploaded && (
-                      <div {...getRootProps()} style={dropzoneStyle}>
+                      <div {...getRootProps()} style={dropzoneStyle} className={errors.image ? 'is-invalid' : ''}>
                         <input {...getInputProps()} />
                         {isDragActive ? (
-                          <p>拖放圖片至此...</p>
+                          <p>Drop the image here...</p>
                         ) : (
-                          <p>拖拉或點擊上傳大頭照</p>
+                          <p>Drag and drop or click to upload profile picture</p>
                         )}
                       </div>
                     )}
+                    {errors.image && <div className="invalid-feedback">{errors.image}</div>}
                     {preview && (
                       <div style={previewContainerStyle}>
-                        <img src={preview} alt="預覽圖片" style={previewImageStyle} />
+                        <img src={preview} alt="Preview image" style={previewImageStyle} />
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="col-md-12">
-                  <p className="agree-privacy">By clicking the Sign Up button below you agreed to our privacy policy and terms of use of our website.</p>
+                <div className="col-md-12 mt-4">
+                  <p className="agree-privacy text-muted">By clicking the Sign Up button below, you agree to our privacy policy and terms of use of our website.</p>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 mt-3">
                   <span className="go-login">
-                    Already a member? <Link to="/sign-in">Sign In</Link>
+                    Already a member? <Link to="/sign-in" className="text-primary">Sign In</Link>
                   </span>
                 </div>
-                <div className="col-md-6 text-right">
-                  <div className="form-group">
-                    <button type="submit" className="btn btn-primary sign-up">
-                      Sign Up
-                    </button>
-                  </div>
+                <div className="col-md-6 text-right mt-3">
+                  <button type="submit" className="btn btn-primary sign-up px-4 py-2">
+                    Sign Up
+                  </button>
                 </div>
               </div>
             </form>
@@ -247,11 +258,6 @@ function SignUp() {
             <div className="text-white mt-5 mb-5">
               <h2 className="create-account mb-3">Create Account</h2>
               <p>Enter your personal details and start journey with us.</p>
-            </div>
-            <div className="auth-quick-links">
-              <a href="#" className="btn btn-outline-primary">
-                Purchase template
-              </a>
             </div>
           </div>
         </div>
@@ -282,5 +288,35 @@ const previewImageStyle = {
   borderRadius: '50%',
   objectFit: 'cover',
 };
+
+// 添加以下 CSS 樣式到您的樣式文件中
+const styles = `
+.custom-input {
+  border-radius: 20px;
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.custom-input:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.sign-up {
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.agree-privacy {
+  font-size: 0.9rem;
+}
+`;
+
+// 將樣式添加到文檔中
+const styleElement = document.createElement('style');
+styleElement.innerHTML = styles;
+document.head.appendChild(styleElement);
 
 export default SignUp;

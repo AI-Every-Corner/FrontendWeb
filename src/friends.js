@@ -11,6 +11,8 @@ function Friends() {
   });
   const { userId, setAvatarUrl } = useContext(UserContext);
 
+  const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';  // 使用環境變量或默認值
+
   useEffect(() => {
     console.log('Fetched userId:', userId);
 
@@ -33,6 +35,37 @@ function Friends() {
         console.error("獲取用戶資料時發生錯誤:", error);
       });
   }, [userId]);
+
+  const [friends, setFriends] = useState([]);
+
+  useEffect(() => {
+    const fetchUserDataAndFriends = async () => {
+
+      const token = localStorage.getItem('token');
+      
+      try {
+        // 獲取用戶資料
+        const userResponse = await axios.get(`http://localhost:8080/api/auth/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setFormData({
+          nickName: userResponse.data.nickName,
+          username: userResponse.data.username
+        });
+
+        // 獲取好友列表
+        const friendsResponse = await axios.get(`http://localhost:8080/friends/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setFriends(friendsResponse.data);
+      } catch (error) {
+        console.error("獲取好友數據時發生錯誤:", error);
+      }
+    };
+
+    fetchUserDataAndFriends();
+  }, [userId]);
+
 
   return (
     <div className="Friends">
@@ -60,6 +93,7 @@ function Friends() {
       <link href="assets/css/components.css" rel="stylesheet" />
       <link href="assets/css/profile.css" rel="stylesheet" />
       <link href="assets/css/media.css" rel="stylesheet" />
+      <link href="assets/css/friends.css" rel="stylesheet" />
       <div className="container-fluid newsfeed d-flex" id="wrapper">
         <div className="row newsfeed-size">
           <div className="col-md-12 p-0">
@@ -310,60 +344,38 @@ function Friends() {
                               <h5 className="mb-4">Latest Active Friends</h5>
                               <a href="#" className="btn btn-link">See All</a>
                             </div>
-                            <div className="row">
-                              <div className="col-md-4 col-sm-6">
-                                <div className="card group-card shadow-sm">
-                                  <img src="assets/images/groups/group-1.png" className="card-img-top group-card-image" alt="Group image" />
-                                  <div className="card-body">
-                                    <h5 className="card-title">Ruth D. Greene
-                                      <img src="assets/images/theme/verify.png" width="10px" className="verify" alt="Group verified" />
-                                    </h5>
-                                    <p className="card-text">10k Members 20+ post a week</p>
-                                    <div className="btn-group w-100" role="group">
-                                      <a href="#" className="btn btn-quick-link join-group-btn border w-100">Message</a>
+                            <div className="friend-card">
+                              {friends.map(friend => (
+                                <div key={friend.friendId} className="friend-card-item">
+                                  <img
+                                    src={`${baseUrl}${friend.imagePath}`}
+                                    alt={`${friend.nickname || 'Friend'}'s avatar`}
+                                    className="friend-card-image"
+                                  />
+                                  <div className="friend-card-body">
+                                    <h5 className="friend-card-title">{friend.nickname}</h5>
+                                    <p className="card-text text-muted"></p>
+                                    <div className="friend-card-buttons" role="group">
+                                      <a href="#" className="btn btn-light border w-100">發送訊息</a>
                                       <div className="btn-group" role="group">
-                                        <button id="friendsMore" type="button" className="btn btn-quick-link join-group-btn border btn-group-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <button 
+                                          type="button" 
+                                          className="btn btn-light border friend-card-options-btn" 
+                                          data-toggle="dropdown" 
+                                          aria-haspopup="true" 
+                                          aria-expanded="false"
+                                        >
                                           <i className='bx bx-dots-horizontal-rounded'></i>
                                         </button>
-                                        <div className="dropdown-menu" aria-labelledby="friendsMore">
-                                          <a className="dropdown-item" href="#">Dropdown link</a>
-                                          <a className="dropdown-item" href="#">Dropdown link</a>
+                                        <div className="dropdown-menu dropdown-menu-right">
+                                          <a className="dropdown-item" href="#">查看個人資料</a>
+                                          <a className="dropdown-item" href="#">取消好友</a>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="col-md-4 col-sm-6">
-                                <div className="card group-card shadow-sm">
-                                  <img src="assets/images/groups/group-2.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                  <div className="card-body">
-                                    <h5 className="card-title">Tourism</h5>
-                                    <p className="card-text">2.5k Members 35+ post a week</p>
-                                    <a href="#" className="btn btn-quick-link join-group-btn border w-100">Join</a>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-md-4 col-sm-6">
-                                <div className="card group-card shadow-sm">
-                                  <img src="assets/images/groups/group-3.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                  <div className="card-body">
-                                    <h5 className="card-title">Reading Books</h5>
-                                    <p className="card-text">1.3k Members 10+ post a day</p>
-                                    <a href="#" className="btn btn-quick-link join-group-btn border w-100">Join</a>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-md-4 col-sm-6">
-                                <div className="card group-card shadow-sm">
-                                  <img src="assets/images/groups/group-4.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                  <div className="card-body">
-                                    <h5 className="card-title">Capture The Best</h5>
-                                    <p className="card-text">2.8k Members 8+ post a day</p>
-                                    <a href="#" className="btn btn-quick-link join-group-btn border w-100">Join</a>
-                                  </div>
-                                </div>
-                              </div>
+                              ))}
                             </div>
                           </div>
                         </div>
