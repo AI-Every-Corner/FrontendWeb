@@ -47,9 +47,12 @@ root.render(
                 <Route path='/profile' element={<PrivateRoute element={Profile} />} />
                 <Route path='/settings' element={<PrivateRoute element={Settings} />} />
                 <Route path='/about' element={<PrivateRoute element={About} />} />
-                <Route path='/photo' element={<PrivateRoute element={Photo} />} /> 
-                <Route path='/intro' element={<PrivateRoute element={Intro} />} /> 
-                <Route path='/profile/:userId' element={<PrivateRoute element={Profile} />} /> 
+                <Route path='/photo' element={<PrivateRoute element={Photo} />} />
+                <Route path='/intro' element={<PrivateRoute element={Intro} />} />
+                <Route
+                  path="/profile/:userId"
+                  element={<PrivateRoute element={Profile} />}
+                />
               </Routes>
             </div>
           </>

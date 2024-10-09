@@ -12,7 +12,7 @@ const PostList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [ViewComments, setViewComments] = useState(true);
 
-  const userId = localStorage.getItem('userId'); // 獲取當前用戶的 userId
+ // const userId = localStorage.getItem('userId'); // 獲取當前用戶的 userId
 
   const fetchPosts = async () => {
     const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
@@ -71,9 +71,10 @@ const PostList = () => {
               />
               <div className="media-body pb-3 mb-0 small lh-125">
                 <div className="d-flex justify-content-between align-items-center w-100">
-                  <a className="text-gray-dark post-user-name"><a className="h5">
-                    <Link to={`/profile?userId=${post.userId}`}>{post.nickname}</Link>
-                    </a></a>
+                  <Link to={`/profile?userId=${post.userId}`} className="text-gray-dark h5">
+                    {post.nickname}
+                  </Link>
+
                   console.log(post.userId);
                   <div className="dropdown">
                     <a

@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useLocation  } from 'react-router-dom';
+import { useNavigate, useParams, useLocation   } from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
 import axios from 'axios';
@@ -13,19 +13,24 @@ import Recentmedia from './recentmedia';
 
 function Profile() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
     const { avatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
     });
-    const { userId, setAvatarUrl } = useContext(UserContext);
+    //const { userId } = useContext(UserContext);
+    const userId = params.get('userId'); // 從查詢參數中獲取 userId
 
     const [posts, setPosts] = useState([]);  // New state for posts
 
     const [moodData, setMoodData] = useState();
 
     useEffect(() => {
+
         console.log('Fetched userId:', userId);
+        console.log('Query userId:', userId);
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
@@ -57,6 +62,8 @@ function Profile() {
             console.error("Error fetching posts:", error);
         });
 
+        console.log('URL 中的 userId:', userId);
+
     }, [userId]);
 
     // Function to handle logout
@@ -68,7 +75,7 @@ function Profile() {
     // 這裡的函數需要被立即調用
     const fetchData = async () => {
         try {
-            const userId = localStorage.getItem("userId");
+            //const userId = localStorage.getItem("userId");
             const token = localStorage.getItem("token");
 
             const response = await axios.post(
@@ -89,7 +96,8 @@ function Profile() {
     useEffect(() => {
         fetchData(); // 調用函數
 
-    }, []); // 這裡添加空依賴數組，確保 useEffect 只運行一次
+    }, [userId]); // 這裡添加空依賴數組，確保 useEffect 只運行一次
+
     return (
         <div className="Profile">
             <>
