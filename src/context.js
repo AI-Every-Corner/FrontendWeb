@@ -5,6 +5,14 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [userId, setUserId] = useState('');
+  const [userInfo, setUserInfo] = useState({
+    work: "曾在XXX地工作",
+    school: "就讀於AI大學",
+    location: "現居XX市",
+    fromLocation: "來自XX市",
+    relationship: "單身",
+    phone: "0900 000 000",
+  });
 
   useEffect(() => {
 
@@ -25,7 +33,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ avatarUrl, setAvatarUrl, userId, setUserId }}>
+    <UserContext.Provider value={{ avatarUrl, setAvatarUrl, userId, setUserId, userInfo, setUserInfo }}>
       {children}
     </UserContext.Provider>
   );
