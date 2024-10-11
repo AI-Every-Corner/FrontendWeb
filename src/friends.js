@@ -1,64 +1,43 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
-import axios from 'axios';
+import React, { useEffect, useState, useContext } from 'react'
 import { UserContext } from './context';
+import axios from 'axios';
+import Intro from './intro';
+import Recentmedia from './recentmedia';
+import { useNavigate, useParams, useLocation   } from 'react-router-dom';
 
 function Friends() {
 
-  const navigate = useNavigate();
   const location = useLocation();
+  const { avatarUrl } = useContext(UserContext);
   const params = new URLSearchParams(location.search);
-  const { avatar, setAvatar } = useContext(UserContext);
+  const userId = params.get('userId'); // 從查詢參數中獲取 userId
   const [formData, setFormData] = useState({
     nickName: '',
     username: ''
   });
-  const urlUserId = params.get('userId');
-  const storedUserId = localStorage.getItem('userId');
-  const userId = urlUserId || storedUserId;
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
-  const [friends, setFriends] = useState([]);
-  const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';  // 使用環境變量或默認值
-
+  const { setAvatarUrl } = useContext(UserContext);
 
   useEffect(() => {
-    const currentUserId = localStorage.getItem('userId');
-    setIsCurrentUser(userId === currentUserId);
-
     console.log('Fetched userId:', userId);
 
-    const token = localStorage.getItem('token');
+    // 從後端獲取用戶資料
+    const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
 
-    // 獲取用戶資料
     axios.get(`http://localhost:8080/api/auth/${userId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}` // 設置 Authorization 標頭
       }
     })
       .then(response => {
         const userData = response.data;
         setFormData({
-          nickName: userData.nickName,
+          nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
           username: userData.username
         });
       })
       .catch(error => {
         console.error("獲取用戶資料時發生錯誤:", error);
       });
-
-    // 獲取好友列表
-    axios.get(`http://localhost:8080/friends/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(response => {
-        setFriends(response.data);
-      })
-      .catch(error => {
-        console.error("獲取好友數據時發生錯誤:", error);
-      });
-
   }, [userId]);
 
   return (
@@ -87,7 +66,6 @@ function Friends() {
       <link href="assets/css/components.css" rel="stylesheet" />
       <link href="assets/css/profile.css" rel="stylesheet" />
       <link href="assets/css/media.css" rel="stylesheet" />
-      <link href="assets/css/friends.css" rel="stylesheet" />
       <div className="container-fluid newsfeed d-flex" id="wrapper">
         <div className="row newsfeed-size">
           <div className="col-md-12 p-0">
@@ -110,7 +88,7 @@ function Friends() {
                         <div className="profile-img w-shadow">
                           <div className="profile-img-overlay" />
                           <img
-                            src={avatar}
+                            src={avatarUrl}
                             alt="Avatar"
                             className="avatar img-circle"
                           />
@@ -142,8 +120,8 @@ function Friends() {
                             <span className="fs-8">More</span>
                           </button>
                           <div className="dropdown-menu dropdown-menu-right profile-ql-dropdown" aria-labelledby="moreMobile">
-                            <a href="/profile" className="dropdown-item">Timeline</a>
-                            <a href="/about" className="dropdown-item">About</a>
+                            <a href={`/profile?userId=${userId}`} className="dropdown-item">Timeline</a>
+                            <a href={`/about?userId=${userId}`} className="dropdown-item">About</a>
                             <a href="followers.html" className="dropdown-item">Followers</a>
                             <a href="following.html" className="dropdown-item">Following</a>
                             <a href="photos.html" className="dropdown-item">Photos</a>
@@ -158,28 +136,7 @@ function Friends() {
                         <div className="intro-item d-flex justify-content-between align-items-center">
                           <h3 className="intro-about">Intro</h3>
                         </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <p className="intro-title text-muted">
-                            <i className='bx bx-briefcase text-primary'></i> Web Developer at
-                            <a href="#">Company Name</a>
-                          </p>
-                        </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <p className="intro-title text-muted">
-                            <i className='bx bx-map text-primary'></i> Lives in <a href="#">City, Country</a>
-                          </p>
-                        </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <p className="intro-title text-muted">
-                            <i className='bx bx-time text-primary'></i> Last Login
-                            <a href="#">Online
-                              <span className="ml-1 online-status bg-success"></span>
-                            </a>
-                          </p>
-                        </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <a href="#" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                        </div>
+                        <Intro />
                       </div>
                       <div className="intro mt-5 row mv-hidden">
                         <div className="col-md-4">
@@ -192,29 +149,6 @@ function Friends() {
                           <img src="assets/images/users/album/album-3.jpg" width="95" alt="" />
                         </div>
                       </div>
-                      <div className="intro mt-5 mv-hidden">
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <h3 className="intro-about">Other Social Accounts</h3>
-                        </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <p className="intro-title text-muted">
-                            <i className='bx bxl-facebook-square facebook-color'></i>
-                            <a href="#" target="_blank">facebook.com/username</a>
-                          </p>
-                        </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <p className="intro-title text-muted">
-                            <i className='bx bxl-twitter twitter-color'></i>
-                            <a href="#" target="_blank">twitter.com/username</a>
-                          </p>
-                        </div>
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <p className="intro-title text-muted">
-                            <i className='bx bxl-instagram instagram-color'></i>
-                            <a href="#" target="_blank">instagram.com/username</a>
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   </div>
                   <div className="col-md-9 p-0">
@@ -224,15 +158,15 @@ function Friends() {
                         <div className="col-md-9 profile-center">
                           <ul className="list-inline profile-links d-flex justify-content-between shadow-sm rounded">
                             <li className="list-inline-item">
-                              <a href="/profile">Timeline</a>
+                              <a href={`/profile?userId=${userId}`}>Timeline</a>
                             </li>
                             <li className="list-inline-item">
-                              <a href="/about">About</a></li>
+                              <a href={`/about?userId=${userId}`}>About</a></li>
                             <li className="list-inline-item profile-active">
-                              <a href="/friends">Friends</a>
+                              <a href={`/friends?userId=${userId}`}>Friends</a>
                             </li>
                             <li className="list-inline-item">
-                              <a href="/photo">Photos</a>
+                              <a href={`/photo?userId=${userId}`}>Photos</a>
                             </li>
                             <li className="list-inline-item dropdown">
                               <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -338,180 +272,64 @@ function Friends() {
                               <h5 className="mb-4">Latest Active Friends</h5>
                               <a href="#" className="btn btn-link">See All</a>
                             </div>
-                            <div className="friend-card">
-                              {friends.map(friend => (
-                                <div key={friend.friendId} className="friend-card-item">
-                                  <img
-                                    src={`${baseUrl}${friend.imagePath}`}
-                                    alt={`${friend.nickname || 'Friend'}'s avatar`}
-                                    className="friend-card-image"
-                                  />
-                                  <div className="friend-card-body">
-                                    <h5 className="friend-card-title"><Link to={`/profile?userId=${friend.friendId}`}>{friend.nickname}</Link></h5>
-                                    <p className="card-text text-muted"></p>
-                                    <div className="friend-card-buttons" role="group">
-                                      <a href="#" className="btn btn-light border w-100">發送訊息</a>
+                            <div className="row">
+                              <div className="col-md-4 col-sm-6">
+                                <div className="card group-card shadow-sm">
+                                  <img src="assets/images/groups/group-1.png" className="card-img-top group-card-image" alt="Group image" />
+                                  <div className="card-body">
+                                    <h5 className="card-title">Ruth D. Greene
+                                      <img src="assets/images/theme/verify.png" width="10px" className="verify" alt="Group verified" />
+                                    </h5>
+                                    <p className="card-text">10k Members 20+ post a week</p>
+                                    <div className="btn-group w-100" role="group">
+                                      <a href="#" className="btn btn-quick-link join-group-btn border w-100">Message</a>
                                       <div className="btn-group" role="group">
-                                        <button 
-                                          type="button" 
-                                          className="btn btn-light border friend-card-options-btn" 
-                                          data-toggle="dropdown" 
-                                          aria-haspopup="true" 
-                                          aria-expanded="false"
-                                        >
+                                        <button id="friendsMore" type="button" className="btn btn-quick-link join-group-btn border btn-group-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                           <i className='bx bx-dots-horizontal-rounded'></i>
                                         </button>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <a className="dropdown-item" href="#">查看個人資料</a>
-                                          <a className="dropdown-item" href="#">取消好友</a>
+                                        <div className="dropdown-menu" aria-labelledby="friendsMore">
+                                          <a className="dropdown-item" href="#">Dropdown link</a>
+                                          <a className="dropdown-item" href="#">Dropdown link</a>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-md-3 profile-quick-media">
-                          <h6 className="text-muted timeline-title">Recent Media</h6>
-                          <div className="quick-media">
-                            <div className="media-overlay"></div>
-                            <a href="#" className="quick-media-img">
-                              <img src="assets/images/users/album/album-1.jpg" alt="Quick media" />
-                            </a>
-                            <div className="media-overlay-content">
-                              <div className="d-flex justify-content-between align-items-center">
-                                <div className="media-overlay-owner">
-                                  <img src="assets/images/users/user-12.png" alt="Media owner image" />
-                                  <span className="overlay-owner-name fs-9">Irwin M. Spelle</span>
-                                </div>
-                                <div className="dropdown">
-                                  <a href="#" className="overlay-more" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <i className='bx bx-dots-horizontal-rounded'></i>
-                                  </a>
-                                  <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                    <a className="dropdown-item" href="#">Save post</a>
-                                    <a className="dropdown-item" href="#">Turn on notifications</a>
+                              </div>
+                              <div className="col-md-4 col-sm-6">
+                                <div className="card group-card shadow-sm">
+                                  <img src="assets/images/groups/group-2.jpg" className="card-img-top group-card-image" alt="Group image" />
+                                  <div className="card-body">
+                                    <h5 className="card-title">Tourism</h5>
+                                    <p className="card-text">2.5k Members 35+ post a week</p>
+                                    <a href="#" className="btn btn-quick-link join-group-btn border w-100">Join</a>
                                   </div>
                                 </div>
                               </div>
-
-                              <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                <div className="argon-reaction">
-                                  <span className="like-btn">
-                                    <a href="#" className="post-card-buttons" id="reactions"><i className='bx bxs-like mr-1'></i> 67</a>
-                                    <ul className="reactions-box dropdown-shadow">
-                                      <li className="reaction reaction-like" data-reaction="Like"></li>
-                                      <li className="reaction reaction-love" data-reaction="Love"></li>
-                                      <li className="reaction reaction-haha" data-reaction="HaHa"></li>
-                                      <li className="reaction reaction-wow" data-reaction="Wow"></li>
-                                      <li className="reaction reaction-sad" data-reaction="Sad"></li>
-                                      <li className="reaction reaction-angry" data-reaction="Angry"></li>
-                                    </ul>
-                                  </span>
-                                </div>
-                                <div className="liked-users">
-                                  <img src="assets/images/users/user-9.png" alt="Liked users" />
-                                  <img src="assets/images/users/user-6.png" alt="Liked users" />
-                                  <img src="assets/images/users/user-12.png" alt="Liked users" />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="quick-media">
-                            <div className="media-overlay"></div>
-                            <a href="#" className="quick-media-img">
-                              <img src="assets/images/users/album/album-2.jpg" alt="Quick media" />
-                            </a>
-                            <div className="media-overlay-content">
-                              <div className="d-flex justify-content-between align-items-center">
-                                <div className="media-overlay-owner">
-                                  <img src="assets/images/users/user-12.png" alt="Media owner image" />
-                                  <span className="overlay-owner-name fs-9">Irwin M. Spelle</span>
-                                </div>
-                                <div className="dropdown">
-                                  <a href="#" className="overlay-more" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <i className='bx bx-dots-horizontal-rounded'></i>
-                                  </a>
-                                  <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                    <a className="dropdown-item" href="#">Save post</a>
-                                    <a className="dropdown-item" href="#">Turn on notifications</a>
+                              <div className="col-md-4 col-sm-6">
+                                <div className="card group-card shadow-sm">
+                                  <img src="assets/images/groups/group-3.jpg" className="card-img-top group-card-image" alt="Group image" />
+                                  <div className="card-body">
+                                    <h5 className="card-title">Reading Books</h5>
+                                    <p className="card-text">1.3k Members 10+ post a day</p>
+                                    <a href="#" className="btn btn-quick-link join-group-btn border w-100">Join</a>
                                   </div>
                                 </div>
                               </div>
-
-                              <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                <div className="argon-reaction">
-                                  <span className="like-btn">
-                                    <a href="#" className="post-card-buttons" id="reactions">
-                                      <i className='bx bxs-like mr-1'></i> 67
-                                    </a>
-                                    <ul className="reactions-box dropdown-shadow">
-                                      <li className="reaction reaction-like" data-reaction="Like"></li>
-                                      <li className="reaction reaction-love" data-reaction="Love"></li>
-                                      <li className="reaction reaction-haha" data-reaction="HaHa"></li>
-                                      <li className="reaction reaction-wow" data-reaction="Wow"></li>
-                                      <li className="reaction reaction-sad" data-reaction="Sad"></li>
-                                      <li className="reaction reaction-angry" data-reaction="Angry"></li>
-                                    </ul>
-                                  </span>
-                                </div>
-                                <div className="liked-users">
-                                  <img src="assets/images/users/user-9.png" alt="Liked users" />
-                                  <img src="assets/images/users/user-6.png" alt="Liked users" />
-                                  <img src="assets/images/users/user-12.png" alt="Liked users" />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="quick-media">
-                            <div className="media-overlay"></div>
-                            <a href="#" className="quick-media-img">
-                              <img src="assets/images/users/album/album-3.jpg" alt="Quick media" />
-                            </a>
-                            <div className="media-overlay-content">
-                              <div className="d-flex justify-content-between align-items-center">
-                                <div className="media-overlay-owner">
-                                  <img src="assets/images/users/user-12.png" alt="Media owner image" />
-                                  <span className="overlay-owner-name fs-9">Irwin M. Spelle</span>
-                                </div>
-                                <div className="dropdown">
-                                  <a href="#" className="overlay-more" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <i className='bx bx-dots-horizontal-rounded'></i>
-                                  </a>
-                                  <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                    <a className="dropdown-item" href="#">Save post</a>
-                                    <a className="dropdown-item" href="#">Turn on notifications</a>
+                              <div className="col-md-4 col-sm-6">
+                                <div className="card group-card shadow-sm">
+                                  <img src="assets/images/groups/group-4.jpg" className="card-img-top group-card-image" alt="Group image" />
+                                  <div className="card-body">
+                                    <h5 className="card-title">Capture The Best</h5>
+                                    <p className="card-text">2.8k Members 8+ post a day</p>
+                                    <a href="#" className="btn btn-quick-link join-group-btn border w-100">Join</a>
                                   </div>
-                                </div>
-                              </div>
-
-                              <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                <div className="argon-reaction">
-                                  <span className="like-btn">
-                                    <a href="#" className="post-card-buttons" id="reactions">
-                                      <i className='bx bxs-like mr-1'></i> 67
-                                    </a>
-                                    <ul className="reactions-box dropdown-shadow">
-                                      <li className="reaction reaction-like" data-reaction="Like"></li>
-                                      <li className="reaction reaction-love" data-reaction="Love"></li>
-                                      <li className="reaction reaction-haha" data-reaction="HaHa"></li>
-                                      <li className="reaction reaction-wow" data-reaction="Wow"></li>
-                                      <li className="reaction reaction-sad" data-reaction="Sad"></li>
-                                      <li className="reaction reaction-angry" data-reaction="Angry"></li>
-                                    </ul>
-                                  </span>
-                                </div>
-                                <div className="liked-users">
-                                  <img src="assets/images/users/user-9.png" alt="Liked users" />
-                                  <img src="assets/images/users/user-6.png" alt="Liked users" />
-                                  <img src="assets/images/users/user-12.png" alt="Liked users" />
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
+                        <Recentmedia />
                       </div>
                     </div>
                   </div>

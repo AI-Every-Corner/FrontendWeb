@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
       setAvatar(`${baseUrl}${storedAvatar}`);
 
       //setAvatarUrl(`http://localhost:8080${storedAvatarUrl}`);
-    }
+    }  
 
     if (storedUserId) {
       setUserId(storedUserId);

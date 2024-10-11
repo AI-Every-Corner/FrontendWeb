@@ -3,16 +3,20 @@ import { UserContext } from './context';
 import axios from 'axios';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
+import { useNavigate, useParams, useLocation   } from 'react-router-dom';
 
 function Photo() {
 
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const userId = params.get('userId'); // 從查詢參數中獲取 userId
     const { avatarUrl } = useContext(UserContext);
 
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
     });
-    const { userId, setAvatarUrl } = useContext(UserContext);
+    const { setAvatarUrl } = useContext(UserContext);
 
     useEffect(() => {
         console.log('Fetched userId:', userId);
@@ -175,9 +179,6 @@ function Photo() {
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                                                    </div>
                                                 </div>
                                                 <div className="intro mt-5 row mv-hidden">
                                                     <div className="col-md-4">
@@ -211,16 +212,16 @@ function Photo() {
                                                     <div className="col-md-9 profile-center">
                                                         <ul className="list-inline profile-links d-flex justify-content-between w-shadow rounded">
                                                             <li className="list-inline-item ">
-                                                                <a href="/profile">Timeline</a>
+                                                                <a href={`/profile?userId=${userId}`}>Timeline</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/about">About</a>
+                                                                <a href={`/about?userId=${userId}`}>About</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/friends">Friends</a>
+                                                                <a href={`/friends?userId=${userId}`}>Friends</a>
                                                             </li>
                                                             <li className="list-inline-item profile-active">
-                                                                <a href="/photo">Photos</a>
+                                                                <a href={`/photo?userId=${userId}`}>Photos</a>
                                                             </li>
                                                             <li className="list-inline-item dropdown">
                                                                 <a

@@ -3,6 +3,7 @@ import { UserContext } from './context';
 import axios from 'axios';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 
 function About() {
@@ -212,9 +213,6 @@ function About() {
                                                         handleInputChange={handleInputChange}
                                                         handleSubmit={handleSubmit} />
                                                 </div>
-                                                <div className="intro-item d-flex justify-content-between align-items-center">
-                                                    <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                                                </div>
                                                 <div className="intro mt-5 row mv-hidden">
                                                     <div className="col-md-4">
                                                         <img
@@ -247,16 +245,16 @@ function About() {
                                                     <div className="col-md-9 profile-center">
                                                         <ul className="list-inline profile-links d-flex justify-content-between w-shadow rounded">
                                                             <li className="list-inline-item ">
-                                                                <a href="/profile">Timeline</a>
+                                                                <a href={`/profile?userId=${userId}`}>Timeline</a>
                                                             </li>
                                                             <li className="list-inline-item profile-active">
-                                                                <a href="/about">About</a>
+                                                                <a href={`/about?userId=${userId}`}>About</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/friends">Friends</a>
+                                                                <a href={`/friends?userId=${userId}`}>Friends</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/photo">Photos</a>
+                                                                <a href={`/photo?userId=${userId}`}>Photos</a>
                                                             </li>
                                                             <li className="list-inline-item dropdown">
                                                                 <a
@@ -293,9 +291,12 @@ function About() {
                                                             </div>
                                                             <div className="col-md-9 col-sm-12">
                                                                 <div className="timeline-manage">
-                                                                    <button className="btn btn-manage" onClick={toggleEditMode}>
-                                                                        {isEditing ? "Cancel" : "Manage About"}
-                                                                    </button>
+                                                                    {/* Check if the userId from localStorage matches the one from the query parameters */}
+                                                                    {localStorageUserId === queryUserId ? (
+                                                                        <button className="btn btn-manage" onClick={toggleEditMode}>
+                                                                            {isEditing ? "Cancel" : "Manage About"}
+                                                                        </button>
+                                                                    ): null}
                                                                 </div>
                                                                 {/* 如果處於編輯模式，顯示編輯表單 */}
                                                                 {isEditing ? (
