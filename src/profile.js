@@ -19,8 +19,7 @@ function Profile() {
     const { avatarUrl, setAvatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
-        username: '',
-        imagePath: ''
+        username: ''
         
     });
     //const { userId } = useContext(UserContext);
@@ -52,7 +51,7 @@ function Profile() {
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
                     username: userData.username,
-                    imagePath: userData.imagePath
+                    avatarUrl: userData.imagePath ? `http://localhost:8080${userData.imagePath}` : null
                 });
                 if (userData.imagePath) {
                     setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
@@ -157,7 +156,7 @@ function Profile() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src={formData.imagePath}
+                                                            src={formData.avatarUrl || avatarUrl}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
