@@ -6,6 +6,7 @@ import TimePassedComponent from "./timePassedComponent";
 import ResponseList from "./responselist";
 import { Link } from "react-router-dom";
 
+
 const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
@@ -35,17 +36,36 @@ const PostList = () => {
         }
     };
 
-    useEffect(() => {
-      fetchPosts();
-    }, [page]);
+  useEffect(() => {
+    fetchPosts();
+  }, [page]);
 
-    const toggleComments = (postId) => {
-      console.log(postId);
-      setOpenComments(prev => ({
-        ...prev,
-        [postId]: !prev[postId]
-      })); // hide : show
-    }
+  const toggleComments = (postId) => {
+    console.log(postId);
+    setOpenComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    })); // hide : show
+  }
+
+  // Function to reset the page to 0
+  const resetPageOnBack = () => {
+    setPage(0);
+  };
+
+  useEffect(() => {
+    // Listen for popstate event (browser back/forward navigation)
+    const handlePopState = () => {
+      resetPageOnBack();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    // Cleanup the event listener on unmount
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
 
     return (
         <InfiniteScroll
@@ -59,6 +79,7 @@ const PostList = () => {
             <div key={post.postId}>
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
+    <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
     <img
     src={post.imagePath}
     alt="Online user"
@@ -66,112 +87,112 @@ const PostList = () => {
     />
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
-      <a href="#" className="text-gray-dark post-user-name">
-        <a className="h5">{post.nickname}</a>
-        <Link to="/profile"/>
+      <a to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
+        {post.nickname}
       </a>
-      <div className="dropdown">
-      <a
-        href="#"
-        className="post-more-settings"
-        role="button"
-        data-toggle="dropdown"
-        id="postOptions"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <i className="bx bx-dots-horizontal-rounded" />
-      </a>
-      <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
+      {/* <div className="dropdown">
         <a
-        href="#"
-        className="dropdown-item"
-        aria-describedby="savePost"
+          href="#"
+          className="post-more-settings"
+          role="button"
+          data-toggle="dropdown"
+          id="postOptions"
+          aria-haspopup="true"
+          aria-expanded="false"
         >
-        <div className="row">
-          <div className="col-md-2">
-          <i className="bx bx-bookmark-plus post-option-icon" />
-          </div>
-          <div className="col-md-10">
-          <span className="fs-9">Save post</span>
-          <small
-            id="savePost"
-            className="form-text text-muted"
-          >
-            Add this to your saved items
-          </small>
-          </div>
-        </div>
+          <i className="bx bx-dots-horizontal-rounded" />
         </a>
-        <a
-        href="#"
-        className="dropdown-item"
-        aria-describedby="hidePost"
-        >
-        <div className="row">
-          <div className="col-md-2">
-          <i className="bx bx-hide post-option-icon" />
-          </div>
-          <div className="col-md-10">
-          <span className="fs-9">Hide post</span>
-          <small
-            id="hidePost"
-            className="form-text text-muted"
+        <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
+          <a
+          href="#"
+          className="dropdown-item"
+          aria-describedby="savePost"
           >
-            See fewer posts like this
-          </small>
+          <div className="row">
+            <div className="col-md-2">
+            <i className="bx bx-bookmark-plus post-option-icon" />
+            </div>
+            <div className="col-md-10">
+            <span className="fs-9">Save post</span>
+            <small
+              id="savePost"
+              className="form-text text-muted"
+            >
+              Add this to your saved items
+            </small>
+            </div>
           </div>
-        </div>
-        </a>
-        <a
-        href="#"
-        className="dropdown-item"
-        aria-describedby="snoozePost"
-        >
-        <div className="row">
-          <div className="col-md-2">
-          <i className="bx bx-time post-option-icon" />
-          </div>
-          <div className="col-md-10">
-          <span className="fs-9">
-            Snooze Lina for 30 days
-          </span>
-          <small
-            id="snoozePost"
-            className="form-text text-muted"
+          </a>
+          <a
+          href="#"
+          className="dropdown-item"
+          aria-describedby="hidePost"
           >
-            Temporarily stop seeing posts
-          </small>
-          </div>
-        </div>
-        </a>
-        <a
-        href="#"
-        className="dropdown-item"
-        aria-describedby="reportPost"
-        >
-        <div className="row">
-          <div className="col-md-2">
-          <i className="bx bx-block post-option-icon" />
-          </div>
-          <div className="col-md-10">
-          <span className="fs-9">Report</span>
-          <small
-            id="reportPost"
-            className="form-text text-muted"
+            <div className="row">
+              <div className="col-md-2">
+              <i className="bx bx-hide post-option-icon" />
+              </div>
+              <div className="col-md-10">
+              <span className="fs-9">Hide post</span>
+              <small
+                id="hidePost"
+                className="form-text text-muted"
+              >
+                See fewer posts like this
+              </small>
+              </div>
+            </div>
+          </a>
+          <a
+          href="#"
+          className="dropdown-item"
+          aria-describedby="snoozePost"
           >
-            I'm concerned about this post
-          </small>
-          </div>
+            <div className="row">
+              <div className="col-md-2">
+                <i className="bx bx-time post-option-icon" />
+              </div>
+              <div className="col-md-10">
+                <span className="fs-9">
+                  Snooze Lina for 30 days
+                </span>
+                <small
+                  id="snoozePost"
+                  className="form-text text-muted"
+                >
+                  Temporarily stop seeing posts
+                </small>
+              </div>
+            </div>
+          </a>
+          <a
+          href="#"
+          className="dropdown-item"
+          aria-describedby="reportPost"
+          >
+            <div className="row">
+              <div className="col-md-2">
+              <i className="bx bx-block post-option-icon" />
+              </div>
+              <div className="col-md-10">
+              <span className="fs-9">Report</span>
+                <small
+                  id="reportPost"
+                  className="form-text text-muted"
+                >
+                  I'm concerned about this post
+                </small>
+              </div>
+            </div>
+          </a>
         </div>
-        </a>
-      </div>
-      </div>
+      </div> */}
     </div>
     <span className="d-block">
       <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
     </span>
     </div>
+    </Link>
   </div>
 <div className="mt-3">
   <p>
@@ -266,10 +287,10 @@ const PostList = () => {
 </div>
 </div>
 
-</div>
-            ))}
-        </InfiniteScroll>
-    );
+        </div>
+      ))}
+    </InfiniteScroll>
+  );
 };
 
 export default PostList;

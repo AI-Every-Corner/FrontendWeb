@@ -100,7 +100,7 @@ function ResponseList(postId) {
         <a href="#" className="pull-left">
           <Link to="/profile">
             <img
-            src={users[response.userId].avatarUrl}
+            src={avatarUrl}
             alt="User Avatar"
             className="img-circle"
             />
@@ -169,7 +169,7 @@ function ResponseList(postId) {
         {users[response.userId] ? (
         <a href="#" className="pull-left">
           <img
-          src={users[response.userId].avatarUrl}
+          src={users[response.userId].imagePath}
           alt=""
           className="img-circle"
           />
@@ -207,18 +207,6 @@ function ResponseList(postId) {
                   <i className="bx bxs-like mr-2 text-start" /> 67
                 </a>
               </span>
-              {reply ? 
-                <span className="reply-btn mx-4 px-4" onClick={handleReply}>
-                  <a className="text-primary">Reply</a>
-                </span> :
-                <span className="flex-grow-1 px-4">
-                  <input
-                  type="text"
-                  className="form-control comment-input"
-                  placeholder="Write a reply..."
-                  />
-                </span>
-              }
             </div>
           </div>
         </div>
