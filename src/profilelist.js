@@ -4,19 +4,25 @@ import axios from "axios";
 import { avatarProvider } from "./avatarProvider";
 import TimePassedComponent from "./timepassedcomponent";
 import ResponseList from "./responselist";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 
-const PostList = () => {
+const ProfileList = () => {
+    
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const userId = params.get('userId'); // 從查詢參數中獲取 userId
+
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [openComments, setOpenComments] = useState({});
+    
   
     const fetchPosts = async () => {
         try {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-            const response = await axios.get(`http://localhost:8080/posts`,{
+            const response = await axios.get(`http://localhost:8080/posts/${userId}`,{
               headers: {
                 'Authorization': `Bearer ${token}` // 添加 Authorization header
               },
@@ -26,7 +32,7 @@ const PostList = () => {
               }
             });
             console.log(response);
-            setPosts([...posts, ...response.data.postsList]);  // Append new posts
+            setPosts([...posts, ...response.data]);  // Append new posts
 
             if (response.data.last || response.data.totalPages - 1 === page) {
               setHasMore(false);  // No more posts to load
@@ -36,9 +42,11 @@ const PostList = () => {
         }
     };
 
-  useEffect(() => {
-    fetchPosts();
-  }, [page]);
+    useEffect(() => {
+        setPosts([]); // 清空已有的文章
+        setPage(0);   // 重設頁數
+        fetchPosts(); // 再次抓取新userId的文章
+      }, [userId]);
 
   const toggleComments = (postId) => {
     console.log(postId);
@@ -81,7 +89,7 @@ const PostList = () => {
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
     <img
-    src={post.imagePath}
+    src={userId.imagePath}
     alt="Online user"
     className="mr-3 post-user-image"
     />
@@ -90,103 +98,7 @@ const PostList = () => {
       <a to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
         {post.nickname}
       </a>
-      {/* <div className="dropdown">
-        <a
-          href="#"
-          className="post-more-settings"
-          role="button"
-          data-toggle="dropdown"
-          id="postOptions"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <i className="bx bx-dots-horizontal-rounded" />
-        </a>
-        <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="savePost"
-          >
-          <div className="row">
-            <div className="col-md-2">
-            <i className="bx bx-bookmark-plus post-option-icon" />
-            </div>
-            <div className="col-md-10">
-            <span className="fs-9">Save post</span>
-            <small
-              id="savePost"
-              className="form-text text-muted"
-            >
-              Add this to your saved items
-            </small>
-            </div>
-          </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="hidePost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-              <i className="bx bx-hide post-option-icon" />
-              </div>
-              <div className="col-md-10">
-              <span className="fs-9">Hide post</span>
-              <small
-                id="hidePost"
-                className="form-text text-muted"
-              >
-                See fewer posts like this
-              </small>
-              </div>
-            </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="snoozePost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-                <i className="bx bx-time post-option-icon" />
-              </div>
-              <div className="col-md-10">
-                <span className="fs-9">
-                  Snooze Lina for 30 days
-                </span>
-                <small
-                  id="snoozePost"
-                  className="form-text text-muted"
-                >
-                  Temporarily stop seeing posts
-                </small>
-              </div>
-            </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="reportPost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-              <i className="bx bx-block post-option-icon" />
-              </div>
-              <div className="col-md-10">
-              <span className="fs-9">Report</span>
-                <small
-                  id="reportPost"
-                  className="form-text text-muted"
-                >
-                  I'm concerned about this post
-                </small>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div> */}
+      
     </div>
     <span className="d-block">
       <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
@@ -293,4 +205,4 @@ const PostList = () => {
   );
 };
 
-export default PostList;
+export default ProfileList;

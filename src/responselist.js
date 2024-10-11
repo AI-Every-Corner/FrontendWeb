@@ -3,7 +3,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import axios from 'axios';
 import { UserContext } from './context';
 import { Link, useNavigate } from 'react-router-dom';
-import TimePassedComponent from './timePassedComponent';
+import TimePassedComponent from './timepassedcomponent';
 
 function ResponseList(postId) {
   const [responses, setResponses] = useState([]);
