@@ -50,7 +50,7 @@ root.render(
                 <Route path='/photo' element={<PrivateRoute element={Photo} />} />
                 <Route path='/intro' element={<PrivateRoute element={Intro} />} />
                 <Route
-                  path="/profile/:userId"
+                  path="/profile/:userid"
                   element={<PrivateRoute element={Profile} />}
                 />
               </Routes>

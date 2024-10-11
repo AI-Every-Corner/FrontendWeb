@@ -7,8 +7,8 @@ import Recentmedia from './recentmedia';
 
 function About() {
 
-    const { avatarUrl } = useContext(UserContext);
-    const { userId, setAvatarUrl } = useContext(UserContext);
+    const { avatar } = useContext(UserContext);
+    const { userId, setAvatar } = useContext(UserContext);
 
     const [formData, setFormData] = useState({
         nickName: '',
@@ -122,7 +122,7 @@ function About() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src={avatarUrl}
+                                                            src={avatar}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
