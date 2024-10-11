@@ -171,11 +171,6 @@ function SignIn() {
             Thank you for joining. Updates and new features are released daily.
           </p>
         </div>
-        <div className="auth-quick-links">
-          <a href="#" className="btn btn-outline-primary">
-            Purchase template
-          </a>
-        </div>
       </div>
     </div>
   </div>

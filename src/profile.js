@@ -16,7 +16,7 @@ function Profile() {
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const { avatarUrl } = useContext(UserContext);
+    const { avatarUrl, setAvatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
         username: '',
@@ -24,12 +24,17 @@ function Profile() {
         
     });
     //const { userId } = useContext(UserContext);
-    const userId = params.get('userId'); // 從查詢參數中獲取 userId
+    const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
+    const storedUserId = localStorage.getItem('userId');
+    const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
     const [posts, setPosts] = useState([]);  // New state for posts
-    const [loading, setLoading] = useState(true); // 用來顯示加載狀態
     const [moodData, setMoodData] = useState();
+    const [isCurrentUser, setIsCurrentUser] = useState(false); //
 
     useEffect(() => {
+
+        const currentUserId = localStorage.getItem('userId');
+        setIsCurrentUser(userId === currentUserId);
 
         console.log('Fetched userId:', userId);
         console.log('Query userId:', userId);
@@ -49,6 +54,9 @@ function Profile() {
                     username: userData.username,
                     imagePath: userData.imagePath
                 });
+                if (userData.imagePath) {
+                    setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
+                }
             })
             .catch(error => {
                 console.error("獲取用戶資料時發生錯誤:", error);
@@ -70,12 +78,6 @@ function Profile() {
 
     }, [userId]);
 
-    // Function to handle logout
-    const handleLogout = async () => {
-        await logout();
-        alert('登出成功');
-        navigate('/sign-in');
-    };
     // 這裡的函數需要被立即調用
     const fetchData = async () => {
         try {
@@ -104,6 +106,7 @@ function Profile() {
 
     return (
         <div className="Profile">
+
             <>
                 <meta charSet="utf-8" />
                 <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -239,6 +242,11 @@ function Profile() {
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
+                                                    {isCurrentUser && (
+                                                    <div className="intro-item d-flex justify-content-between align-items-center">
+                                                        <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
+                                                    </div>
+                                                    )}
                                                 </div>
                                                 <div className="intro mt-5 row mv-hidden">
                                                     <div className="col-md-4">
@@ -311,6 +319,7 @@ function Profile() {
                                                                 </div>
                                                             </li>
                                                         </ul>
+                                                        <CalendarChart isCurrentUser={isCurrentUser} />
                                                         <Container>
                                                             <Row>
                                                                 <Col md={1} lg={1} xl={1}></Col>
@@ -460,7 +469,10 @@ function Profile() {
     );
 }
 
-function CalendarChart() {
+function CalendarChart({ isCurrentUser}) {
+    if(!isCurrentUser){
+        return null;
+    }
     const data = [
         [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
         [new Date(2024, 5, 12), 3],
@@ -509,6 +521,7 @@ function CalendarChart() {
     };
 
     return (
+        
         <div style={{ width: '100%', maxWidth: '650px', aspectRatio: '6 / 1' }}>
             <Chart
                 chartType="Calendar"
@@ -519,6 +532,7 @@ function CalendarChart() {
                 loader={<div>Loading Chart...</div>}
             />
         </div>
+        
     );
 }
 

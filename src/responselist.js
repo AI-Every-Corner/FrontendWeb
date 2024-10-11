@@ -10,7 +10,6 @@ function ResponseList(postId) {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [reply, setReply] = useState(true);
   const { avatarUrl } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
 
   const fetchComments = async () => {
@@ -73,7 +72,6 @@ function ResponseList(postId) {
 
   const handleReply = () => {
     fetchComments();
-    setReply(false);
   }
 
   return (
@@ -189,7 +187,7 @@ function ResponseList(postId) {
               </div>
               <div>
                 <a className="comment-created-time">
-                &nbsp;  ago
+                &nbsp; <TimePassedComponent updateAt={response.updateAt} />
                 </a>
               </div>
             </div>

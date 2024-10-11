@@ -11,30 +11,60 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [users, setUsers] = useState([]);
     const [openComments, setOpenComments] = useState({});
-  
+
     const fetchPosts = async () => {
-        try {
-            const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-            const response = await axios.get(`http://localhost:8080/posts`,{
+      try {
+        const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+        const response = await axios.get(`http://localhost:8080/posts`,{
+          headers: {
+            'Authorization': `Bearer ${token}` // 添加 Authorization header
+          },
+          params: {
+            page: page,
+            size: 10
+          }
+        });
+        console.log(response);
+        setPosts([...posts, ...response.data.postsList]);  // Append new posts
+
+        if (response.data.last || response.data.totalPages - 1 === page) {
+          setHasMore(false);  // No more posts to load
+        }
+
+        // Fetch user details for the new responses
+        const userIds = response.data.postsList.map(resp => resp.userId);
+        fetchUsers(userIds);
+      } catch (error) {
+        console.error("Failed to load posts", error);
+      }
+    };
+
+    // Fetch user data based on userIds and update the state
+    const fetchUsers = async (userIds) => {
+      try {
+        const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+        const fetchedUsers = {};
+        await Promise.all(userIds.map(async (id) => {
+          console.log("userIds: ");
+          console.log(userIds);
+          if (!users[id]) {  // Avoid refetching already loaded users
+            const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
               headers: {
-                'Authorization': `Bearer ${token}` // 添加 Authorization header
-              },
-              params: {
-                page: page,
-                size: 10
+                'Authorization': `Bearer ${token}`
               }
             });
-            console.log(response);
-            setPosts([...posts, ...response.data.postsList]);  // Append new posts
-
-            if (response.data.last || response.data.totalPages - 1 === page) {
-              setHasMore(false);  // No more posts to load
-            }
-        } catch (error) {
-          console.error("Failed to load posts", error);
-        }
-    };
+            fetchedUsers[id] = response.data;
+            console.log("id: ");
+            console.log(id);
+          }
+        }));
+        setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
+      } catch (error) {
+        console.error("fetchUsers: " + error);
+      }
+    }
 
   useEffect(() => {
     fetchPosts();
@@ -80,113 +110,20 @@ const PostList = () => {
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
+    {console.log(users[post.userId])}
+    {users[post.userId] ? (
     <img
-    src={post.imagePath}
+    src={users[post.userId].imagePath}
     alt="Online user"
     className="mr-3 post-user-image"
-    />
+    /> ) : (
+      <p>Loading user data...</p>
+    )}
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
       <a to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
         {post.nickname}
       </a>
-      {/* <div className="dropdown">
-        <a
-          href="#"
-          className="post-more-settings"
-          role="button"
-          data-toggle="dropdown"
-          id="postOptions"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <i className="bx bx-dots-horizontal-rounded" />
-        </a>
-        <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="savePost"
-          >
-          <div className="row">
-            <div className="col-md-2">
-            <i className="bx bx-bookmark-plus post-option-icon" />
-            </div>
-            <div className="col-md-10">
-            <span className="fs-9">Save post</span>
-            <small
-              id="savePost"
-              className="form-text text-muted"
-            >
-              Add this to your saved items
-            </small>
-            </div>
-          </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="hidePost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-              <i className="bx bx-hide post-option-icon" />
-              </div>
-              <div className="col-md-10">
-              <span className="fs-9">Hide post</span>
-              <small
-                id="hidePost"
-                className="form-text text-muted"
-              >
-                See fewer posts like this
-              </small>
-              </div>
-            </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="snoozePost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-                <i className="bx bx-time post-option-icon" />
-              </div>
-              <div className="col-md-10">
-                <span className="fs-9">
-                  Snooze Lina for 30 days
-                </span>
-                <small
-                  id="snoozePost"
-                  className="form-text text-muted"
-                >
-                  Temporarily stop seeing posts
-                </small>
-              </div>
-            </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="reportPost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-              <i className="bx bx-block post-option-icon" />
-              </div>
-              <div className="col-md-10">
-              <span className="fs-9">Report</span>
-                <small
-                  id="reportPost"
-                  className="form-text text-muted"
-                >
-                  I'm concerned about this post
-                </small>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div> */}
     </div>
     <span className="d-block">
       <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
@@ -200,12 +137,15 @@ const PostList = () => {
   </p>
 </div>
 <div className="d-block mt-3">
+  {post.imagePath ? 
   <img
   src={post.imagePath}
   className="post-content"
   alt="post image"
   style={{ display: post.imagePath === "" ? "none" : "block" }} 
-  />
+  /> : (
+    <pre></pre>
+  )}
 </div>
 <div className="mb-3">
 

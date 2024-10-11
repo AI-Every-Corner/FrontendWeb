@@ -11,7 +11,7 @@ function Header() {
     const [settingDropdownVisible, setSettingDropdownVisible] = useState(false);
     const [notificationDropdownVisible, setNotificationDropdownVisible] = useState(false);
     const location = useLocation(); // 使用 useLocation 來獲取當前路徑
-    const { avatarUrl, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+    const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
     const navigate = useNavigate();
     const handleClick = () => {
         navigate(`/profile?userId=${userId}`);
@@ -417,7 +417,7 @@ function Header() {
                                         <a onClick={handleClick} className="nav-link nav-links" style={{ cursor: 'pointer' }}>
                                             <div className="menu-user-image">
                                                 <img
-                                                    src={avatarUrl}
+                                                    src={avatar}
                                                     className="menu-user-img ml-1"
                                                     alt="Menu Image"
                                                 />

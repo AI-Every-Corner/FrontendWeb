@@ -8,13 +8,9 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 function About() {
 
-    const location = useLocation();
-    const { avatarUrl } = useContext(UserContext);
-    const { setAvatarUrl } = useContext(UserContext);
-    const params = new URLSearchParams(location.search);
-    const queryUserId = params.get('userId'); // userId from query parameters
-    const userId = params.get('userId'); // 從查詢參數中獲取 userId
-    const localStorageUserId = localStorage.getItem('userId');
+    const { avatar } = useContext(UserContext);
+    const { userId, setAvatar } = useContext(UserContext);
+
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
@@ -127,7 +123,7 @@ function About() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src={avatarUrl}
+                                                            src={avatar}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
