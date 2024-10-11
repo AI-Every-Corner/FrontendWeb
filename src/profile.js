@@ -11,6 +11,7 @@ import Intro from './intro';
 import Recentmedia from './recentmedia';
 import ProfileList from './profilelist';
 import Avatar from './avatar';
+import Cover from './cover';
 
 function Profile() {
     
@@ -136,20 +137,7 @@ function Profile() {
                         <div className="col-md-12 p-0">
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
-                                    <div className="profile-header-background">
-                                        <a href="#" className="profile-cover">
-                                            <img
-                                                src="assets/images/users/cover/cover-1.gif"
-                                                alt="Profile Header Background"
-                                            />
-                                        </a>
-                                        <div className="cover-overlay">
-                                            <a href="#" className="profile-cover"></a>
-                                            <a href="#" className="btn btn-update-cover">
-                                                <i className="bx bxs-camera" /> Update Cover Photo
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <Cover />
                                     <div className="row profile-rows">
                                         <div className="col-md-3">
                                             <div className="profile-info-left">

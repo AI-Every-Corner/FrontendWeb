@@ -5,11 +5,11 @@ import Intro from './intro';
 import Recentmedia from './recentmedia';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import Avatar from './avatar';
+import Cover from './cover';
 
 
 function About() {
 
-    const { avatar } = useContext(UserContext);
     const { userId, setAvatar } = useContext(UserContext);
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -30,12 +30,9 @@ function About() {
         relationship: "單身",
         phone: "0900 000 000",
     });
-    const [isCurrentUser, setIsCurrentUser] = useState(false); 
 
     useEffect(() => {
         console.log('Fetched userId:', userId);
-        const currentUserId = localStorage.getItem('userId');
-        setIsCurrentUser(userId === currentUserId);
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
@@ -109,20 +106,7 @@ function About() {
                         <div className="col-md-12 p-0">
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
-                                    <div className="profile-header-background">
-                                        <a href="#" className="profile-cover">
-                                            <img
-                                                src="assets/images/users/cover/cover-1.gif"
-                                                alt="Profile Header Background"
-                                            />
-                                        </a>
-                                        <div className="cover-overlay">
-                                            <a href="#" className="profile-cover"></a>
-                                            <a href="#" className="btn btn-update-cover">
-                                                <i className="bx bxs-camera" /> Update Cover Photo
-                                            </a>
-                                        </div>
-                                    </div>
+                                <Cover />
                                     <div className="row profile-rows">
                                         <div className="col-md-3">
                                             <div className="profile-info-left">
@@ -164,7 +148,7 @@ function About() {
                                                             className="dropdown-menu dropdown-menu-right profile-ql-dropdown"
                                                             aria-labelledby="moreMobile"
                                                         >
-                                                            <a href="newsfeed.html" className="dropdown-item">
+                                                            <a href={`/profile?userId=${userId}`} className="dropdown-item">
                                                                 Timeline
                                                             </a>
                                                             <a href="/about" className="dropdown-item">
@@ -284,11 +268,12 @@ function About() {
                                                             <div className="col-md-9 col-sm-12">
                                                                 <div className="timeline-manage">
                                                                     {/* Check if the userId from localStorage matches the one from the query parameters */}
-                                                                    {isCurrentUser && (
+                                                                    
+                                                                    {localStorageUserId === queryUserId && (
                                                                         <button className="btn btn-manage" onClick={toggleEditMode}>
                                                                             {isEditing ? "Cancel" : "Manage About"}
                                                                         </button>
-                                                                    ) : null}
+                                                                    ) }
                                                                 </div>
                                                                 {/* 如果處於編輯模式，顯示編輯表單 */}
                                                                 {isEditing ? (

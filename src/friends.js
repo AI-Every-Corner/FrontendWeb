@@ -3,8 +3,9 @@ import { UserContext } from './context';
 import axios from 'axios';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
-import { useNavigate, useParams, useLocation   } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, Link  } from 'react-router-dom';
 import Avatar from './avatar';
+import Cover from './cover';
 
 function Friends() {
 
@@ -102,21 +103,12 @@ function Friends() {
       <link href="assets/css/profile.css" rel="stylesheet" />
       <link href="assets/css/media.css" rel="stylesheet" />
       <link href="assets/css/friends.css" rel="stylesheet" />
-      <div className="container-fluid newsfeed d-flex" id="wrapper">
+      <div className="container-fluid newsfeed " id="wrapper">
         <div className="row newsfeed-size">
           <div className="col-md-12 p-0">
             <div className="row profile-right-side-content">
               <div className="user-profile">
-                <div className="profile-header-background">
-                  <a href="#" className="profile-cover">
-                    <img src="assets/images/users/cover/cover-1.gif" alt="Profile Header Background" />
-                    <div className="cover-overlay">
-                      <a href="#" className="btn btn-update-cover">
-                        <i className='bx bxs-camera'></i> Update Cover Photo
-                      </a>
-                    </div>
-                  </a>
-                </div>
+              <Cover />
                 <div className="row profile-rows">
                   <div className="col-md-3">
                     <div className="profile-info-left">
