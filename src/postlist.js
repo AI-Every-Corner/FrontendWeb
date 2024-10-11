@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import { avatarProvider } from "./avatarProvider";
-import TimePassedComponent from "./timePassedComponent";
+import TimePassedComponent from "./timepassedcomponent";
 import ResponseList from "./responselist";
 import { Link } from "react-router-dom";
 
@@ -34,7 +34,7 @@ const PostList = () => {
         }
 
         // Fetch user details for the new responses
-        const userIds = response.data.respList.map(resp => resp.userId);
+        const userIds = response.data.postsList.map(resp => resp.userId);
         fetchUsers(userIds);
       } catch (error) {
         console.error("Failed to load posts", error);
@@ -110,6 +110,7 @@ const PostList = () => {
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
+    {console.log(users[post.userId])}
     {users[post.userId] ? (
     <img
     src={users[post.userId].imagePath}
@@ -123,103 +124,6 @@ const PostList = () => {
       <a to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
         {post.nickname}
       </a>
-      {/* <div className="dropdown">
-        <a
-          href="#"
-          className="post-more-settings"
-          role="button"
-          data-toggle="dropdown"
-          id="postOptions"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <i className="bx bx-dots-horizontal-rounded" />
-        </a>
-        <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="savePost"
-          >
-          <div className="row">
-            <div className="col-md-2">
-            <i className="bx bx-bookmark-plus post-option-icon" />
-            </div>
-            <div className="col-md-10">
-            <span className="fs-9">Save post</span>
-            <small
-              id="savePost"
-              className="form-text text-muted"
-            >
-              Add this to your saved items
-            </small>
-            </div>
-          </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="hidePost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-              <i className="bx bx-hide post-option-icon" />
-              </div>
-              <div className="col-md-10">
-              <span className="fs-9">Hide post</span>
-              <small
-                id="hidePost"
-                className="form-text text-muted"
-              >
-                See fewer posts like this
-              </small>
-              </div>
-            </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="snoozePost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-                <i className="bx bx-time post-option-icon" />
-              </div>
-              <div className="col-md-10">
-                <span className="fs-9">
-                  Snooze Lina for 30 days
-                </span>
-                <small
-                  id="snoozePost"
-                  className="form-text text-muted"
-                >
-                  Temporarily stop seeing posts
-                </small>
-              </div>
-            </div>
-          </a>
-          <a
-          href="#"
-          className="dropdown-item"
-          aria-describedby="reportPost"
-          >
-            <div className="row">
-              <div className="col-md-2">
-              <i className="bx bx-block post-option-icon" />
-              </div>
-              <div className="col-md-10">
-              <span className="fs-9">Report</span>
-                <small
-                  id="reportPost"
-                  className="form-text text-muted"
-                >
-                  I'm concerned about this post
-                </small>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div> */}
     </div>
     <span className="d-block">
       <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
