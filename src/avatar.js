@@ -15,15 +15,12 @@ function Avatar() {
         nickName: '',
         username: '',
         imagePath: ''
-        
     });
 
     //const { userId } = useContext(UserContext);
     const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
     const storedUserId = localStorage.getItem('userId');
     const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
-    const [setPosts] = useState([]);  // New state for posts
-    const [moodData, setMoodData] = useState();
     const [isCurrentUser, setIsCurrentUser] = useState(false); //
 
     useEffect(() => {
@@ -56,20 +53,6 @@ function Avatar() {
             .catch(error => {
                 console.error("獲取用戶資料時發生錯誤:", error);
             });
-
-        // Fetch posts by user ID
-        axios.get(`http://localhost:8080/posts/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }).then(response => {
-            setPosts(response.data);  // Update the posts state with the response
-            
-        }).catch(error => {
-            console.error("Error fetching posts:", error);
-        });
-
-        console.log('URL 中的 userId:', userId);
 
     }, [userId]);
 

@@ -6,13 +6,13 @@ import { useDropzone } from 'react-dropzone';
 
 function Settings() {
 
-  const [previewSrc, setPreviewSrc] = useState(null);
+  const [previewSrc, setPreviewSrc] = useState({ image: null, cover: null });
 
   // States for handling password match
   const [newPassword, setNewPassword] = useState('');
   const [retypePassword, setRetypePassword] = useState('');
   const [passwordsMatch, setPasswordsMatch] = useState(true);
-  const [imageUploaded, setImageUploaded] = useState(false); // 照片上傳狀態
+  const [imageUploaded, setImageUploaded] = useState({ image: false, cover: false }); // 照片上傳狀態
 
   useEffect(() => {
     setPasswordsMatch(newPassword === retypePassword);
@@ -28,7 +28,7 @@ function Settings() {
   });
 
   const navigate = useNavigate();
-  const { userId, setAvatarUrl } = useContext(UserContext);
+  const { userId, setAvatarUrl, setCoverUrl } = useContext(UserContext);
 
   useEffect(() => {
 
@@ -73,19 +73,25 @@ function Settings() {
     }));
   };
 
-  // 使用react-dropzone處理圖片拖放上傳和預覽
-  const onDrop = (acceptedFiles) => {
+  // 修改 onDrop 函數以處理兩種圖片
+  const onDrop = (acceptedFiles, type) => {
     const file = acceptedFiles[0];
-    setFormData(prevData => ({ ...prevData, image: file }));
+    setFormData(prevData => ({ ...prevData, [type]: file }));
 
-    // 建立圖片預覽的URL
     const previewUrl = URL.createObjectURL(file);
-    setPreviewSrc(previewUrl);
-    setImageUploaded(true); // 設置照片上傳狀態為已上傳
+    setPreviewSrc(prevPreview => ({ ...prevPreview, [type]: previewUrl }));
+    setImageUploaded(prevUploaded => ({ ...prevUploaded, [type]: true }));
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+  // 為頭像和封面照片創建單獨的 dropzone
+  const { getRootProps: getProfileRootProps, getInputProps: getProfileInputProps } = useDropzone({
+    onDrop: (files) => onDrop(files, 'profile'),
+    accept: 'image/*',
+    multiple: false
+  });
+
+  const { getRootProps: getCoverRootProps, getInputProps: getCoverInputProps } = useDropzone({
+    onDrop: (files) => onDrop(files, 'cover'),
     accept: 'image/*',
     multiple: false
   });
@@ -125,6 +131,10 @@ function Settings() {
       formDataToSend.append("image", formData.image);
     }
 
+    if (formData.cover) {
+      formDataToSend.append("cover", formData.cover);
+    }
+
     // 這裡可以發送 PUT 請求來更新用戶數據，使用 username 來動態構建 PUT API 地址
     axios.put(`http://localhost:8080/api/auth/${userId}`, formDataToSend, {
       headers: {
@@ -142,6 +152,13 @@ function Settings() {
           const fullImageUrl = `${updatedImagePath}`;
           localStorage.setItem('userImage', updatedImagePath); // 更新 localStorage 中的 userImage
           setAvatarUrl(fullImageUrl); // 更新 UserContext 中的 avatarUrl
+        }
+
+        const updatedCoverPath = response.data.coverPath; // 從後端的回應中提取新的圖片路徑
+        if (updatedCoverPath) {
+          const fullCoverUrl = `${updatedCoverPath}`;
+          localStorage.setItem('coverImage', updatedCoverPath); // 更新 localStorage 中的 coverImage
+          setCoverUrl(fullCoverUrl); // 更新 UserContext 中的 coverUrl
         }
 
         // 清空密碼欄位
@@ -276,22 +293,30 @@ function Settings() {
 
                               <div className="form-group">
                                 {/* 使用react-dropzone來實現拖放上傳 */}
-                                {!imageUploaded && (
-                                  <div {...getRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
-                                    <input {...getInputProps()} />
-                                    {isDragActive ? (
-                                      <p>拖放圖片至此...</p>
-                                    ) : (
-                                      <p>拖拉或點擊上傳圖片</p>
-                                    )}
+                                <h5>個人頭像</h5>
+                                  <div {...getProfileRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
+                                    <input {...getProfileInputProps()} />
+                                    <p>拖拉或點擊上傳個人頭像</p>
                                   </div>
-                                )}
-                                {/* Image Preview */}
-                                {previewSrc && (
-                                  <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                                    <img src={previewSrc} alt="預覽圖片" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                                  {previewSrc.profile && (
+                                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                      <img src={previewSrc.profile} alt="預覽頭像" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="col-md-6">
+                                <div className="form-group">
+                                  <h5>封面照片</h5>
+                                  <div {...getCoverRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
+                                    <input {...getCoverInputProps()} />
+                                    <p>拖拉或點擊上傳封面照片</p>
                                   </div>
-                                )}
+                                  {previewSrc.cover && (
+                                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                      <img src={previewSrc.cover} alt="預覽封面" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                                    </div>
+                                  )}
                               </div>
 
                             </div>

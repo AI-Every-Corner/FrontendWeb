@@ -17,7 +17,6 @@ function Profile() {
     
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const { setAvatarUrl, setCoverUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
@@ -52,15 +51,7 @@ function Profile() {
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
                     username: userData.username,
-                    avatarUrl: userData.imagePath ? `${userData.imagePath}` : null,
-                    coverUrl: userData.coverPath ? `${userData.coverPath}` : null
                 });
-                if (userData.imagePath) {
-                    setAvatarUrl(`${userData.imagePath}`);
-                }
-                if (userData.coverPath) {
-                    setCoverUrl(`${userData.coverPath}`);
-                }
             })
             .catch(error => {
                 console.error("獲取用戶資料時發生錯誤:", error);
@@ -141,22 +132,7 @@ function Profile() {
                         <div className="col-md-12 p-0">
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
-                                <div className="user-profile">
-                                    <div className="profile-header-background">
-                                        <a href="#" className="profile-cover">
-                                            <img
-                                                src={formData.coverUrl}
-                                                alt="Profile Header Background"
-                                            />
-                                        </a>
-                                        <div className="cover-overlay">
-                                            <a href="#" className="profile-cover"></a>
-                                            <a href="#" className="btn btn-update-cover">
-                                                <i className="bx bxs-camera" /> Update Cover Photo
-                                            </a>
-                                        </div>
-                                    </div>
-                                    </div>
+                                    <Cover />
                                     <div className="row profile-rows">
                                         <div className="col-md-3">
                                             <div className="profile-info-left">
