@@ -186,7 +186,7 @@ function MainPage() {
         </Link>
         </div>
       </div> */}
-      <ul className="list-unstyled mt-3" style={{ marginBottom: 0 }}>
+      <ul className="list-unstyled" style={{ marginBottom: 0 }}>
         <PostForm />
         {/* <li className="media post-form w-shadow">
         <div className="media-body">
