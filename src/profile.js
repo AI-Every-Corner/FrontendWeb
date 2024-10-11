@@ -10,7 +10,7 @@ import axios from 'axios';
 import { data } from 'jquery';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
-import PostList from './postlist';
+import ProfileList from './profilelist';
 
 function Profile() {
     const navigate = useNavigate();
@@ -19,7 +19,9 @@ function Profile() {
     const { avatarUrl, setAvatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
-        username: ''
+        username: '',
+        imagePath: ''
+        
     });
     //const { userId } = useContext(UserContext);
     const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
@@ -50,7 +52,7 @@ function Profile() {
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
                     username: userData.username,
-                    avatarUrl: userData.imagePath ? `http://localhost:8080${userData.imagePath}` : null
+                    imagePath: userData.imagePath
                 });
                 if (userData.imagePath) {
                     setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
@@ -155,7 +157,7 @@ function Profile() {
                                                     <div className="profile-img w-shadow">
                                                         <div className="profile-img-overlay" />
                                                         <img
-                                                            src={formData.avatarUrl || avatarUrl}
+                                                            src={formData.imagePath}
                                                             alt="Avatar"
                                                             className="avatar img-circle"
                                                         />
@@ -354,7 +356,7 @@ function Profile() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                           <Row>
+                                                          {/*  <Row>
                                                             {posts.length > 0 ? (
                                                                 posts.map(post => (
                                                                     <div key={post.postId} className="post border-bottom p-3 bg-white">
@@ -375,7 +377,9 @@ function Profile() {
                                                                 <p>No posts available</p>
                                                             )}
 
-                                                        </Row>   
+                                                        </Row>  */}  
+
+                                                        <ProfileList />
                                                         
                                                         <div
                                                             className="border-top pt-3 hide-comments"
