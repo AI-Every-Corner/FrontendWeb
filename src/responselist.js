@@ -198,7 +198,7 @@ function ResponseList(postId) {
             <div className="d-flex align-items-center w-100 commentLR mb-3">
               <span className="like-btn">
                 <a className="post-card-buttons p-1" id="reactions">
-                  <i className="bx bxs-like mr-2 text-start" /> 67
+                  <i className="bx bxs-like mr-2 text-start" /> {response.likes}
                 </a>
               </span>
             </div>

@@ -152,7 +152,7 @@ const PostList = () => {
   <div className="argon-reaction">
   <span className="like-btn">
     <a href="#" className="post-card-buttons" id="reactions">
-    <i className="bx bxs-like mr-2" /> 67
+    <i className="bx bxs-like mr-2" /> {post.likes}
     </a>
     <ul className="dropdown-shadow">
     <li
