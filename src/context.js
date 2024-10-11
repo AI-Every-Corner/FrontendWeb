@@ -20,8 +20,7 @@ export const UserProvider = ({ children }) => {
     const storedUserId = localStorage.getItem('userId');  // 從 localStorage 獲取 userId
 
     if (storedAvatarUrl) {
-      const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';  // 使用環境變量或默認值
-      setAvatarUrl(`${baseUrl}${storedAvatarUrl}`);
+      setAvatarUrl(`${storedAvatarUrl}`);
 
       //setAvatarUrl(`http://localhost:8080${storedAvatarUrl}`);
     }

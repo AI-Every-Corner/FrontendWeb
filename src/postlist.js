@@ -11,30 +11,60 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [users, setUsers] = useState([]);
     const [openComments, setOpenComments] = useState({});
-  
+
     const fetchPosts = async () => {
-        try {
-            const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-            const response = await axios.get(`http://localhost:8080/posts`,{
+      try {
+        const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+        const response = await axios.get(`http://localhost:8080/posts`,{
+          headers: {
+            'Authorization': `Bearer ${token}` // 添加 Authorization header
+          },
+          params: {
+            page: page,
+            size: 10
+          }
+        });
+        console.log(response);
+        setPosts([...posts, ...response.data.postsList]);  // Append new posts
+
+        if (response.data.last || response.data.totalPages - 1 === page) {
+          setHasMore(false);  // No more posts to load
+        }
+
+        // Fetch user details for the new responses
+        const userIds = response.data.respList.map(resp => resp.userId);
+        fetchUsers(userIds);
+      } catch (error) {
+        console.error("Failed to load posts", error);
+      }
+    };
+
+    // Fetch user data based on userIds and update the state
+    const fetchUsers = async (userIds) => {
+      try {
+        const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+        const fetchedUsers = {};
+        await Promise.all(userIds.map(async (id) => {
+          console.log("userIds: ");
+          console.log(userIds);
+          if (!users[id]) {  // Avoid refetching already loaded users
+            const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
               headers: {
-                'Authorization': `Bearer ${token}` // 添加 Authorization header
-              },
-              params: {
-                page: page,
-                size: 10
+                'Authorization': `Bearer ${token}`
               }
             });
-            console.log(response);
-            setPosts([...posts, ...response.data.postsList]);  // Append new posts
-
-            if (response.data.last || response.data.totalPages - 1 === page) {
-              setHasMore(false);  // No more posts to load
-            }
-        } catch (error) {
-          console.error("Failed to load posts", error);
-        }
-    };
+            fetchedUsers[id] = response.data;
+            console.log("id: ");
+            console.log(id);
+          }
+        }));
+        setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
+      } catch (error) {
+        console.error("fetchUsers: " + error);
+      }
+    }
 
   useEffect(() => {
     fetchPosts();
@@ -80,11 +110,14 @@ const PostList = () => {
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
+    {users[post.userId] ? (
     <img
-    src={post.imagePath}
+    src={users[post.userId].imagePath}
     alt="Online user"
     className="mr-3 post-user-image"
-    />
+    /> ) : (
+      <p>Loading user data...</p>
+    )}
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
       <a to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
@@ -200,12 +233,15 @@ const PostList = () => {
   </p>
 </div>
 <div className="d-block mt-3">
+  {post.imagePath ? 
   <img
   src={post.imagePath}
   className="post-content"
   alt="post image"
   style={{ display: post.imagePath === "" ? "none" : "block" }} 
-  />
+  /> : (
+    <pre></pre>
+  )}
 </div>
 <div className="mb-3">
 
