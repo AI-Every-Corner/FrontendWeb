@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
-import TimePassedComponent from "./timepassedcomponent";
+import { avatarProvider } from "./avatarProvider";
+import TimePassedComponent from "./timePassedComponent";
 import ResponseList from "./responselist";
 import { Link } from "react-router-dom";
 
@@ -9,8 +10,8 @@ const PostList = () => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [ViewComments, setViewComments] = useState(true);
-
+    const [openComments, setOpenComments] = useState({});
+  
     const fetchPosts = async () => {
         try {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
@@ -19,19 +20,15 @@ const PostList = () => {
                 'Authorization': `Bearer ${token}` // 添加 Authorization header
               },
               params: {
-                page: 0,
+                page: page,
                 size: 10
               }
             });
             console.log(response);
             setPosts([...posts, ...response.data.postsList]);  // Append new posts
 
-            if (response.data.last) {
+            if (response.data.last || response.data.totalPages - 1 === page) {
               setHasMore(false);  // No more posts to load
-            }
-            
-            if (response.data.totalPages - 1 === page) {
-              setHasMore(false);  // No more pages to load
             }
         } catch (error) {
           console.error("Failed to load posts", error);
@@ -42,8 +39,12 @@ const PostList = () => {
       fetchPosts();
     }, [page]);
 
-    const handleViewComments = () => {
-      setViewComments(false);
+    const toggleComments = (postId) => {
+      console.log(postId);
+      setOpenComments(prev => ({
+        ...prev,
+        [postId]: !prev[postId]
+      })); // hide : show
     }
 
     return (
@@ -54,13 +55,12 @@ const PostList = () => {
           loader={<h4>Loading...</h4>}
           endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
         >
-          {console.log(page)}
           {posts.map((post) => (
             <div key={post.postId}>
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <img
-    src="assets/images/users/user-1.jpg"
+    src={post.imagePath}
     alt="Online user"
     className="mr-3 post-user-image"
     />
@@ -193,30 +193,10 @@ const PostList = () => {
     <a href="#" className="post-card-buttons" id="reactions">
     <i className="bx bxs-like mr-2" /> 67
     </a>
-    <ul className="reactions-box dropdown-shadow">
+    <ul className="dropdown-shadow">
     <li
-      className="reaction reaction-like"
+      className="reaction reaction-like-edited"
       data-reaction="Like"
-    />
-    <li
-      className="reaction reaction-love"
-      data-reaction="Love"
-    />
-    <li
-      className="reaction reaction-haha"
-      data-reaction="HaHa"
-    />
-    <li
-      className="reaction reaction-wow"
-      data-reaction="Wow"
-    />
-    <li
-      className="reaction reaction-sad"
-      data-reaction="Sad"
-    />
-    <li
-      className="reaction reaction-angry"
-      data-reaction="Angry"
     />
     </ul>
   </span>
@@ -273,18 +253,15 @@ const PostList = () => {
   </div>
 </div>
 <div className="media-body">
-  <div className="comment-see-more text-center" onClick={handleViewComments}>
-    {ViewComments ? 
-    <div>
+  <div className="comment-see-more">
+    <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)}>
       <hr></hr>
-      <button
-        type="button"
-        className="btn btn-link fs-8"
-      >
-        See comments
-      </button>
-    </div> : <ResponseList postId={post.postId}/>
-    }
+      {openComments[post.postId] ? 'Hide Comments' : 'See Comments'}
+      {/* {console.log(post.postId)} */}
+    </div>
+    {openComments[post.postId] && (
+      <ResponseList postId={post.postId} />
+    )}
   </div>
 </div>
 </div>
