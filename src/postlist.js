@@ -29,6 +29,7 @@ const PostList = () => {
         }
       });
       console.log(response);
+
       setPosts([...posts, ...response.data.postsList]);  // Append new posts
 
       if (response.data.last) {

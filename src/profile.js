@@ -3,13 +3,15 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams, useLocation   } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
 import axios from 'axios';
 import { data } from 'jquery';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
+import PostList from './postlist';
+import ProfilepostList from './profilepostlist';
 
 function Profile() {
     const navigate = useNavigate();
@@ -22,9 +24,8 @@ function Profile() {
     });
     //const { userId } = useContext(UserContext);
     const userId = params.get('userId'); // 從查詢參數中獲取 userId
-
     const [posts, setPosts] = useState([]);  // New state for posts
-
+    const [loading, setLoading] = useState(true); // 用來顯示加載狀態
     const [moodData, setMoodData] = useState();
 
     useEffect(() => {
@@ -58,6 +59,7 @@ function Profile() {
             }
         }).then(response => {
             setPosts(response.data);  // Update the posts state with the response
+            setLoading(false); // 加載完成
         }).catch(error => {
             console.error("Error fetching posts:", error);
         });
@@ -235,9 +237,6 @@ function Profile() {
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                                                    </div>
                                                 </div>
                                                 <div className="intro mt-5 row mv-hidden">
                                                     <div className="col-md-4">
@@ -271,16 +270,16 @@ function Profile() {
                                                     <div className="col-md-9 profile-center">
                                                         <ul className="list-inline profile-links d-flex justify-content-between w-shadow rounded">
                                                             <li className="list-inline-item profile-active">
-                                                                <a href="/profile">Timeline</a>
+                                                                <a href={`/profile?userId=${userId}`}>Timeline</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/about">About</a>
+                                                                <a href={`/about?userId=${userId}`}>About</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/friends">Friends</a>
+                                                                <a href={`/friends?userId=${userId}`}>Friends</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/photo">Photos</a>
+                                                                <a href={`/photo?userId=${userId}`}>Photos</a>
                                                             </li>
                                                             <li className="list-inline-item dropdown">
                                                                 <a
@@ -347,7 +346,7 @@ function Profile() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <Row>
+                                                           <Row>
                                                             {posts.length > 0 ? (
                                                                 posts.map(post => (
                                                                     <div key={post.postId} className="post border-bottom p-3 bg-white">
@@ -368,8 +367,8 @@ function Profile() {
                                                                 <p>No posts available</p>
                                                             )}
 
-                                                        </Row>
-
+                                                        </Row>   
+                                                        
                                                         <div
                                                             className="border-top pt-3 hide-comments"
                                                             style={{ display: "none" }}

@@ -3,15 +3,19 @@ import { UserContext } from './context';
 import axios from 'axios';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
+import { useNavigate, useParams, useLocation   } from 'react-router-dom';
 
 function Friends() {
 
+  const location = useLocation();
   const { avatarUrl } = useContext(UserContext);
+  const params = new URLSearchParams(location.search);
+  const userId = params.get('userId'); // 從查詢參數中獲取 userId
   const [formData, setFormData] = useState({
     nickName: '',
     username: ''
   });
-  const { userId, setAvatarUrl } = useContext(UserContext);
+  const { setAvatarUrl } = useContext(UserContext);
 
   useEffect(() => {
     console.log('Fetched userId:', userId);
@@ -116,8 +120,8 @@ function Friends() {
                             <span className="fs-8">More</span>
                           </button>
                           <div className="dropdown-menu dropdown-menu-right profile-ql-dropdown" aria-labelledby="moreMobile">
-                            <a href="/profile" className="dropdown-item">Timeline</a>
-                            <a href="/about" className="dropdown-item">About</a>
+                            <a href={`/profile?userId=${userId}`} className="dropdown-item">Timeline</a>
+                            <a href={`/about?userId=${userId}`} className="dropdown-item">About</a>
                             <a href="followers.html" className="dropdown-item">Followers</a>
                             <a href="following.html" className="dropdown-item">Following</a>
                             <a href="photos.html" className="dropdown-item">Photos</a>
@@ -133,9 +137,6 @@ function Friends() {
                           <h3 className="intro-about">Intro</h3>
                         </div>
                         <Intro />
-                        <div className="intro-item d-flex justify-content-between align-items-center">
-                          <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                        </div>
                       </div>
                       <div className="intro mt-5 row mv-hidden">
                         <div className="col-md-4">
@@ -157,15 +158,15 @@ function Friends() {
                         <div className="col-md-9 profile-center">
                           <ul className="list-inline profile-links d-flex justify-content-between shadow-sm rounded">
                             <li className="list-inline-item">
-                              <a href="/profile">Timeline</a>
+                              <a href={`/profile?userId=${userId}`}>Timeline</a>
                             </li>
                             <li className="list-inline-item">
-                              <a href="/about">About</a></li>
+                              <a href={`/about?userId=${userId}`}>About</a></li>
                             <li className="list-inline-item profile-active">
-                              <a href="/friends">Friends</a>
+                              <a href={`/friends?userId=${userId}`}>Friends</a>
                             </li>
                             <li className="list-inline-item">
-                              <a href="/photo">Photos</a>
+                              <a href={`/photo?userId=${userId}`}>Photos</a>
                             </li>
                             <li className="list-inline-item dropdown">
                               <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
