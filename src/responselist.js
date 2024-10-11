@@ -10,11 +10,11 @@ function ResponseList(postId) {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const { avatarUrl } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+  const { avatar } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
 
   const fetchComments = async () => {
-    console.log("fetchComments");
-    console.log(postId);
+    // console.log("fetchComments");
+    // console.log(postId);
     try {
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const response = await axios.get(`http://localhost:8080/responses/${postId.postId}`,{
@@ -26,7 +26,7 @@ function ResponseList(postId) {
           size: 10
         }
       });
-      console.log(response);
+      // console.log(response);
       setResponses([...responses, ...response.data.respList]);  // Append new posts
 
       if (response.data.last || response.data.totalPages - 1 === page) {
@@ -47,8 +47,8 @@ function ResponseList(postId) {
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const fetchedUsers = {};
       await Promise.all(userIds.map(async (id) => {
-        console.log("userIds: ");
-        console.log(userIds);
+        // console.log("userIds: ");
+        // console.log(userIds);
         if (!users[id]) {  // Avoid refetching already loaded users
           const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
             headers: {
@@ -56,8 +56,8 @@ function ResponseList(postId) {
             }
           });
           fetchedUsers[id] = response.data;
-          console.log("id: ");
-          console.log(id);
+          // console.log("id: ");
+          // console.log(id);
         }
       }));
       setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
@@ -69,10 +69,6 @@ function ResponseList(postId) {
   useEffect(() => {
     fetchComments();
   }, [postId, page]);
-
-  const handleReply = () => {
-    fetchComments();
-  }
 
   return (
     <InfiniteScroll
@@ -98,7 +94,7 @@ function ResponseList(postId) {
         <a href="#" className="pull-left">
           <Link to="/profile">
             <img
-            src={avatarUrl}
+            src={avatar}
             alt="User Avatar"
             className="img-circle"
             />
@@ -108,7 +104,7 @@ function ResponseList(postId) {
           <p>Loading user data...</p>
         )
         }
-        {console.log(users[response.userId])}
+        {/* {console.log(users[response.userId])} */}
         <div className="media-body">
           <form action="" method="" role="form">
           <div className="row">

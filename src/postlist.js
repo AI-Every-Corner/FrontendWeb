@@ -47,8 +47,8 @@ const PostList = () => {
         const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
         const fetchedUsers = {};
         await Promise.all(userIds.map(async (id) => {
-          console.log("userIds: ");
-          console.log(userIds);
+          // console.log("userIds: ");
+          // console.log(userIds);
           if (!users[id]) {  // Avoid refetching already loaded users
             const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
               headers: {
@@ -56,8 +56,8 @@ const PostList = () => {
               }
             });
             fetchedUsers[id] = response.data;
-            console.log("id: ");
-            console.log(id);
+            // console.log("id: ");
+            // console.log(id);
           }
         }));
         setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
@@ -71,7 +71,7 @@ const PostList = () => {
   }, [page]);
 
   const toggleComments = (postId) => {
-    console.log(postId);
+    // console.log(postId);
     setOpenComments(prev => ({
       ...prev,
       [postId]: !prev[postId]
@@ -110,7 +110,7 @@ const PostList = () => {
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
-    {console.log(users[post.userId])}
+    {/* {console.log(users[post.userId])} */}
     {users[post.userId] ? (
     <img
     src={users[post.userId].imagePath}

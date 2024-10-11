@@ -10,7 +10,10 @@ function About() {
 
     const { avatar } = useContext(UserContext);
     const { userId, setAvatar } = useContext(UserContext);
-
+    const queryUserId = params.get('userId'); // userId from query parameters
+    const localStorageUserId = localStorage.getItem('userId');
+    const params = new URLSearchParams(location.search);
+    const location = useLocation();
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''

@@ -69,7 +69,7 @@ function Profile() {
             }
         }).then(response => {
             setPosts(response.data);  // Update the posts state with the response
-            setLoading(false); // 加載完成
+            // setLoading(false); // 加載完成
         }).catch(error => {
             console.error("Error fetching posts:", error);
         });
