@@ -30,9 +30,12 @@ function About() {
         relationship: "單身",
         phone: "0900 000 000",
     });
+    const [isCurrentUser, setIsCurrentUser] = useState(false); 
 
     useEffect(() => {
         console.log('Fetched userId:', userId);
+        const currentUserId = localStorage.getItem('userId');
+        setIsCurrentUser(userId === currentUserId);
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
@@ -281,7 +284,7 @@ function About() {
                                                             <div className="col-md-9 col-sm-12">
                                                                 <div className="timeline-manage">
                                                                     {/* Check if the userId from localStorage matches the one from the query parameters */}
-                                                                    {localStorageUserId === queryUserId ? (
+                                                                    {isCurrentUser && (
                                                                         <button className="btn btn-manage" onClick={toggleEditMode}>
                                                                             {isEditing ? "Cancel" : "Manage About"}
                                                                         </button>

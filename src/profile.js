@@ -19,8 +19,7 @@ function Profile() {
     const { setAvatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
-        username: '',
-        imagePath: ''
+        username: ''
         
     });
     //const { userId } = useContext(UserContext);
@@ -52,10 +51,10 @@ function Profile() {
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
                     username: userData.username,
-                    imagePath: userData.imagePath
+                    avatarUrl: userData.imagePath ? `${userData.imagePath}` : null
                 });
                 if (userData.imagePath) {
-                    setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
+                    setAvatarUrl(`${userData.imagePath}`);
                 }
             })
             .catch(error => {
@@ -163,6 +162,7 @@ function Profile() {
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
+                                                {!isCurrentUser && (
                                                 <div className="intro mt-4">
                                                     <div className="d-flex">
                                                         <button type="button" className="btn btn-follow mr-3">
@@ -222,6 +222,7 @@ function Profile() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                )}
                                                 <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>

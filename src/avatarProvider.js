@@ -20,8 +20,7 @@ export const AvatarProvider = ({ children, id }) => {
       const receivedUserId = response.data.userId;
       
       if (receivedAvatarUrl) {
-        const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
-        setAvatarUrl(`${baseUrl}${receivedAvatarUrl}`);
+        setAvatarUrl(`${receivedAvatarUrl}`);
       }
 
       if (receivedUserId) {
