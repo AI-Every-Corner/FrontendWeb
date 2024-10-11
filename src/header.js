@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
-
+import NotificationComponent from './NotificationComponent';
 
 function Header() {
 
@@ -13,7 +13,8 @@ function Header() {
     const location = useLocation(); // 使用 useLocation 來獲取當前路徑
     const { avatarUrl } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
     const navigate = useNavigate();
-
+    const { userId, setAvatarUrl } = useContext(UserContext);
+    console.log("userId="+userId);
     // Function to toggle dropdown visibility
     const toggleDropdown = () => {
         setDropdownVisible(!dropdownVisible);
@@ -197,8 +198,8 @@ function Header() {
                                             </div>
                                         </div>
                                     </form>
-
-                                    <li className="nav-item s-nav dropdown notification">
+                                    <NotificationComponent userId={userId} />
+                                    {/* <li className="nav-item s-nav dropdown notification">
                                         <a
                                             href="#"
                                             className="nav-link nav-links rm-drop-mobile drop-w-tooltip"
@@ -237,7 +238,7 @@ function Header() {
                                             </div>
                                             {/* end notify title */}
                                             {/* notify content */}
-                                            <div className="drop-content">
+                                            {/*<div className="drop-content">
                                                 <li>
                                                     <div className="col-md-2 col-sm-2 col-xs-2">
                                                         <div className="notify-img">
@@ -408,7 +409,7 @@ function Header() {
                                                 <a href="#">See More</a>
                                             </div>
                                         </ul>
-                                    </li>
+                                    </li> */}
                                     <li className="nav-item s-nav">
                                         <a href="/profile" className="nav-link nav-links">
                                             <div className="menu-user-image">
