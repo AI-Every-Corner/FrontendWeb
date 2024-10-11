@@ -51,10 +51,10 @@ function Profile() {
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
                     username: userData.username,
-                    avatarUrl: userData.imagePath ? `http://localhost:8080${userData.imagePath}` : null
+                    avatarUrl: userData.imagePath ? `${userData.imagePath}` : null
                 });
                 if (userData.imagePath) {
-                    setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
+                    setAvatarUrl(`${userData.imagePath}`);
                 }
             })
             .catch(error => {
@@ -176,6 +176,7 @@ function Profile() {
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
+                                                {!isCurrentUser && (
                                                 <div className="intro mt-4">
                                                     <div className="d-flex">
                                                         <button type="button" className="btn btn-follow mr-3">
@@ -235,16 +236,12 @@ function Profile() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                )}
                                                 <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                    {isCurrentUser && (
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                                                    </div>
-                                                    )}
                                                 </div>
                                                 <div className="intro mt-5 row mv-hidden">
                                                     <div className="col-md-4">

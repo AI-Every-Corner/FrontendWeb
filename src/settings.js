@@ -139,8 +139,7 @@ function Settings() {
 
         // 更新 localStorage 中的圖片路徑
         if (updatedImagePath) {
-          const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
-          const fullImageUrl = `${baseUrl}${updatedImagePath}`;
+          const fullImageUrl = `${updatedImagePath}`;
           localStorage.setItem('userImage', updatedImagePath); // 更新 localStorage 中的 userImage
           setAvatarUrl(fullImageUrl); // 更新 UserContext 中的 avatarUrl
         }

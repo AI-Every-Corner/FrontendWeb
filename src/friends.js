@@ -16,10 +16,13 @@ function Friends() {
     username: ''
   });
   const { setAvatar } = useContext(UserContext);
-  const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
   const [friends, setFriends] = useState([]);
+  const [isCurrentUser, setIsCurrentUser] = useState(false); 
+
   useEffect(() => {
     console.log('Fetched userId:', userId);
+    const currentUserId = localStorage.getItem('userId');
+    setIsCurrentUser(userId === currentUserId);
 
     // 從後端獲取用戶資料
     const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
@@ -139,6 +142,7 @@ function Friends() {
                         <p className="profile-username mb-3 text-muted">@{formData.username || 'username'}</p>
                       </div>
                       <div className="intro mt-4">
+                      {!isCurrentUser && (
                         <div className="d-flex">
                           <button type="button" className="btn btn-follow mr-3">
                             <i className='bx bx-plus'></i> Follow
@@ -162,7 +166,8 @@ function Friends() {
                             <a href="events.html" className="dropdown-item">Events</a>
                             <a href="likes.html" className="dropdown-item">Likes</a>
                           </div>
-                        </div>
+                          </div>
+                      )}
                       </div>
                       <div className="intro mt-5 mv-hidden">
                         <div className="intro-item d-flex justify-content-between align-items-center">
@@ -308,7 +313,7 @@ function Friends() {
                               {friends.map(friend => (
                                 <div key={friend.friendId} className="friend-card-item">
                                   <img
-                                    src={`${baseUrl}${friend.imagePath}`}
+                                    src={`${friend.imagePath}`}
                                     alt={`${friend.nickname || 'Friend'}'s avatar`}
                                     className="friend-card-image"
                                   />
