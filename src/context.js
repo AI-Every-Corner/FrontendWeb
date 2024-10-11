@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect } from 'react';
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+
   const [avatarUrl, setAvatarUrl] = useState('');
   const [userId, setUserId] = useState('');
   const [userInfo, setUserInfo] = useState({
@@ -23,7 +24,7 @@ export const UserProvider = ({ children }) => {
       setAvatarUrl(`${storedAvatarUrl}`);
 
       //setAvatarUrl(`http://localhost:8080${storedAvatarUrl}`);
-    }
+    }  
 
     if (storedUserId) {
       setUserId(storedUserId);
