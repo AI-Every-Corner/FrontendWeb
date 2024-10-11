@@ -232,6 +232,12 @@
     background-image: url('../images/icons/reactions/like.gif');
 }
 
+.reaction-like-edited {
+  top: 10px;
+  transition-delay: 0s;
+  background-image: url('../images/icons/reactions/like.gif');
+}
+
 .reaction-love {
     left: 162px;
     transition-delay: .05s;
