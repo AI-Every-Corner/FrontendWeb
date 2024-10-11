@@ -3,20 +3,20 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from './context';
-import { logout } from './api';
 import axios from 'axios';
 import { data } from 'jquery';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
 import ProfileList from './profilelist';
+import Avatar from './avatar';
 
 function Profile() {
-    const navigate = useNavigate();
+    
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const { avatarUrl, setAvatarUrl } = useContext(UserContext);
+    const { setAvatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
         username: '',
@@ -27,7 +27,7 @@ function Profile() {
     const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
     const storedUserId = localStorage.getItem('userId');
     const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
-    const [posts, setPosts] = useState([]);  // New state for posts
+    const [setPosts] = useState([]);  // New state for posts
     const [moodData, setMoodData] = useState();
     const [isCurrentUser, setIsCurrentUser] = useState(false); //
 
@@ -69,7 +69,7 @@ function Profile() {
             }
         }).then(response => {
             setPosts(response.data);  // Update the posts state with the response
-            setLoading(false); // 加載完成
+            
         }).catch(error => {
             console.error("Error fetching posts:", error);
         });
@@ -156,22 +156,7 @@ function Profile() {
                                             <div className="profile-info-left">
                                                 <div className="text-center">
                                                     <div className="profile-img w-shadow">
-                                                        <div className="profile-img-overlay" />
-                                                        <img
-                                                            src={formData.imagePath}
-                                                            alt="Avatar"
-                                                            className="avatar img-circle"
-                                                        />
-                                                        <div className="profile-img-caption">
-                                                            <label htmlFor="updateProfilePic" className="upload">
-                                                                <i className="bx bxs-camera" /> Update
-                                                                <input
-                                                                    type="file"
-                                                                    id="updateProfilePicInput"
-                                                                    className="text-center upload"
-                                                                />
-                                                            </label>
-                                                        </div>
+                                                        <Avatar />
                                                     </div>
                                                     <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
                                                     <p className="profile-username mb-3 text-muted">
@@ -242,11 +227,7 @@ function Profile() {
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                    {isCurrentUser && (
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                                                    </div>
-                                                    )}
+                                                    
                                                 </div>
                                                 <div className="intro mt-5 row mv-hidden">
                                                     <div className="col-md-4">

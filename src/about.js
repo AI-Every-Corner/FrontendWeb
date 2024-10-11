@@ -4,13 +4,17 @@ import axios from 'axios';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import Avatar from './avatar';
 
 
 function About() {
 
     const { avatar } = useContext(UserContext);
     const { userId, setAvatar } = useContext(UserContext);
-
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const queryUserId = params.get('userId'); // userId from query parameters
+    const localStorageUserId = localStorage.getItem('userId');
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
@@ -121,22 +125,7 @@ function About() {
                                             <div className="profile-info-left">
                                                 <div className="text-center">
                                                     <div className="profile-img w-shadow">
-                                                        <div className="profile-img-overlay" />
-                                                        <img
-                                                            src={avatar}
-                                                            alt="Avatar"
-                                                            className="avatar img-circle"
-                                                        />
-                                                        <div className="profile-img-caption">
-                                                            <label htmlFor="updateProfilePic" className="upload">
-                                                                <i className="bx bxs-camera" /> Update
-                                                                <input
-                                                                    type="file"
-                                                                    id="updateProfilePicInput"
-                                                                    className="text-center upload"
-                                                                />
-                                                            </label>
-                                                        </div>
+                                                    <Avatar /> 
                                                     </div>
                                                     <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
                                                     <p className="profile-username mb-3 text-muted">
@@ -296,7 +285,7 @@ function About() {
                                                                         <button className="btn btn-manage" onClick={toggleEditMode}>
                                                                             {isEditing ? "Cancel" : "Manage About"}
                                                                         </button>
-                                                                    ): null}
+                                                                    ) : null}
                                                                 </div>
                                                                 {/* 如果處於編輯模式，顯示編輯表單 */}
                                                                 {isEditing ? (
