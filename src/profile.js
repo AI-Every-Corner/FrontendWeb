@@ -11,7 +11,6 @@ import { data } from 'jquery';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
 import PostList from './postlist';
-import ProfilepostList from './profilepostlist';
 
 function Profile() {
     const navigate = useNavigate();
