@@ -171,38 +171,6 @@ function Profile() {
                                                             <i className="bx bx-dots-horizontal-rounded" />{" "}
                                                             <span className="fs-8">More</span>
                                                         </button>
-                                                        <div
-                                                            className="dropdown-menu dropdown-menu-right profile-ql-dropdown"
-                                                            aria-labelledby="moreMobile"
-                                                        >
-                                                            <a href="newsfeed.html" className="dropdown-item">
-                                                                Timeline
-                                                            </a>
-                                                            <a href="/about" className="dropdown-item">
-                                                                About
-                                                            </a>
-                                                            <a href="followers.html" className="dropdown-item">
-                                                                Followers
-                                                            </a>
-                                                            <a href="following.html" className="dropdown-item">
-                                                                Following
-                                                            </a>
-                                                            <a href="photos.html" className="dropdown-item">
-                                                                Photos
-                                                            </a>
-                                                            <a href="videos.html" className="dropdown-item">
-                                                                Videos
-                                                            </a>
-                                                            <a href="check-ins.html" className="dropdown-item">
-                                                                Check-Ins
-                                                            </a>
-                                                            <a href="events.html" className="dropdown-item">
-                                                                Events
-                                                            </a>
-                                                            <a href="likes.html" className="dropdown-item">
-                                                                Likes
-                                                            </a>
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 )}

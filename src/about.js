@@ -10,15 +10,17 @@ import Cover from './cover';
 
 function About() {
 
-    const { userId, setAvatar } = useContext(UserContext);
+    const { setAvatar } = useContext(UserContext);
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const queryUserId = params.get('userId'); // userId from query parameters
-    const localStorageUserId = localStorage.getItem('userId');
+    const urlUserId = params.get('userId'); // userId from query parameters
+    const storedUserId = localStorage.getItem('userId');
+    const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
     });
+    const [isCurrentUser, setIsCurrentUser] = useState(false); 
 
     // 狀態管理個人資料和是否處於編輯模式
     const [isEditing, setIsEditing] = useState(false);
@@ -36,7 +38,10 @@ function About() {
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
+        const currentUserId = localStorage.getItem('userId');
+        setIsCurrentUser(userId === currentUserId);
 
+        
         axios.get(`http://localhost:8080/api/auth/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}` // 設置 Authorization 標頭
@@ -269,7 +274,7 @@ function About() {
                                                                 <div className="timeline-manage">
                                                                     {/* Check if the userId from localStorage matches the one from the query parameters */}
                                                                     
-                                                                    {localStorageUserId === queryUserId && (
+                                                                    {isCurrentUser && (
                                                                         <button className="btn btn-manage" onClick={toggleEditMode}>
                                                                             {isEditing ? "Cancel" : "Manage About"}
                                                                         </button>
