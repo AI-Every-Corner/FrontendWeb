@@ -28,7 +28,7 @@ function Settings() {
   });
 
   const navigate = useNavigate();
-  const { userId, setAvatarUrl, setCoverUrl } = useContext(UserContext);
+  const { userId, setAvatar, setCover } = useContext(UserContext);
 
   useEffect(() => {
 
@@ -84,8 +84,8 @@ function Settings() {
   };
 
   // 為頭像和封面照片創建單獨的 dropzone
-  const { getRootProps: getProfileRootProps, getInputProps: getProfileInputProps } = useDropzone({
-    onDrop: (files) => onDrop(files, 'profile'),
+  const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } = useDropzone({
+    onDrop: (files) => onDrop(files, 'image'),
     accept: 'image/*',
     multiple: false
   });
@@ -151,14 +151,14 @@ function Settings() {
         if (updatedImagePath) {
           const fullImageUrl = `${updatedImagePath}`;
           localStorage.setItem('userImage', updatedImagePath); // 更新 localStorage 中的 userImage
-          setAvatarUrl(fullImageUrl); // 更新 UserContext 中的 avatarUrl
+          setAvatar(fullImageUrl); // 更新 UserContext 中的 avatarUrl
         }
 
         const updatedCoverPath = response.data.coverPath; // 從後端的回應中提取新的圖片路徑
         if (updatedCoverPath) {
           const fullCoverUrl = `${updatedCoverPath}`;
           localStorage.setItem('coverImage', updatedCoverPath); // 更新 localStorage 中的 coverImage
-          setCoverUrl(fullCoverUrl); // 更新 UserContext 中的 coverUrl
+          setCover(fullCoverUrl); // 更新 UserContext 中的 coverUrl
         }
 
         // 清空密碼欄位
@@ -294,13 +294,13 @@ function Settings() {
                               <div className="form-group">
                                 {/* 使用react-dropzone來實現拖放上傳 */}
                                 <h5>個人頭像</h5>
-                                  <div {...getProfileRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
-                                    <input {...getProfileInputProps()} />
+                                  <div {...getImageRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
+                                    <input {...getImageInputProps()} />
                                     <p>拖拉或點擊上傳個人頭像</p>
                                   </div>
-                                  {previewSrc.profile && (
+                                  {previewSrc.image && (
                                     <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                                      <img src={previewSrc.profile} alt="預覽頭像" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                                      <img src={previewSrc.image} alt="預覽頭像" style={{ maxWidth: '100%', maxHeight: '200px' }} />
                                     </div>
                                   )}
                                 </div>

@@ -12,6 +12,7 @@ import Recentmedia from './recentmedia';
 import ProfileList from './profilelist';
 import Avatar from './avatar';
 import Cover from './cover';
+import Follow from './follow';
 
 function Profile() {
     
@@ -145,35 +146,7 @@ function Profile() {
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
-                                                {!isCurrentUser && (
-                                                <div className="intro mt-4">
-                                                    <div className="d-flex">
-                                                        <button type="button" className="btn btn-follow mr-3">
-                                                            <i className="bx bx-plus" /> Follow
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-start-chat"
-                                                            data-toggle="modal"
-                                                            data-target="#newMessageModal"
-                                                        >
-                                                            <i className="bx bxs-message-rounded" />{" "}
-                                                            <span className="fs-8">Message</span>
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-follow"
-                                                            id="moreMobile"
-                                                            data-toggle="dropdown"
-                                                            aria-haspopup="true"
-                                                            aria-expanded="false"
-                                                        >
-                                                            <i className="bx bx-dots-horizontal-rounded" />{" "}
-                                                            <span className="fs-8">More</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                )}
+                                                <Follow />
                                                 <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>

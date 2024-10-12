@@ -11,4 +11,5 @@ export const logout = async () => {
   localStorage.removeItem('token');
   localStorage.removeItem('userId');
   localStorage.removeItem('userImage');
+  localStorage.removeItem('coverImage');
 };
