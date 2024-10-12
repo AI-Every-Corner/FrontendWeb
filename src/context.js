@@ -4,6 +4,7 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [avatar, setAvatar] = useState('');
+  const [cover, setCover] = useState('');
   const [userId, setUserId] = useState('');
   const [userInfo, setUserInfo] = useState({
     work: "曾在XXX地工作",
@@ -18,12 +19,17 @@ export const UserProvider = ({ children }) => {
 
     const storedAvatar = localStorage.getItem('userImage');
     const storedUserId = localStorage.getItem('userId');  // 從 localStorage 獲取 userId
+    const storedCover = localStorage.getItem('coverImage');
 
     if (storedAvatar) {
       setAvatar(`${storedAvatar}`);
 
       //setAvatarUrl(`http://localhost:8080${storedAvatarUrl}`);
     }  
+
+    if (storedCover) {
+      setCover(`${storedCover}`);
+    }
 
     if (storedUserId) {
       setUserId(storedUserId);
@@ -32,7 +38,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ avatar, setAvatar, userId, setUserId, userInfo, setUserInfo }}>
+    <UserContext.Provider value={{ avatar, setAvatar, cover, setCover, userId, setUserId, userInfo, setUserInfo }}>
       {children}
     </UserContext.Provider>
   );
