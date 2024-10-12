@@ -29,6 +29,7 @@ function Profile() {
     const [setPosts] = useState([]);  // New state for posts
     const [moodData, setMoodData] = useState();
     const [isCurrentUser, setIsCurrentUser] = useState(false); //
+    const [isFollowing, setIsFollowing] = useState(false);  // 是否已經追蹤
 
     useEffect(() => {
 
@@ -62,8 +63,8 @@ function Profile() {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        }).then(response => {
-            setPosts(response.data);  // Update the posts state with the response
+        //}).then(response => {
+        //    setPosts(response.data);  // Update the posts state with the response
             
         }).catch(error => {
             console.error("Error fetching posts:", error);
@@ -151,15 +152,7 @@ function Profile() {
                                                         <button type="button" className="btn btn-follow mr-3">
                                                             <i className="bx bx-plus" /> Follow
                                                         </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-start-chat"
-                                                            data-toggle="modal"
-                                                            data-target="#newMessageModal"
-                                                        >
-                                                            <i className="bx bxs-message-rounded" />{" "}
-                                                            <span className="fs-8">Message</span>
-                                                        </button>
+                                                        
                                                         <button
                                                             type="button"
                                                             className="btn btn-follow"

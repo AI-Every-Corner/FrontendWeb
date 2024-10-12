@@ -115,7 +115,7 @@ const ProfileList = () => {
         >
             {posts.map((post) => (
                 <div key={post.postId}>
-                    <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
+                    <div className="post border-bottom p-3 bg-white w-shadow" >
                         <div className="media text-muted pt-3">
                             <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
                                 {console.log(users[post.userId])}
@@ -150,7 +150,7 @@ const ProfileList = () => {
                                 <img
                                     src={post.imagePath}
                                     className="post-content"
-                                    alt="post image"
+                                    alt="   "
                                     style={{ display: post.imagePath === "" ? "none" : "block" }}
                                 /> : (
                                     <pre></pre>

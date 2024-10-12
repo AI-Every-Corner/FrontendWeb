@@ -125,10 +125,6 @@ function Friends() {
                           <button type="button" className="btn btn-follow mr-3">
                             <i className='bx bx-plus'></i> Follow
                           </button>
-                          <button type="button" className="btn btn-start-chat" data-toggle="modal" data-target="#newMessageModal">
-                            <i className='bx bxs-message-rounded'></i>
-                            <span className="fs-8">Message</span>
-                          </button>
                           <button type="button" className="btn btn-follow" id="moreMobile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i className='bx bx-dots-horizontal-rounded'></i>
                             <span className="fs-8">More</span>
@@ -154,6 +150,7 @@ function Friends() {
                         <Intro />
                       </div>
                       <div className="intro mt-5 row mv-hidden">
+                        
                         <div className="col-md-4">
                           <img src="assets/images/users/album/album-1.jpg" width="95" alt="" />
                         </div>

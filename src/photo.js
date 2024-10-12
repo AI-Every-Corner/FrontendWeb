@@ -12,16 +12,20 @@ function Photo() {
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const userId = params.get('userId'); // 從查詢參數中獲取 userId
-    const { avatarUrl } = useContext(UserContext);
 
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
     });
-    const { setAvatarUrl } = useContext(UserContext);
+
+    const [posts, setPosts] = useState([]);
+    const [isCurrentUser, setIsCurrentUser] = useState(false); //
 
     useEffect(() => {
         console.log('Fetched userId:', userId);
+
+        const currentUserId = localStorage.getItem('userId');
+        setIsCurrentUser(userId === currentUserId);
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
@@ -40,6 +44,22 @@ function Photo() {
             })
             .catch(error => {
                 console.error("獲取用戶資料時發生錯誤:", error);
+            });
+    }, [userId]);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+
+        axios.get(`http://localhost:8080/posts/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                setPosts(response.data);
+            })
+            .catch(error => {
+                console.error("Error fetching posts:", error);
             });
     }, [userId]);
 
@@ -70,7 +90,7 @@ function Photo() {
                 <link href="assets/css/components.css" rel="stylesheet" />
                 <link href="assets/css/profile.css" rel="stylesheet" />
                 <link href="assets/css/media.css" rel="stylesheet" />
-                <div className="container-fluid newsfeed d-flex" id="wrapper">
+                <div className="container-fluid newsfeed " id="wrapper">
                     <div className="row newsfeed-size">
                         <div className="col-md-12 p-0">
 
@@ -89,20 +109,13 @@ function Photo() {
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
+                                                {!isCurrentUser && (
                                                 <div className="intro mt-4">
                                                     <div className="d-flex">
                                                         <button type="button" className="btn btn-follow mr-3">
                                                             <i className="bx bx-plus" /> Follow
                                                         </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-start-chat"
-                                                            data-toggle="modal"
-                                                            data-target="#newMessageModal"
-                                                        >
-                                                            <i className="bx bxs-message-rounded" />{" "}
-                                                            <span className="fs-8">Message</span>
-                                                        </button>
+                                                        
                                                         <button
                                                             type="button"
                                                             className="btn btn-follow"
@@ -114,68 +127,14 @@ function Photo() {
                                                             <i className="bx bx-dots-horizontal-rounded" />{" "}
                                                             <span className="fs-8">More</span>
                                                         </button>
-                                                        <div
-                                                            className="dropdown-menu dropdown-menu-right profile-ql-dropdown"
-                                                            aria-labelledby="moreMobile"
-                                                        >
-                                                            <a href="newsfeed.html" className="dropdown-item">
-                                                                Timeline
-                                                            </a>
-                                                            <a href="/about" className="dropdown-item">
-                                                                About
-                                                            </a>
-                                                            <a href="followers.html" className="dropdown-item">
-                                                                Followers
-                                                            </a>
-                                                            <a href="following.html" className="dropdown-item">
-                                                                Following
-                                                            </a>
-                                                            <a href="photos.html" className="dropdown-item">
-                                                                Photos
-                                                            </a>
-                                                            <a href="videos.html" className="dropdown-item">
-                                                                Videos
-                                                            </a>
-                                                            <a href="check-ins.html" className="dropdown-item">
-                                                                Check-Ins
-                                                            </a>
-                                                            <a href="events.html" className="dropdown-item">
-                                                                Events
-                                                            </a>
-                                                            <a href="likes.html" className="dropdown-item">
-                                                                Likes
-                                                            </a>
-                                                        </div>
                                                     </div>
                                                 </div>
+                                                )}
                                                 <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                </div>
-                                                <div className="intro mt-5 row mv-hidden">
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-1.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-2.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-3.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -317,26 +276,23 @@ function Photo() {
                                                                 <a href="#" className="btn btn-link">See All</a>
                                                             </div>
                                                             <div className="row">
-                                                                <div className="col-md-4 col-sm-6">
-                                                                    <div className="card group-card shadow-sm">
-                                                                        <img src="assets/images/groups/group-1.png" className="card-img-top group-card-image" alt="Group image" />
+
+                                                                {posts.map((post, index) => (
+                                                                    <div key={index} className="col-md-4 col-sm-6">
+                                                                        <div className="card group-card shadow-sm">
+                                                                            {post.imagePath ? (
+                                                                                <img
+                                                                                    src={post.imagePath}
+                                                                                    className="card-img-top group-card-image"
+                                                                                    alt="post image"
+                                                                                />
+                                                                            ) : (
+                                                                                <p>No image</p>
+                                                                            )}
+
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div className="col-md-4 col-sm-6">
-                                                                    <div className="card group-card shadow-sm">
-                                                                        <img src="assets/images/groups/group-2.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4 col-sm-6">
-                                                                    <div className="card group-card shadow-sm">
-                                                                        <img src="assets/images/groups/group-3.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-4 col-sm-6">
-                                                                    <div className="card group-card shadow-sm">
-                                                                        <img src="assets/images/groups/group-4.jpg" className="card-img-top group-card-image" alt="Group image" />
-                                                                    </div>
-                                                                </div>
+                                                                ))}
                                                             </div>
                                                         </div>
                                                     </div>
