@@ -34,7 +34,10 @@ function ResponseList(postId) {
       console.log(page);
       console.log("response.data.respList[0].responseId");
       console.log(response.data.respList[0].responseId);
-      if (!fetchedResponses.find(item => item.postId === postId.postId && item.responseId === response.data.respList[0].responseId)) {
+      if (page >= response.data.totalPages) {
+        setHasMore(false);
+        return;
+      } else if (!fetchedResponses.find(item => item.postId === postId.postId && item.responseId === response.data.respList[0].responseId)) {
         console.log(response);
         setResponses([...responses, ...response.data.respList]);  // Append new posts
 
@@ -51,6 +54,7 @@ function ResponseList(postId) {
         storeResponseIds(postId.postId, response.data.respList[0].responseId);
       } else {
         console.log("already fetched");
+        setHasMore(false);
       }
     } catch (error) {
       console.error("fetchComments: " + error);
@@ -96,7 +100,7 @@ function ResponseList(postId) {
       next={fetchComments}
       hasMore={hasMore}
       loader={<h4 className="text-secondary text-center pt-5 pb-3">Loading...</h4>}
-      endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
+      endMessage={<p className="text-secondary text-center pt-5 pb-3">No more comments</p>}
     >
       <div>
         {responses.map((response) => (
