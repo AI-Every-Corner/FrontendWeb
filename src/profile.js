@@ -243,30 +243,7 @@ function Profile() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                          {/*  <Row>
-                                                            {posts.length > 0 ? (
-                                                                posts.map(post => (
-                                                                    <div key={post.postId} className="post border-bottom p-3 bg-white">
-                                                                        <div className="media text-muted pt-3">
-                                                                            <img src={avatarUrl} alt="User avatar" className="mr-3 post-user-image" />
-                                                                            <div className="media-body pb-3 mb-0 small lh-125">
-                                                                                <h5 className="mt-0">{formData.nickName}</h5>
-                                                                                <span>{new Date(post.createdAt).toLocaleString()}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <p>{post.content}</p>
-                                                                        {post.imagePath && (
-                                                                            <img src={post.imagePath} className="w-100 mb-3" alt="Post content" />
-                                                                        )}
-                                                                    </div>
-                                                                ))
-                                                            ) : (
-                                                                <p>No posts available</p>
-                                                            )}
-
-                                                        </Row>  */}  
-
-                                                        <ProfileList />
+                                                          <ProfileList />
                                                         
                                                         <div
                                                             className="border-top pt-3 hide-comments"
