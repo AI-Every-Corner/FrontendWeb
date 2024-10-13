@@ -8,65 +8,73 @@ import { Link } from "react-router-dom";
 
 
 const PostList = () => {
-    const [posts, setPosts] = useState([]);
-    const [page, setPage] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-    const [users, setUsers] = useState([]);
-    const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
-    const [openComments, setOpenComments] = useState({});
-    const [commentContent, setCommentContent] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [users, setUsers] = useState([]);
+  const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+  const [openComments, setOpenComments] = useState({});
+  const [likedPosts, setLikedPosts] = useState([]);
+  const [commentContent, setCommentContent] = useState("");
 
-    const fetchPosts = async () => {
-      try {
-        const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-        const response = await axios.get(`http://localhost:8080/posts`,{
-          headers: {
-            'Authorization': `Bearer ${token}` // 添加 Authorization header
-          },
-          params: {
-            page: page,
-            size: 10
-          }
-        });
-        console.log(response);
-        setPosts([...posts, ...response.data.postsList]);  // Append new posts
+  // initialize page
+  useEffect(() => {
+    setPage(0);
+    setPosts([]);
+    setHasMore(true);
+  }, []);
 
-        if (response.data.last || response.data.totalPages - 1 === page) {
-          setHasMore(false);  // No more posts to load
+  const fetchPosts = async () => {
+    try {
+      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      const response = await axios.get(`http://localhost:8080/posts`,{
+        headers: {
+          'Authorization': `Bearer ${token}` // 添加 Authorization header
+        },
+        params: {
+          page: page,
+          size: 10
         }
+      });
+      console.log(response);
+      setPosts([...posts, ...response.data.postsList]);  // Append new posts
 
-        // Fetch user details for the new responses
-        const userIds = response.data.postsList.map(resp => resp.userId);
-        fetchUsers(userIds);
-      } catch (error) {
-        console.error("Failed to load posts", error);
+      if (response.data.last || response.data.totalPages - 1 === page) {
+        setHasMore(false);  // No more posts to load
       }
-    };
 
-    // Fetch user data based on userIds and update the state
-    const fetchUsers = async (userIds) => {
-      try {
-        const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-        const fetchedUsers = {};
-        await Promise.all(userIds.map(async (id) => {
-          // console.log("userIds: ");
-          // console.log(userIds);
-          if (!users[id]) {  // Avoid refetching already loaded users
-            const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-            fetchedUsers[id] = response.data;
-            // console.log("id: ");
-            // console.log(id);
-          }
-        }));
-        setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
-      } catch (error) {
-        console.error("fetchUsers: " + error);
-      }
+      // Fetch user details for the new responses
+      const userIds = response.data.postsList.map(resp => resp.userId);
+      fetchUsers(userIds);
+    } catch (error) {
+      console.error("Failed to load posts", error);
     }
+  };
+
+  // Fetch user data based on userIds and update the state
+  const fetchUsers = async (userIds) => {
+    try {
+      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      const fetchedUsers = {};
+      await Promise.all(userIds.map(async (id) => {
+        // console.log("userIds: ");
+        // console.log(userIds);
+        if (!users[id]) {  // Avoid refetching already loaded users
+          const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          fetchedUsers[id] = response.data;
+          // console.log("id: ");
+          // console.log(id);
+        }
+      }));
+      setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
+    } catch (error) {
+      console.error("fetchUsers: " + error);
+    }
+  }
 
   useEffect(() => {
     fetchPosts();
@@ -121,20 +129,75 @@ const PostList = () => {
     };
   }, []);
 
-    return (
-        <InfiniteScroll
-          dataLength={posts.length}
-          next={() => setPage(page + 1)}  // Load next page
-          hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
-          endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
-        >
-          {posts.map((post) => (
-            <div key={post.postId}>
+  const addLike = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.error("User ID not found in localStorage");
+        return;
+      }
+      console.log("type of userId: " + typeof userId);
+      const response = await axios.put(`http://localhost:8080/posts/${postId}/like`, null, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'userId': userId
+        }
+      });
+
+      console.log(response);
+
+      setLikedPosts([...likedPosts, postId]);
+  } catch (error) {
+      console.error("addLike: " + error);
+    }
+  }
+
+  const removeLike = async (postId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const response = await axios.delete(`http://localhost:8080/posts/${postId}/unlike`, null, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'userId': userId
+        }
+      });
+      
+      console.log(response);
+
+      setLikedPosts(likedPosts.filter(id => id !== postId));
+    } catch (error) {
+      console.error("removeLike: " + error);
+    }
+  }
+
+  const handleLike = (postId) => {
+    if (likedPosts.includes(postId)) {
+      removeLike(postId);
+    } else {
+      addLike(postId);
+    }
+  }
+
+  useEffect(() => {
+    console.log(likedPosts);
+  }, [likedPosts]);
+
+  return (
+    <InfiniteScroll
+      dataLength={posts.length}
+      next={() => setPage(page + 1)}  // Load next page
+      hasMore={hasMore}
+      loader={<h4>Loading...</h4>}
+      endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
+      // resetFunction={() => setPage(0)}
+    >
+      {posts.map((post) => (
+        <div key={post.postId}>
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
-    {/* {console.log(users[post.userId])} */}
     {users[post.userId] ? (
     <img
     src={users[post.userId].imagePath}
@@ -174,10 +237,18 @@ const PostList = () => {
 <div className="mb-3">
 
   <div className="argon-reaction">
-  <span className="like-btn">
-    <a href="#" className="post-card-buttons" id="reactions">
-    <i className="bx bxs-like mr-2" /> {post.likes || 0}
-    </a>
+  <span className="like-btn" onClick={() => handleLike(post.postId)}>
+    {
+      likedPosts.includes(post.postId) ? (
+        <a className="post-card-buttons" id="reactions">
+          <i className="bx bxs-like mr-2" /> {post.likes + 1}
+        </a>
+      ) : (
+        <a className="post-card-buttons" id="reactions">
+          <i className="bx bxs-like mr-2" /> {post.likes}
+        </a>
+      )
+    }
     <ul className="dropdown-shadow">
     <li
       className="reaction reaction-like-edited"
@@ -194,47 +265,15 @@ const PostList = () => {
   <i className="bx bx-message-rounded mr-2" /> {post.commentCount || 0}
   </a>
   <div className="dropdown dropup share-dropup">
-  <a
-    href="#"
-    className="post-card-buttons"
-    data-toggle="dropdown"
-    aria-haspopup="true"
-    aria-expanded="false"
-  >
-    <i className="bx bx-share-alt mr-2" /> Share
-  </a>
-  <div className="dropdown-menu post-dropdown-menu">
-    <a href="#" className="dropdown-item">
-    <div className="row">
-      <div className="col-md-2">
-      <i className="bx bx-share-alt" />
-      </div>
-      <div className="col-md-10">
-      <span>Share Now (Public)</span>
-      </div>
-    </div>
+    <a
+      href="#"
+      className="post-card-buttons"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <i className="bx bx-share-alt mr-2" /> Share
     </a>
-    <a href="#" className="dropdown-item">
-    <div className="row">
-      <div className="col-md-2">
-      <i className="bx bx-share-alt" />
-      </div>
-      <div className="col-md-10">
-      <span>Share...</span>
-      </div>
-    </div>
-    </a>
-    <a href="#" className="dropdown-item">
-    <div className="row">
-      <div className="col-md-2">
-      <i className="bx bx-message" />
-      </div>
-      <div className="col-md-10">
-      <span>Send as Message</span>
-      </div>
-    </div>
-    </a>
-  </div>
   </div>
 </div>
 <div className="media-body">
@@ -242,10 +281,10 @@ const PostList = () => {
     <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)} style={{ cursor: 'pointer' }}>
       <hr></hr>
       {openComments[post.postId] ? 'Hide Comments' : 'See Comments'}
-      {/* {console.log(post.postId)} */}
     </div>
     {openComments[post.postId] && (
       <div className="px-3">
+        <hr></hr>
         <div className="row justify-content-start mb-3 media">
           <a href="#" className="pull-left">
             <Link to="/profile">
@@ -280,7 +319,6 @@ const PostList = () => {
   </div>
 </div>
 </div>
-
         </div>
       ))}
     </InfiniteScroll>
