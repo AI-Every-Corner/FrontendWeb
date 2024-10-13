@@ -17,6 +17,7 @@ function Header() {
         navigate(`/profile?userId=${userId}`);
         //navigate(`/profile/${userId}`);
     };
+    
 
     // Function to toggle dropdown visibility
     const toggleDropdown = () => {

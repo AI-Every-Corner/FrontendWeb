@@ -3,20 +3,22 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from './context';
-import { logout } from './api';
 import axios from 'axios';
 import { data } from 'jquery';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
 import ProfileList from './profilelist';
+import Avatar from './avatar';
+import Cover from './cover';
+import Follow from './follow';
+import MiniPhoto from './miniphoto';
 
 function Profile() {
-    const navigate = useNavigate();
+    
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const { avatarUrl, setAvatarUrl } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
@@ -26,9 +28,10 @@ function Profile() {
     const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
     const storedUserId = localStorage.getItem('userId');
     const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
-    const [posts, setPosts] = useState([]);  // New state for posts
+    const [setPosts] = useState([]);  // New state for posts
     const [moodData, setMoodData] = useState();
     const [isCurrentUser, setIsCurrentUser] = useState(false); //
+    const [isFollowing, setIsFollowing] = useState(false);  // 是否已經追蹤
 
     useEffect(() => {
 
@@ -51,11 +54,7 @@ function Profile() {
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
                     username: userData.username,
-                    avatarUrl: userData.imagePath ? `http://localhost:8080${userData.imagePath}` : null
                 });
-                if (userData.imagePath) {
-                    setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
-                }
             })
             .catch(error => {
                 console.error("獲取用戶資料時發生錯誤:", error);
@@ -66,8 +65,9 @@ function Profile() {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        }).then(response => {
-            setPosts(response.data);  // Update the posts state with the response
+        //}).then(response => {
+        //    setPosts(response.data);  // Update the posts state with the response
+            
         }).catch(error => {
             console.error("Error fetching posts:", error);
         });
@@ -135,140 +135,28 @@ function Profile() {
                         <div className="col-md-12 p-0">
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
-                                    <div className="profile-header-background">
-                                        <a href="#" className="profile-cover">
-                                            <img
-                                                src="assets/images/users/cover/cover-1.gif"
-                                                alt="Profile Header Background"
-                                            />
-                                        </a>
-                                        <div className="cover-overlay">
-                                            <a href="#" className="profile-cover"></a>
-                                            <a href="#" className="btn btn-update-cover">
-                                                <i className="bx bxs-camera" /> Update Cover Photo
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <Cover />
                                     <div className="row profile-rows">
                                         <div className="col-md-3">
                                             <div className="profile-info-left">
                                                 <div className="text-center">
                                                     <div className="profile-img w-shadow">
-                                                        <div className="profile-img-overlay" />
-                                                        <img
-                                                            src={formData.avatarUrl || avatarUrl}
-                                                            alt="Avatar"
-                                                            className="avatar img-circle"
-                                                        />
-                                                        <div className="profile-img-caption">
-                                                            <label htmlFor="updateProfilePic" className="upload">
-                                                                <i className="bx bxs-camera" /> Update
-                                                                <input
-                                                                    type="file"
-                                                                    id="updateProfilePicInput"
-                                                                    className="text-center upload"
-                                                                />
-                                                            </label>
-                                                        </div>
+                                                        <Avatar />
                                                     </div>
                                                     <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
                                                     <p className="profile-username mb-3 text-muted">
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
-                                                <div className="intro mt-4">
-                                                    <div className="d-flex">
-                                                        <button type="button" className="btn btn-follow mr-3">
-                                                            <i className="bx bx-plus" /> Follow
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-start-chat"
-                                                            data-toggle="modal"
-                                                            data-target="#newMessageModal"
-                                                        >
-                                                            <i className="bx bxs-message-rounded" />{" "}
-                                                            <span className="fs-8">Message</span>
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-follow"
-                                                            id="moreMobile"
-                                                            data-toggle="dropdown"
-                                                            aria-haspopup="true"
-                                                            aria-expanded="false"
-                                                        >
-                                                            <i className="bx bx-dots-horizontal-rounded" />{" "}
-                                                            <span className="fs-8">More</span>
-                                                        </button>
-                                                        <div
-                                                            className="dropdown-menu dropdown-menu-right profile-ql-dropdown"
-                                                            aria-labelledby="moreMobile"
-                                                        >
-                                                            <a href="newsfeed.html" className="dropdown-item">
-                                                                Timeline
-                                                            </a>
-                                                            <a href="/about" className="dropdown-item">
-                                                                About
-                                                            </a>
-                                                            <a href="followers.html" className="dropdown-item">
-                                                                Followers
-                                                            </a>
-                                                            <a href="following.html" className="dropdown-item">
-                                                                Following
-                                                            </a>
-                                                            <a href="photos.html" className="dropdown-item">
-                                                                Photos
-                                                            </a>
-                                                            <a href="videos.html" className="dropdown-item">
-                                                                Videos
-                                                            </a>
-                                                            <a href="check-ins.html" className="dropdown-item">
-                                                                Check-Ins
-                                                            </a>
-                                                            <a href="events.html" className="dropdown-item">
-                                                                Events
-                                                            </a>
-                                                            <a href="likes.html" className="dropdown-item">
-                                                                Likes
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <Follow />
                                                 <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                    {isCurrentUser && (
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <a href="/about" className="btn btn-quick-link join-group-btn border w-100">Edit Details</a>
-                                                    </div>
-                                                    )}
+                                                    
                                                 </div>
-                                                <div className="intro mt-5 row mv-hidden">
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-1.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-2.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-3.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <MiniPhoto />
                                             </div>
                                         </div>
                                         <div className="col-md-9 p-0">

@@ -14,13 +14,14 @@ function SignUp() {
     gender: '',
     email: '',
     phoneNum: '',
-    image: null
+    image: null,
+    cover: null
   });
 
 
-  const [preview, setPreview] = useState(null); // 預覽圖片的狀態
+  const [preview, setPreview] = useState({ image: null, cover: null }); // 預覽圖片的狀態
   const [passwordError, setPasswordError] = useState('');
-  const [imageUploaded, setImageUploaded] = useState(false); // 照片上傳狀態
+  const [imageUploaded, setImageUploaded] = useState({ image: false, cover: false }); // 照片上傳狀態
   const [weather, setWeather] = useState({ temp: '', city: '', icon: '' });
   const [errors, setErrors] = useState({});
 
@@ -44,14 +45,13 @@ function SignUp() {
   };
 
   // 使用react-dropzone處理圖片拖放上傳和預覽
-  const onDrop = (acceptedFiles) => {
+  const onDrop = (acceptedFiles, type) => {
     const file = acceptedFiles[0];
-    setFormData(prevData => ({ ...prevData, image: file }));
+    setFormData(prevData => ({ ...prevData, [type]: file }));
 
-    // 建立圖片預覽的URL
     const previewUrl = URL.createObjectURL(file);
-    setPreview(previewUrl);
-    setImageUploaded(true); // 設置照片上傳狀態為已上傳
+    setPreview(prevPreview => ({ ...prevPreview, [type]: previewUrl }));
+    setImageUploaded(prevUploaded => ({ ...prevUploaded, [type]: true }));
   };
 
   const handleSubmit = async (e) => {
@@ -72,6 +72,7 @@ function SignUp() {
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.phoneNum) newErrors.phoneNum = "Phone Number is required";
     if (!formData.image) newErrors.image = "Profile picture is required";
+    if (!formData.cover) newErrors.cover = "Cover picture is required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -82,7 +83,7 @@ function SignUp() {
 
       const formDataToSend = new FormData();
       for (let key in dataToSend) {
-        if (key === 'image') {
+        if (key === 'image' || key === 'cover') {
           if (dataToSend[key]) {
             formDataToSend.append(key, dataToSend[key], dataToSend[key].name);
           }
@@ -111,8 +112,14 @@ function SignUp() {
     }
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+  const { getRootProps: getImageRootProps, getInputProps: getImageInputProps, isDragActive: isImageDragActive } = useDropzone({
+    onDrop: (files) => onDrop(files, 'image'),
+    accept: 'image/*',
+    multiple: false
+  });
+
+  const { getRootProps: getCoverRootProps, getInputProps: getCoverInputProps, isDragActive: isCoverDragActive } = useDropzone({
+    onDrop: (files) => onDrop(files, 'cover'),
     accept: 'image/*',
     multiple: false
   });
@@ -212,20 +219,42 @@ function SignUp() {
                 <div className="col-md-12">
                   <div className="form-group">
                     {/* Use react-dropzone for drag and drop upload */}
-                    {!imageUploaded && (
-                      <div {...getRootProps()} style={dropzoneStyle} className={errors.image ? 'is-invalid' : ''}>
-                        <input {...getInputProps()} />
-                        {isDragActive ? (
-                          <p>Drop the image here...</p>
+                    <h5>Profile Picture</h5>
+                    {!imageUploaded.image && (
+                      <div {...getImageRootProps()} style={dropzoneStyle} className={errors.image ? 'is-invalid' : ''}>
+                        <input {...getImageInputProps()} />
+                        {isImageDragActive ? (
+                          <p>Drop the profile picture here...</p>
                         ) : (
                           <p>Drag and drop or click to upload profile picture</p>
                         )}
                       </div>
                     )}
                     {errors.image && <div className="invalid-feedback">{errors.image}</div>}
-                    {preview && (
+                    {preview.image && (
                       <div style={previewContainerStyle}>
-                        <img src={preview} alt="Preview image" style={previewImageStyle} />
+                        <img src={preview.image} alt="Preview profile" style={previewImageStyle} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <h5>Cover Photo</h5>
+                    {!imageUploaded.cover && (
+                      <div {...getCoverRootProps()} style={dropzoneStyle} className={errors.cover ? 'is-invalid' : ''}>
+                        <input {...getCoverInputProps()} />
+                        {isCoverDragActive ? (
+                          <p>Drop the cover photo here...</p>
+                        ) : (
+                          <p>Drag and drop or click to upload cover photo</p>
+                        )}
+                      </div>
+                    )}
+                    {errors.cover && <div className="invalid-feedback">{errors.cover}</div>}
+                    {preview.cover && (
+                      <div style={previewContainerStyle}>
+                        <img src={preview.cover} alt="Preview cover" style={previewCoverStyle} />
                       </div>
                     )}
                   </div>
@@ -287,6 +316,14 @@ const previewImageStyle = {
   height: '150px',
   borderRadius: '50%',
   objectFit: 'cover',
+};
+
+const previewCoverStyle = {
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
+  width: '100%',
+  height: '250px',  
 };
 
 // 添加以下 CSS 樣式到您的樣式文件中

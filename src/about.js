@@ -4,20 +4,24 @@ import axios from 'axios';
 import Intro from './intro';
 import Recentmedia from './recentmedia';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-
+import Avatar from './avatar';
+import Cover from './cover';
+import Follow from './follow';
+import MiniPhoto from './miniphoto';
 
 function About() {
 
-    const { avatar } = useContext(UserContext);
-    const { userId, setAvatar } = useContext(UserContext);
-    const queryUserId = params.get('userId'); // userId from query parameters
-    const localStorageUserId = localStorage.getItem('userId');
-    const params = new URLSearchParams(location.search);
+    const { setAvatar } = useContext(UserContext);
     const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const urlUserId = params.get('userId'); // userId from query parameters
+    const storedUserId = localStorage.getItem('userId');
+    const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
     });
+    const [isCurrentUser, setIsCurrentUser] = useState(false); 
 
     // 狀態管理個人資料和是否處於編輯模式
     const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +39,10 @@ function About() {
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
+        const currentUserId = localStorage.getItem('userId');
+        setIsCurrentUser(userId === currentUserId);
 
+        
         axios.get(`http://localhost:8080/api/auth/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}` // 設置 Authorization 標頭
@@ -105,106 +112,20 @@ function About() {
                         <div className="col-md-12 p-0">
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
-                                    <div className="profile-header-background">
-                                        <a href="#" className="profile-cover">
-                                            <img
-                                                src="assets/images/users/cover/cover-1.gif"
-                                                alt="Profile Header Background"
-                                            />
-                                        </a>
-                                        <div className="cover-overlay">
-                                            <a href="#" className="profile-cover"></a>
-                                            <a href="#" className="btn btn-update-cover">
-                                                <i className="bx bxs-camera" /> Update Cover Photo
-                                            </a>
-                                        </div>
-                                    </div>
+                                <Cover />
                                     <div className="row profile-rows">
                                         <div className="col-md-3">
                                             <div className="profile-info-left">
                                                 <div className="text-center">
                                                     <div className="profile-img w-shadow">
-                                                        <div className="profile-img-overlay" />
-                                                        <img
-                                                            src={avatar}
-                                                            alt="Avatar"
-                                                            className="avatar img-circle"
-                                                        />
-                                                        <div className="profile-img-caption">
-                                                            <label htmlFor="updateProfilePic" className="upload">
-                                                                <i className="bx bxs-camera" /> Update
-                                                                <input
-                                                                    type="file"
-                                                                    id="updateProfilePicInput"
-                                                                    className="text-center upload"
-                                                                />
-                                                            </label>
-                                                        </div>
+                                                    <Avatar /> 
                                                     </div>
                                                     <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
                                                     <p className="profile-username mb-3 text-muted">
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
-                                                <div className="intro mt-4">
-                                                    <div className="d-flex">
-                                                        <button type="button" className="btn btn-follow mr-3">
-                                                            <i className="bx bx-plus" /> Follow
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-start-chat"
-                                                            data-toggle="modal"
-                                                            data-target="#newMessageModal"
-                                                        >
-                                                            <i className="bx bxs-message-rounded" />{" "}
-                                                            <span className="fs-8">Message</span>
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-follow"
-                                                            id="moreMobile"
-                                                            data-toggle="dropdown"
-                                                            aria-haspopup="true"
-                                                            aria-expanded="false"
-                                                        >
-                                                            <i className="bx bx-dots-horizontal-rounded" />{" "}
-                                                            <span className="fs-8">More</span>
-                                                        </button>
-                                                        <div
-                                                            className="dropdown-menu dropdown-menu-right profile-ql-dropdown"
-                                                            aria-labelledby="moreMobile"
-                                                        >
-                                                            <a href="newsfeed.html" className="dropdown-item">
-                                                                Timeline
-                                                            </a>
-                                                            <a href="/about" className="dropdown-item">
-                                                                About
-                                                            </a>
-                                                            <a href="followers.html" className="dropdown-item">
-                                                                Followers
-                                                            </a>
-                                                            <a href="following.html" className="dropdown-item">
-                                                                Following
-                                                            </a>
-                                                            <a href="/photos" className="dropdown-item">
-                                                                Photos
-                                                            </a>
-                                                            <a href="videos.html" className="dropdown-item">
-                                                                Videos
-                                                            </a>
-                                                            <a href="check-ins.html" className="dropdown-item">
-                                                                Check-Ins
-                                                            </a>
-                                                            <a href="events.html" className="dropdown-item">
-                                                                Events
-                                                            </a>
-                                                            <a href="likes.html" className="dropdown-item">
-                                                                Likes
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <Follow />
                                                 <div className="intro-item d-flex justify-content-between align-items-center">
                                                     <h3 className="intro-about">Intro</h3>
                                                 </div>
@@ -216,29 +137,7 @@ function About() {
                                                         handleInputChange={handleInputChange}
                                                         handleSubmit={handleSubmit} />
                                                 </div>
-                                                <div className="intro mt-5 row mv-hidden">
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-1.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-2.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-3.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <MiniPhoto />
                                             </div>
                                         </div>
                                         <div className="col-md-9 p-0">
@@ -295,11 +194,12 @@ function About() {
                                                             <div className="col-md-9 col-sm-12">
                                                                 <div className="timeline-manage">
                                                                     {/* Check if the userId from localStorage matches the one from the query parameters */}
-                                                                    {localStorageUserId === queryUserId ? (
+                                                                    
+                                                                    {isCurrentUser && (
                                                                         <button className="btn btn-manage" onClick={toggleEditMode}>
                                                                             {isEditing ? "Cancel" : "Manage About"}
                                                                         </button>
-                                                                    ): null}
+                                                                    ) }
                                                                 </div>
                                                                 {/* 如果處於編輯模式，顯示編輯表單 */}
                                                                 {isEditing ? (

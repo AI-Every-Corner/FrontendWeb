@@ -270,10 +270,20 @@
     width: 50%;
 }
 
+.btn-secondary {
+    font-size: 0.8rem;
+    border-radius: 30px;
+    font-weight: 700;
+    width: 50%;
+}
+
+
+
 .btn-follow {
     border: 1px solid #007bff;
     color: #007bff;
 }
+
 
 .btn-follow:hover {
     background-color: #007bff;

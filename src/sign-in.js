@@ -29,6 +29,7 @@ function SignIn() {
       }
       
       localStorage.setItem('userImage', response.data.imagePath);
+      localStorage.setItem('coverImage', response.data.coverPath);
       alert('登錄成功');
       navigate('/');
 
