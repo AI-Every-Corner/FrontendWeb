@@ -180,17 +180,17 @@ function Profile() {
 
                                                         </ul>
 
-    <div className="bg-white profile-posts-options mt-5 mb-4 py-3 justify-content-between shadow-sm" style={{ padding: '20px' }}>
-    <Container >
-        <Row className="justify-content-center" >
-            <Col md={1} lg={1} xl={1}></Col>
-            <Col>
-                <CalendarChart isCurrentUser={isCurrentUser} moodData={moodData} />
-            </Col>
-            <Col md={1} lg={1} xl={1}></Col>
-        </Row>
-    </Container>
-</div>
+                                                        <div className="bg-white profile-posts-options mt-5 mb-4 py-3 justify-content-between shadow-sm" >
+                                                            <Container >
+                                                                <Row className="justify-content-center" >
+                                                                    <Col md={1} lg={1} xl={1}></Col>
+                                                                    <Col>
+                                                                        <CalendarChart isCurrentUser={isCurrentUser} moodData={moodData} />
+                                                                    </Col>
+                                                                    <Col md={1} lg={1} xl={1}></Col>
+                                                                </Row>
+                                                            </Container>
+                                                        </div>
                                                         <ProfileList />
                                                         <div
                                                             className="border-top pt-3 hide-comments"
@@ -332,7 +332,7 @@ function CalendarChart({ isCurrentUser }) {
 
     return (
 
-        <div style={{ width: '100%', maxWidth: '650px', aspectRatio: '5 / 1',  height: 'auto' }}>
+        <div style={{ width: '100%', maxWidth: '650px', aspectRatio: '5 / 1', }}>
             <Chart
                 chartType="Calendar"
                 data={data}

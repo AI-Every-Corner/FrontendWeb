@@ -26,7 +26,7 @@ function About() {
     // 狀態管理個人資料和是否處於編輯模式
     const [isEditing, setIsEditing] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        work: "曾在XXX地工作",
+        work: "曾在XX地工作",
         school: "就讀於AI大學",
         location: "現居XX市",
         fromLocation: "來自XX市",
@@ -204,28 +204,28 @@ function About() {
                                                                 {/* 如果處於編輯模式，顯示編輯表單 */}
                                                                 {isEditing ? (
                                                                     <form onSubmit={handleSubmit}>
-                                                                        <label>工作：</label>
+                                                                        <label>work：</label>
                                                                         <input type="text" name="work" value={userInfo.work} onChange={handleInputChange} placeholder="Work" className="form-control" />
-                                                                        <label>學校：</label>
+                                                                        <label>school：</label>
                                                                         <input type="text" name="school" value={userInfo.school} onChange={handleInputChange} placeholder="School" className="form-control" />
-                                                                        <label>居住地：</label>
+                                                                        <label>location：</label>
                                                                         <input type="text" name="location" value={userInfo.location} onChange={handleInputChange} placeholder="Location" className="form-control" />
-                                                                        <label>來自於：</label>
+                                                                        <label>fromLocation：</label>
                                                                         <input type="text" name="fromLocation" value={userInfo.fromLocation} onChange={handleInputChange} placeholder="From Location" className="form-control" />
-                                                                        <label>感情狀態：</label>
+                                                                        <label>relationship：</label>
                                                                         <input type="text" name="relationship" value={userInfo.relationship} onChange={handleInputChange} placeholder="Relationship" className="form-control" />
-                                                                        <label>聯絡電話：</label>
+                                                                        <label>phone：</label>
                                                                         <input type="text" name="phone" value={userInfo.phone} onChange={handleInputChange} placeholder="Phone" className="form-control" />
                                                                         <button type="submit">Save</button>
                                                                     </form>
                                                                 ) : (
                                                                     <div>
-                                                                        <p>工作：{userInfo.work}</p>
-                                                                        <p>學校：{userInfo.school}</p>
-                                                                        <p>居住地：{userInfo.location}</p>
-                                                                        <p>來自於：{userInfo.fromLocation}</p>
-                                                                        <p>感情狀態：{userInfo.relationship}</p>
-                                                                        <p>聯絡電話：{userInfo.phone}</p>
+                                                                        <p>work：{userInfo.work}</p>
+                                                                        <p>school：{userInfo.school}</p>
+                                                                        <p>location：{userInfo.location}</p>
+                                                                        <p>fromLocation：{userInfo.fromLocation}</p>
+                                                                        <p>relationship：{userInfo.relationship}</p>
+                                                                        <p>phone：{userInfo.phone}</p>
                                                                     </div>
                                                                 )}
                                                             </div>
