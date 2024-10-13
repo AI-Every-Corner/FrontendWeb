@@ -113,6 +113,7 @@ const ProfileList = () => {
             loader={<h4>Loading...</h4>}
             endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
         >
+            <h6 className="timeline-title">Posts</h6>
             {posts.map((post) => (
                 <div key={post.postId}>
                     <div className="post border-bottom p-3 bg-white w-shadow" >

@@ -266,7 +266,7 @@ function Friends() {
                                     <h5 className="friend-card-title"><Link to={`/profile?userId=${friend.friendId}`}>{friend.nickname}</Link></h5>
                                     <p className="card-text text-muted"></p>
                                     <div className="friend-card-buttons" role="group">
-                                      <a href="#" className="btn btn-light border w-100">發送訊息</a>
+                                      <a href="#" className="btn btn-light border w-100">Send message</a>
                                       <div className="btn-group" role="group">
                                         <button 
                                           type="button" 

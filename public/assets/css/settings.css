@@ -4,9 +4,18 @@
  * Licensed under MIT (https://github.com/ArtMin96/argon-social/blob/master/LICENSE.md)
  */
 
+ .container-fluid {
+    overflow-y: auto; /* 確保主容器有滾動條 */
+    height: auto;      /* 根據內容自適應高度，讓滾動條顯示 */
+    max-height: 100vh; /* 確保主容器不會超過視窗高度 */
+  }
+  
+
  .profile-img-upload {
     display: flex;
+    flex-direction: row; /* 保證頭像和其他欄位橫向排列 */
     align-items: center; /* Aligns the image and upload section side by side */
+    gap: 20px; /* 頭像和其他欄位之間的間距 */
   }
   
   .upload-section {
@@ -16,20 +25,24 @@
   .image-preview {
     width: 100px; /* Max width for the preview image */
     height: 100px; /* Max height */
+    overflow: hidden; /* 確保圖片不會超出容器 */
+    border-radius: 50%; /* 圓形預覽圖片 */
+    object-fit: cover; /* 確保圖片按照比例填充容器 */
   }
   
   .image-preview img {
     width: 100%; /* Ensure the image scales within the container */
     height: auto; /* Maintains the aspect ratio */
-    border-radius: 50%; /* Optional: make the preview circular */
+    /*border-radius: 50%; /* Optional: make the preview circular */
     object-fit: cover; /* Ensures the image fills the space proportionally */
   }
   
 
 .message-right-side {
-    width: 100%;
-    padding: 0
-}
+     width: 100%;
+    padding: 0 ;
+    overflow: hidden
+} 
 
 .messenger {
     overflow: hidden
@@ -812,6 +825,11 @@
         padding: 16px 0
     }
 }
+
+.settings-form {
+    max-height: calc(100vh - 100px); /* 設定一個合理的高度限制，避免高度超出 */
+    overflow-y: auto; /* 設置滾動 */
+  }
 
 .settings-form .check-username {
     padding-top: 0.4rem;

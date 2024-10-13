@@ -16,13 +16,13 @@ import Follow from './follow';
 import MiniPhoto from './miniphoto';
 
 function Profile() {
-    
+
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
-        
+
     });
     //const { userId } = useContext(UserContext);
     const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
@@ -65,9 +65,9 @@ function Profile() {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        //}).then(response => {
-        //    setPosts(response.data);  // Update the posts state with the response
-            
+            //}).then(response => {
+            //    setPosts(response.data);  // Update the posts state with the response
+
         }).catch(error => {
             console.error("Error fetching posts:", error);
         });
@@ -154,7 +154,7 @@ function Profile() {
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                    
+
                                                 </div>
                                                 <MiniPhoto />
                                             </div>
@@ -177,71 +177,19 @@ function Profile() {
                                                             <li className="list-inline-item">
                                                                 <a href={`/photo?userId=${userId}`}>Photos</a>
                                                             </li>
-                                                            <li className="list-inline-item dropdown">
-                                                                <a
-                                                                    href="#"
-                                                                    data-toggle="dropdown"
-                                                                    aria-haspopup="true"
-                                                                    aria-expanded="false"
-                                                                >
-                                                                    <i className="bx bx-dots-vertical-rounded" />
-                                                                </a>
-                                                                <div className="dropdown-menu dropdown-menu-right profile-ql-dropdown">
-                                                                    <a href="#" className="dropdown-item">
-                                                                        Activity Log
-                                                                    </a>
-                                                                    <a href="#" className="dropdown-item">
-                                                                        Videos
-                                                                    </a>
-                                                                    <a href="#" className="dropdown-item">
-                                                                        Check-Ins
-                                                                    </a>
-                                                                    <a href="#" className="dropdown-item">
-                                                                        Events
-                                                                    </a>
-                                                                    <a href="#" className="dropdown-item">
-                                                                        Likes
-                                                                    </a>
-                                                                </div>
-                                                            </li>
+
                                                         </ul>
-                                                        <CalendarChart isCurrentUser={isCurrentUser} />
-                                                        <Container>
-                                                            <Row>
-                                                                <Col md={1} lg={1} xl={1}></Col>
-                                                                <Col>  <CalendarChart moodData={moodData} /></Col>
-                                                                <Col md={1} lg={1} xl={1}></Col>
-                                                            </Row>
 
-                                                        </Container>
-
-                                                        <div className="bg-white profile-posts-options mt-5 mb-4 py-3 d-flex justify-content-between shadow-sm">
-                                                            <div className="col-md-3 col-sm-12">
-                                                                <h6 className="timeline-title">Posts</h6>
-                                                            </div>
-                                                            <div className="col-md-9 col-sm-12">
-
-                                                                <div className="timeline-manage">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-quick-link join-group-btn border btn-sm tmo-buttons"
-                                                                    >
-                                                                        <i className="bx bxs-cog" /> Manage Posts
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-quick-link join-group-btn border btn-sm tmo-buttons"
-                                                                    >
-                                                                        <i className="bx bx-align-middle" /> List View
-                                                                    </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-quick-link join-group-btn border btn-sm tmo-buttons"
-                                                                    >
-                                                                        <i className="bx bxs-grid-alt" /> Grid View
-                                                                    </button>
-                                                                </div>
-                                                            </div>
+                                                        <div className="bg-white profile-posts-options mt-5 mb-4 py-3 justify-content-between shadow-sm" >
+                                                            <Container >
+                                                                <Row className="justify-content-center" >
+                                                                    <Col md={1} lg={1} xl={1}></Col>
+                                                                    <Col>
+                                                                        <CalendarChart isCurrentUser={isCurrentUser} moodData={moodData} />
+                                                                    </Col>
+                                                                    <Col md={1} lg={1} xl={1}></Col>
+                                                                </Row>
+                                                            </Container>
                                                         </div>
                                                           <ProfileList />
                                                         
@@ -332,8 +280,8 @@ function Profile() {
     );
 }
 
-function CalendarChart({ isCurrentUser}) {
-    if(!isCurrentUser){
+function CalendarChart({ isCurrentUser }) {
+    if (!isCurrentUser) {
         return null;
     }
     const data = [
@@ -384,18 +332,18 @@ function CalendarChart({ isCurrentUser}) {
     };
 
     return (
-        
-        <div style={{ width: '100%', maxWidth: '650px', aspectRatio: '6 / 1' }}>
+
+        <div style={{ width: '100%', maxWidth: '650px', aspectRatio: '5 / 1', }}>
             <Chart
                 chartType="Calendar"
                 data={data}
                 options={options}
                 width="100%"  // 寬度設為 100%
-                height="100%"  // 高度設為 100%
+                height="auto"  // 高度設為 100%
                 loader={<div>Loading Chart...</div>}
             />
         </div>
-        
+
     );
 }
 

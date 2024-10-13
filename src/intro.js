@@ -15,12 +15,12 @@ function Intro() {
   return (
     <div>
     <div className="intro">
-      <p>工作：{userInfo.work}</p>
-      <p>學校：{userInfo.school}</p>
-      <p>居住地：{userInfo.location}</p>
-      <p>來自於：{userInfo.fromLocation}</p>
-      <p>感情狀態：{userInfo.relationship}</p>
-      <p>聯絡電話：{userInfo.phone}</p>
+      <p>work：{userInfo.work}</p>
+      <p>school：{userInfo.school}</p>
+      <p>location：{userInfo.location}</p>
+      <p>fromlocation：{userInfo.fromLocation}</p>
+      <p>relationship：{userInfo.relationship}</p>
+      <p>phone：{userInfo.phone}</p>
     </div>
     {/* Conditionally render "Edit Details" if userId matches */}
     {String(localStorageUserId) === String(queryUserId) && (
