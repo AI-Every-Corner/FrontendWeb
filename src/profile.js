@@ -3,25 +3,43 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from './context';
-import { logout } from './api';
 import axios from 'axios';
 import { data } from 'jquery';
+import Intro from './intro';
+import Recentmedia from './recentmedia';
+import ProfileList from './profilelist';
+import Avatar from './avatar';
+import Cover from './cover';
+import Follow from './follow';
+import MiniPhoto from './miniphoto';
 
 function Profile() {
-    const navigate = useNavigate();
-    const { avatarUrl } = useContext(UserContext);
+    
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
     const [formData, setFormData] = useState({
         nickName: '',
         username: ''
+        
     });
-    const { userId, setAvatarUrl } = useContext(UserContext);
-    const [posts, setPosts] = useState([]);  // New state for posts
+    //const { userId } = useContext(UserContext);
+    const urlUserId = params.get('userId'); // 從查詢參數中獲取 userId
+    const storedUserId = localStorage.getItem('userId');
+    const userId = urlUserId || storedUserId; // 使用 URL 或 localStorage 中的 userId
+    const [setPosts] = useState([]);  // New state for posts
+    const [moodData, setMoodData] = useState();
+    const [isCurrentUser, setIsCurrentUser] = useState(false); //
+    const [isFollowing, setIsFollowing] = useState(false);  // 是否已經追蹤
 
-    const [moodData,setMoodData]=useState();
     useEffect(() => {
+
+        const currentUserId = localStorage.getItem('userId');
+        setIsCurrentUser(userId === currentUserId);
+
         console.log('Fetched userId:', userId);
+        console.log('Query userId:', userId);
 
         // 從後端獲取用戶資料
         const token = localStorage.getItem('token'); // 假設 token 已存儲在 localStorage 中
@@ -35,7 +53,7 @@ function Profile() {
                 const userData = response.data;
                 setFormData({
                     nickName: userData.nickName,  // 假設後端返回的資料包含 nickName 和 username
-                    username: userData.username
+                    username: userData.username,
                 });
             })
             .catch(error => {
@@ -47,47 +65,46 @@ function Profile() {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        }).then(response => {
-            setPosts(response.data);  // Update the posts state with the response
+        //}).then(response => {
+        //    setPosts(response.data);  // Update the posts state with the response
+            
         }).catch(error => {
             console.error("Error fetching posts:", error);
         });
 
+        console.log('URL 中的 userId:', userId);
+
     }, [userId]);
 
-    // Function to handle logout
-    const handleLogout = async () => {
-        await logout();
-        alert('登出成功');
-        navigate('/sign-in');
-    };
- // 這裡的函數需要被立即調用
- const fetchData = async () => {
-    try {
-        const userId = localStorage.getItem("userId");
-        const token = localStorage.getItem("token");
+    // 這裡的函數需要被立即調用
+    const fetchData = async () => {
+        try {
+            //const userId = localStorage.getItem("userId");
+            const token = localStorage.getItem("token");
 
-        const response = await axios.post(
-        `http://localhost:8080/yearReview/${userId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // 設置 Authorization 標頭
-          },
+            const response = await axios.post(
+                `http://localhost:8080/yearReview/${userId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // 設置 Authorization 標頭
+                    },
+                }
+            );
+            console.log(response.data); // 請求成功後打印 response 的數據
+            setMoodData(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error); // 捕獲錯誤
         }
-      );
-      console.log(response.data); // 請求成功後打印 response 的數據
-      setMoodData(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error); // 捕獲錯誤
-    }
-  };
-        useEffect(() => {
-          fetchData(); // 調用函數
-      
-        }, []); // 這裡添加空依賴數組，確保 useEffect 只運行一次
+    };
+    useEffect(() => {
+        fetchData(); // 調用函數
+
+    }, [userId]); // 這裡添加空依賴數組，確保 useEffect 只運行一次
+
     return (
         <div className="Profile">
+
             <>
                 <meta charSet="utf-8" />
                 <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -113,197 +130,33 @@ function Profile() {
                 <link href="assets/css/components.css" rel="stylesheet" />
                 <link href="assets/css/profile.css" rel="stylesheet" />
                 <link href="assets/css/media.css" rel="stylesheet" />
-                <div className="container-fluid newsfeed d-flex" id="wrapper">
+                <div className="container-fluid newsfeed " id="wrapper">
                     <div className="row newsfeed-size">
                         <div className="col-md-12 p-0">
                             <div className="row profile-right-side-content">
                                 <div className="user-profile">
-                                    <div className="profile-header-background">
-                                        <a href="#" className="profile-cover">
-                                            <img
-                                                src="assets/images/users/cover/cover-1.gif"
-                                                alt="Profile Header Background"
-                                            />
-                                        </a>
-                                        <div className="cover-overlay">
-                                            <a href="#" className="profile-cover"></a>
-                                            <a href="#" className="btn btn-update-cover">
-                                                <i className="bx bxs-camera" /> Update Cover Photo
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <Cover />
                                     <div className="row profile-rows">
                                         <div className="col-md-3">
                                             <div className="profile-info-left">
                                                 <div className="text-center">
                                                     <div className="profile-img w-shadow">
-                                                        <div className="profile-img-overlay" />
-                                                        <img
-                                                            src={avatarUrl}
-                                                            alt="Avatar"
-                                                            className="avatar img-circle"
-                                                        />
-                                                        <div className="profile-img-caption">
-                                                            <label htmlFor="updateProfilePic" className="upload">
-                                                                <i className="bx bxs-camera" /> Update
-                                                                <input
-                                                                    type="file"
-                                                                    id="updateProfilePicInput"
-                                                                    className="text-center upload"
-                                                                />
-                                                            </label>
-                                                        </div>
+                                                        <Avatar />
                                                     </div>
                                                     <p className="profile-fullname mt-3">{formData.nickName || 'Your Nickname'}</p>
                                                     <p className="profile-username mb-3 text-muted">
                                                         @{formData.username || 'username'}
                                                     </p>
                                                 </div>
-                                                <div className="intro mt-4">
-                                                    <div className="d-flex">
-                                                        <button type="button" className="btn btn-follow mr-3">
-                                                            <i className="bx bx-plus" /> Follow
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-start-chat"
-                                                            data-toggle="modal"
-                                                            data-target="#newMessageModal"
-                                                        >
-                                                            <i className="bx bxs-message-rounded" />{" "}
-                                                            <span className="fs-8">Message</span>
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-follow"
-                                                            id="moreMobile"
-                                                            data-toggle="dropdown"
-                                                            aria-haspopup="true"
-                                                            aria-expanded="false"
-                                                        >
-                                                            <i className="bx bx-dots-horizontal-rounded" />{" "}
-                                                            <span className="fs-8">More</span>
-                                                        </button>
-                                                        <div
-                                                            className="dropdown-menu dropdown-menu-right profile-ql-dropdown"
-                                                            aria-labelledby="moreMobile"
-                                                        >
-                                                            <a href="newsfeed.html" className="dropdown-item">
-                                                                Timeline
-                                                            </a>
-                                                            <a href="/about" className="dropdown-item">
-                                                                About
-                                                            </a>
-                                                            <a href="followers.html" className="dropdown-item">
-                                                                Followers
-                                                            </a>
-                                                            <a href="following.html" className="dropdown-item">
-                                                                Following
-                                                            </a>
-                                                            <a href="photos.html" className="dropdown-item">
-                                                                Photos
-                                                            </a>
-                                                            <a href="videos.html" className="dropdown-item">
-                                                                Videos
-                                                            </a>
-                                                            <a href="check-ins.html" className="dropdown-item">
-                                                                Check-Ins
-                                                            </a>
-                                                            <a href="events.html" className="dropdown-item">
-                                                                Events
-                                                            </a>
-                                                            <a href="likes.html" className="dropdown-item">
-                                                                Likes
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <Follow />
                                                 <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <p className="intro-title text-muted">
-                                                            <i className="bx bx-briefcase text-primary" /> Web
-                                                            Developer at <a href="#">Company Name</a>
-                                                        </p>
-                                                    </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <p className="intro-title text-muted">
-                                                            <i className="bx bx-map text-primary" /> Lives in{" "}
-                                                            <a href="#">City, Country</a>
-                                                        </p>
-                                                    </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <p className="intro-title text-muted">
-                                                            <i className="bx bx-time text-primary" /> Last Login{" "}
-                                                            <a href="#">
-                                                                Online{" "}
-                                                                <span className="ml-1 online-status bg-success" />
-                                                            </a>
-                                                        </p>
-                                                    </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <a
-                                                            href="#"
-                                                            className="btn btn-quick-link join-group-btn border w-100"
-                                                        >
-                                                            Edit Details
-                                                        </a>
-                                                    </div>
+                                                    <Intro />
+                                                    
                                                 </div>
-                                                <div className="intro mt-5 row mv-hidden">
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-1.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-2.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-3.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="intro mt-5 mv-hidden">
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <h3 className="intro-about">Other Social Accounts</h3>
-                                                    </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <p className="intro-title text-muted">
-                                                            <i className="bx bxl-facebook-square facebook-color" />{" "}
-                                                            <a href="#" target="_blank">
-                                                                facebook.com/username
-                                                            </a>
-                                                        </p>
-                                                    </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <p className="intro-title text-muted">
-                                                            <i className="bx bxl-twitter twitter-color" />{" "}
-                                                            <a href="#" target="_blank">
-                                                                twitter.com/username
-                                                            </a>
-                                                        </p>
-                                                    </div>
-                                                    <div className="intro-item d-flex justify-content-between align-items-center">
-                                                        <p className="intro-title text-muted">
-                                                            <i className="bx bxl-instagram instagram-color" />{" "}
-                                                            <a href="#" target="_blank">
-                                                                instagram.com/username
-                                                            </a>
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                                <MiniPhoto />
                                             </div>
                                         </div>
                                         <div className="col-md-9 p-0">
@@ -313,16 +166,16 @@ function Profile() {
                                                     <div className="col-md-9 profile-center">
                                                         <ul className="list-inline profile-links d-flex justify-content-between w-shadow rounded">
                                                             <li className="list-inline-item profile-active">
-                                                                <a href="/profile">Timeline</a>
+                                                                <a href={`/profile?userId=${userId}`}>Timeline</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/about">About</a>
+                                                                <a href={`/about?userId=${userId}`}>About</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/friends">Friends</a>
+                                                                <a href={`/friends?userId=${userId}`}>Friends</a>
                                                             </li>
                                                             <li className="list-inline-item">
-                                                                <a href="/photo">Photos</a>
+                                                                <a href={`/photo?userId=${userId}`}>Photos</a>
                                                             </li>
                                                             <li className="list-inline-item dropdown">
                                                                 <a
@@ -352,10 +205,11 @@ function Profile() {
                                                                 </div>
                                                             </li>
                                                         </ul>
+                                                        <CalendarChart isCurrentUser={isCurrentUser} />
                                                         <Container>
                                                             <Row>
                                                                 <Col md={1} lg={1} xl={1}></Col>
-                                                                <Col>  <CalendarChart moodData={moodData}/></Col>
+                                                                <Col>  <CalendarChart moodData={moodData} /></Col>
                                                                 <Col md={1} lg={1} xl={1}></Col>
                                                             </Row>
 
@@ -389,119 +243,31 @@ function Profile() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <Row>
+                                                          {/*  <Row>
                                                             {posts.length > 0 ? (
                                                                 posts.map(post => (
-                                                                    <Col md={12} className="col-md-9 profile-center" key={post.postId}>
-                                                                        <div className="post border-bottom p-3 bg-white w-shadow">
-                                                                            <div className="media text-muted pt-3">
-                                                                                <img
-                                                                                    src={avatarUrl}
-                                                                                    alt="User avatar"
-                                                                                    className="mr-3 post-user-image"
-                                                                                />
-                                                                                <div className="media-body pb-3 mb-0 small lh-125">
-                                                                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                                                                        <span className="post-type text-muted">
-                                                                                            <p className="profile-fullname mt-3">
-                                                                                                {formData.nickName || 'Your Nickname'}
-                                                                                            </p>{' '}
-                                                                                            updated his cover photo.
-                                                                                        </span>
-                                                                                        <div className="dropdown">
-                                                                                            <a
-                                                                                                href="#"
-                                                                                                className="post-more-settings"
-                                                                                                role="button"
-                                                                                                data-toggle="dropdown"
-                                                                                                id="postOptions"
-                                                                                                aria-haspopup="true"
-                                                                                                aria-expanded="false"
-                                                                                            >
-                                                                                                <i className="bx bx-dots-horizontal-rounded" />
-                                                                                            </a>
-                                                                                            <div className="dropdown-menu dropdown-menu-right dropdown-menu-lg-left post-dropdown-menu">
-                                                                                                <a href="#" className="dropdown-item">
-                                                                                                    Save post
-                                                                                                </a>
-                                                                                                <a href="#" className="dropdown-item">
-                                                                                                    Hide post
-                                                                                                </a>
-                                                                                                <a href="#" className="dropdown-item">
-                                                                                                    Report post
-                                                                                                </a>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <span className="d-block">
-                                                                                        {new Date(post.createdAt).toLocaleString()}{' '}
-                                                                                        <i className="bx bx-globe ml-3" />
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="mt-3">
-                                                                                <p>{post.content}</p>
-                                                                            </div>
-                                                                            {post.imagePath && (
-                                                                                <div className="d-block mt-3">
-                                                                                    <img
-                                                                                        src={post.imagePath}
-                                                                                        className="w-100 mb-3"
-                                                                                        alt="Post image"
-                                                                                    />
-                                                                                </div>
-                                                                            )}
-                                                                            <div className="mb-2">
-                                                                                <div className="argon-reaction">
-                                                                                    <span className="like-btn">
-                                                                                        <a href="#" className="post-card-buttons">
-                                                                                            <i className="bx bxs-like mr-2" /> 67
-                                                                                        </a>
-                                                                                        <ul className="reactions-box dropdown-shadow">
-                                                                                            <li
-                                                                                                className="reaction reaction-like"
-                                                                                                data-reaction="Like"
-                                                                                            />
-                                                                                            <li
-                                                                                                className="reaction reaction-love"
-                                                                                                data-reaction="Love"
-                                                                                            />
-                                                                                            <li
-                                                                                                className="reaction reaction-haha"
-                                                                                                data-reaction="HaHa"
-                                                                                            />
-                                                                                            <li
-                                                                                                className="reaction reaction-wow"
-                                                                                                data-reaction="Wow"
-                                                                                            />
-                                                                                            <li
-                                                                                                className="reaction reaction-sad"
-                                                                                                data-reaction="Sad"
-                                                                                            />
-                                                                                            <li
-                                                                                                className="reaction reaction-angry"
-                                                                                                data-reaction="Angry"
-                                                                                            />
-                                                                                        </ul>
-                                                                                    </span>
-                                                                                </div>
-                                                                                <a href="#" className="post-card-buttons">
-                                                                                    <i className="bx bx-message-rounded mr-2" /> 5
-                                                                                </a>
-
-                                                                                <a href="#" className="post-card-buttons">
-                                                                                    <i className="bx bx-share-alt mr-2" /> Share
-                                                                                </a>
+                                                                    <div key={post.postId} className="post border-bottom p-3 bg-white">
+                                                                        <div className="media text-muted pt-3">
+                                                                            <img src={avatarUrl} alt="User avatar" className="mr-3 post-user-image" />
+                                                                            <div className="media-body pb-3 mb-0 small lh-125">
+                                                                                <h5 className="mt-0">{formData.nickName}</h5>
+                                                                                <span>{new Date(post.createdAt).toLocaleString()}</span>
                                                                             </div>
                                                                         </div>
-                                                                    </Col>
+                                                                        <p>{post.content}</p>
+                                                                        {post.imagePath && (
+                                                                            <img src={post.imagePath} className="w-100 mb-3" alt="Post content" />
+                                                                        )}
+                                                                    </div>
                                                                 ))
                                                             ) : (
                                                                 <p>No posts available</p>
                                                             )}
 
-                                                        </Row>
+                                                        </Row>  */}  
 
+                                                        <ProfileList />
+                                                        
                                                         <div
                                                             className="border-top pt-3 hide-comments"
                                                             style={{ display: "none" }}
@@ -521,298 +287,9 @@ function Profile() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <Col md={3} className="col-md-3 profile-quick-media">
-                                                    <h6 className="text-muted timeline-title">
-                                                        Recent Media
-                                                    </h6>
-                                                    <div className="quick-media">
-                                                        <div className="media-overlay" />
-                                                        <a href="#" className="quick-media-img">
-                                                            <img
-                                                                src="assets/images/users/album/album-1.jpg"
-                                                                alt="Quick media"
-                                                            />
-                                                        </a>
-                                                        <div className="media-overlay-content">
-                                                            <div className="d-flex justify-content-between align-items-center">
-                                                                <div className="media-overlay-owner">
-                                                                    <img
-                                                                        src="assets/images/users/user-12.png"
-                                                                        alt="Media owner image"
-                                                                    />
-                                                                    <span className="overlay-owner-name fs-9">
-                                                                        Irwin M. Spelle
-                                                                    </span>
-                                                                </div>
-                                                                <div className="dropdown">
-                                                                    <a
-                                                                        href="#"
-                                                                        className="overlay-more"
-                                                                        data-toggle="dropdown"
-                                                                        role="button"
-                                                                        aria-haspopup="true"
-                                                                        aria-expanded="false"
-                                                                    >
-                                                                        <i className="bx bx-dots-horizontal-rounded" />
-                                                                    </a>
-                                                                    <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                                                        <a className="dropdown-item" href="#">
-                                                                            Save post
-                                                                        </a>
-                                                                        <a className="dropdown-item" href="#">
-                                                                            Turn on notifications
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                                                <div className="argon-reaction">
-                                                                    <span className="like-btn">
-                                                                        <a
-                                                                            href="#"
-                                                                            className="post-card-buttons"
-                                                                            id="reactions"
-                                                                        >
-                                                                            <i className="bx bxs-like mr-1" /> 67
-                                                                        </a>
-                                                                        <ul className="reactions-box dropdown-shadow">
-                                                                            <li
-                                                                                className="reaction reaction-like"
-                                                                                data-reaction="Like"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-love"
-                                                                                data-reaction="Love"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-haha"
-                                                                                data-reaction="HaHa"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-wow"
-                                                                                data-reaction="Wow"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-sad"
-                                                                                data-reaction="Sad"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-angry"
-                                                                                data-reaction="Angry"
-                                                                            />
-                                                                        </ul>
-                                                                    </span>
-                                                                </div>
-                                                                <div className="liked-users">
-                                                                    <img
-                                                                        src="assets/images/users/user-9.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                    <img
-                                                                        src="assets/images/users/user-6.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                    <img
-                                                                        src="assets/images/users/user-12.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="quick-media">
-                                                        <div className="media-overlay" />
-                                                        <a href="#" className="quick-media-img">
-                                                            <img
-                                                                src="assets/images/users/album/album-2.jpg"
-                                                                alt="Quick media"
-                                                            />
-                                                        </a>
-                                                        <div className="media-overlay-content">
-                                                            <div className="d-flex justify-content-between align-items-center">
-                                                                <div className="media-overlay-owner">
-                                                                    <img
-                                                                        src="assets/images/users/user-12.png"
-                                                                        alt="Media owner image"
-                                                                    />
-                                                                    <span className="overlay-owner-name fs-9">
-                                                                        Irwin M. Spelle
-                                                                    </span>
-                                                                </div>
-                                                                <div className="dropdown">
-                                                                    <a
-                                                                        href="#"
-                                                                        className="overlay-more"
-                                                                        data-toggle="dropdown"
-                                                                        role="button"
-                                                                        aria-haspopup="true"
-                                                                        aria-expanded="false"
-                                                                    >
-                                                                        <i className="bx bx-dots-horizontal-rounded" />
-                                                                    </a>
-                                                                    <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                                                        <a className="dropdown-item" href="#">
-                                                                            Save post
-                                                                        </a>
-                                                                        <a className="dropdown-item" href="#">
-                                                                            Turn on notifications
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                                                <div className="argon-reaction">
-                                                                    <span className="like-btn">
-                                                                        <a
-                                                                            href="#"
-                                                                            className="post-card-buttons"
-                                                                            id="reactions"
-                                                                        >
-                                                                            <i className="bx bxs-like mr-1" /> 67
-                                                                        </a>
-                                                                        <ul className="reactions-box dropdown-shadow">
-                                                                            <li
-                                                                                className="reaction reaction-like"
-                                                                                data-reaction="Like"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-love"
-                                                                                data-reaction="Love"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-haha"
-                                                                                data-reaction="HaHa"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-wow"
-                                                                                data-reaction="Wow"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-sad"
-                                                                                data-reaction="Sad"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-angry"
-                                                                                data-reaction="Angry"
-                                                                            />
-                                                                        </ul>
-                                                                    </span>
-                                                                </div>
-                                                                <div className="liked-users">
-                                                                    <img
-                                                                        src="assets/images/users/user-9.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                    <img
-                                                                        src="assets/images/users/user-6.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                    <img
-                                                                        src="assets/images/users/user-12.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="quick-media">
-                                                        <div className="media-overlay" />
-                                                        <a href="#" className="quick-media-img">
-                                                            <img
-                                                                src="assets/images/users/album/album-3.jpg"
-                                                                alt="Quick media"
-                                                            />
-                                                        </a>
-                                                        <div className="media-overlay-content">
-                                                            <div className="d-flex justify-content-between align-items-center">
-                                                                <div className="media-overlay-owner">
-                                                                    <img
-                                                                        src="assets/images/users/user-12.png"
-                                                                        alt="Media owner image"
-                                                                    />
-                                                                    <span className="overlay-owner-name fs-9">
-                                                                        Irwin M. Spelle
-                                                                    </span>
-                                                                </div>
-                                                                <div className="dropdown">
-                                                                    <a
-                                                                        href="#"
-                                                                        className="overlay-more"
-                                                                        data-toggle="dropdown"
-                                                                        role="button"
-                                                                        aria-haspopup="true"
-                                                                        aria-expanded="false"
-                                                                    >
-                                                                        <i className="bx bx-dots-horizontal-rounded" />
-                                                                    </a>
-                                                                    <div className="dropdown-menu dropdown-menu-right nav-drop dropdown-shadow">
-                                                                        <a className="dropdown-item" href="#">
-                                                                            Save post
-                                                                        </a>
-                                                                        <a className="dropdown-item" href="#">
-                                                                            Turn on notifications
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="overlay-bottom d-flex justify-content-between align-items-center">
-                                                                <div className="argon-reaction">
-                                                                    <span className="like-btn">
-                                                                        <a
-                                                                            href="#"
-                                                                            className="post-card-buttons"
-                                                                            id="reactions"
-                                                                        >
-                                                                            <i className="bx bxs-like mr-1" /> 67
-                                                                        </a>
-                                                                        <ul className="reactions-box dropdown-shadow">
-                                                                            <li
-                                                                                className="reaction reaction-like"
-                                                                                data-reaction="Like"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-love"
-                                                                                data-reaction="Love"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-haha"
-                                                                                data-reaction="HaHa"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-wow"
-                                                                                data-reaction="Wow"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-sad"
-                                                                                data-reaction="Sad"
-                                                                            />
-                                                                            <li
-                                                                                className="reaction reaction-angry"
-                                                                                data-reaction="Angry"
-                                                                            />
-                                                                        </ul>
-                                                                    </span>
-                                                                </div>
-                                                                <div className="liked-users">
-                                                                    <img
-                                                                        src="assets/images/users/user-9.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                    <img
-                                                                        src="assets/images/users/user-6.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                    <img
-                                                                        src="assets/images/users/user-12.png"
-                                                                        alt="Liked users"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Col>
+                                                    <Recentmedia />
                                                 </div>
-                                               
+
                                             </div>
                                         </div>
                                     </div>
@@ -878,29 +355,29 @@ function Profile() {
     );
 }
 
-function CalendarChart({moodData}) {
-        const newData = [
-          [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
-        ];
-      
-        if(moodData!=null){
-   // 使用 for 循環來處理資料
-   for (const [dateString, moodScore] of Object.entries(moodData)) {
-    // 提取出年月日部分，格式類似於：2024-10-08T12:00:00
-    const [year, month, day] = dateString.split('T')[0].split('-');
+function CalendarChart({ isCurrentUser}) {
+    if(!isCurrentUser){
+        return null;
+    }
+    const data = [
+        [{ type: 'date', id: 'Date' }, { type: 'number', id: 'Mood Score' }],
+        [new Date(2024, 5, 12), 3],
+        [new Date(2024, 8, 5), 10],
+        [new Date(2024, 0, 16), 4],
+        [new Date(2024, 5, 16), 9],
+        [new Date(2024, 9, 18), 5],
+        [new Date(2024, 10, 18), 5],
+        [new Date(2024, 10, 26), 3],
+        [new Date(2024, 4, 8), 9],
+        [new Date(2024, 1, 16), 8],
+        [new Date(2024, 5, 1), 9],
+        [new Date(2024, 8, 2), 8],
+        [new Date(2024, 11, 15), 5],
+        [new Date(2024, 5, 11), 2],
+        [new Date(2024, 6, 18), 9],
 
-    // 將日期轉換為 new Date(年, 月 - 1, 日) 格式（月份要減 1）
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    ];
 
-    // 將 [new Date(年, 月, 日), 分數] push 進 newData
-    newData.push([date, moodScore]);
-  }
-
-  // 測試用，將轉換後的資料輸出到 console
-  console.log(newData);
-
-        }
-     
 
     const options = {
         title: "Your Mood for 2024",
@@ -930,20 +407,18 @@ function CalendarChart({moodData}) {
     };
 
     return (
-        <div style={{
-            width: '100%',
-            aspectRatio: '6 / 1',
-
-        }}>
+        
+        <div style={{ width: '100%', maxWidth: '650px', aspectRatio: '6 / 1' }}>
             <Chart
                 chartType="Calendar"
-                data={newData}
+                data={data}
                 options={options}
                 width="100%"  // 寬度設為 100%
                 height="100%"  // 高度設為 100%
                 loader={<div>Loading Chart...</div>}
             />
         </div>
+        
     );
 }
 

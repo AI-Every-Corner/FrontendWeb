@@ -29,6 +29,7 @@ function SignIn() {
       }
       
       localStorage.setItem('userImage', response.data.imagePath);
+      localStorage.setItem('coverImage', response.data.coverPath);
       alert('登錄成功');
       navigate('/');
 
@@ -170,11 +171,6 @@ function SignIn() {
           <p>
             Thank you for joining. Updates and new features are released daily.
           </p>
-        </div>
-        <div className="auth-quick-links">
-          <a href="#" className="btn btn-outline-primary">
-            Purchase template
-          </a>
         </div>
       </div>
     </div>

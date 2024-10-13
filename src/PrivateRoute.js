@@ -1,10 +1,15 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams  } from 'react-router-dom';
 
 const PrivateRoute = ({ element: Component, ...rest }) => {
   const isAuthenticated = !!localStorage.getItem('token'); // 檢查是否有 token
+  const params = useParams(); // // 獲取 URL 中的動態參數
 
-  return isAuthenticated ? <Component {...rest} /> : <Navigate to="/sign-in" />;
+  // 檢查是否認證，否則重定向到登錄頁
+  return isAuthenticated ? (<Component {...rest} {...params} />
+  ) : (
+  <Navigate to="/sign-in" />
+);
 };
 
 export default PrivateRoute;
