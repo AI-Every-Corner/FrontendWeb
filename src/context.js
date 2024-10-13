@@ -23,9 +23,8 @@ export const UserProvider = ({ children }) => {
 
     if (storedAvatar) {
       setAvatar(`${storedAvatar}`);
-
       //setAvatarUrl(`http://localhost:8080${storedAvatarUrl}`);
-    }  
+    }
 
     if (storedCover) {
       setCover(`${storedCover}`);

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
-import { avatarProvider } from "./avatarProvider";
+import { UserContext } from './context';
 import TimePassedComponent from "./timepassedcomponent";
 import ResponseList from "./responselist";
 import { Link } from "react-router-dom";
@@ -12,6 +12,7 @@ const PostList = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [users, setUsers] = useState([]);
+    const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
     const [openComments, setOpenComments] = useState({});
 
     const fetchPosts = async () => {
@@ -47,8 +48,8 @@ const PostList = () => {
         const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
         const fetchedUsers = {};
         await Promise.all(userIds.map(async (id) => {
-          console.log("userIds: ");
-          console.log(userIds);
+          // console.log("userIds: ");
+          // console.log(userIds);
           if (!users[id]) {  // Avoid refetching already loaded users
             const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
               headers: {
@@ -56,8 +57,8 @@ const PostList = () => {
               }
             });
             fetchedUsers[id] = response.data;
-            console.log("id: ");
-            console.log(id);
+            // console.log("id: ");
+            // console.log(id);
           }
         }));
         setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
@@ -71,7 +72,7 @@ const PostList = () => {
   }, [page]);
 
   const toggleComments = (postId) => {
-    console.log(postId);
+    // console.log(postId);
     setOpenComments(prev => ({
       ...prev,
       [postId]: !prev[postId]
@@ -110,7 +111,7 @@ const PostList = () => {
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
-    {console.log(users[post.userId])}
+    {/* {console.log(users[post.userId])} */}
     {users[post.userId] ? (
     <img
     src={users[post.userId].imagePath}
@@ -152,7 +153,7 @@ const PostList = () => {
   <div className="argon-reaction">
   <span className="like-btn">
     <a href="#" className="post-card-buttons" id="reactions">
-    <i className="bx bxs-like mr-2" /> 67
+    <i className="bx bxs-like mr-2" /> {post.likes}
     </a>
     <ul className="dropdown-shadow">
     <li
@@ -221,7 +222,35 @@ const PostList = () => {
       {/* {console.log(post.postId)} */}
     </div>
     {openComments[post.postId] && (
-      <ResponseList postId={post.postId} />
+      <div className="px-3">
+        <div className="row justify-content-start mb-3 media">
+          <a href="#" className="pull-left">
+            <Link to="/profile">
+              <img
+              src={avatar}
+              alt="User Avatar"
+              className="comment-user-img"
+              />
+            </Link>
+          </a>
+          <div className="media-body">
+            <form action="" method="" role="form">
+            <div className="row">
+              <div className="col-md-12">
+              <div className="input-group">
+                <input
+                type="text"
+                className="form-control comment-input"
+                placeholder="Write a comment..."
+                />
+              </div>
+              </div>
+            </div>
+            </form>
+          </div>
+        </div>
+        <ResponseList postId={post.postId} />
+      </div>
     )}
   </div>
 </div>
