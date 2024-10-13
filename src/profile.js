@@ -13,6 +13,7 @@ import ProfileList from './profilelist';
 import Avatar from './avatar';
 import Cover from './cover';
 import Follow from './follow';
+import MiniPhoto from './miniphoto';
 
 function Profile() {
     
@@ -155,29 +156,7 @@ function Profile() {
                                                     <Intro />
                                                     
                                                 </div>
-                                                <div className="intro mt-5 row mv-hidden">
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-1.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-2.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <img
-                                                            src="assets/images/users/album/album-3.jpg"
-                                                            width={95}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                </div>
+                                                <MiniPhoto />
                                             </div>
                                         </div>
                                         <div className="col-md-9 p-0">
