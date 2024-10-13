@@ -612,6 +612,13 @@ body::-webkit-scrollbar-thumb:hover {
     margin: 0;
 }
 
+.comment-user-img {
+  width: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
 .comments-list {
     padding: 0;
     margin-bottom: 0;

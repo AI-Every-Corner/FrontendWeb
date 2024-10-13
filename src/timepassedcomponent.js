@@ -31,15 +31,15 @@ const TimePassedComponent = ({ updateAt }) => {
             if (hour > tmpTime.split(':')[0] - 0) {
               const hours = hour - tmpTime.split(':')[0] - 0;
               return hours + ' hours';
-            }
-          } else if (hour == tmpTime.split(':')[0] - 0) {
-            if (minute > tmpTime.split(':')[1] - 0) {
-              const minutes = minute - tmpTime.split(':')[1] - 0;
-              return minutes + ' minutes';
-            } else if (minute == tmpTime.split(':')[1] - 0) {
-              if (second > tmpTime.split(':')[2] - 0) {
-                const seconds = second - tmpTime.split(':')[2] - 0;
-                return seconds + ' seconds';
+            } else if (hour == tmpTime.split(':')[0] - 0) {
+              if (minute > tmpTime.split(':')[1] - 0) {
+                const minutes = minute - tmpTime.split(':')[1] - 0;
+                return minutes + ' minutes';
+              } else if (minute == tmpTime.split(':')[1] - 0) {
+                if (second > tmpTime.split(':')[2] - 0) {
+                  const seconds = second - tmpTime.split(':')[2] - 0;
+                  return seconds + ' seconds';
+                }
               }
             }
           }

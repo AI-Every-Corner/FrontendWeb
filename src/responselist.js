@@ -1,7 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from 'axios';
-import { UserContext } from './context';
 import { Link, useNavigate } from 'react-router-dom';
 import TimePassedComponent from './timepassedcomponent';
 
@@ -10,11 +9,13 @@ function ResponseList(postId) {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const { avatar } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+  var fetchedResponses = fetchedResponses || [];
+
+  const storeResponseIds = (postId, responseId) => {
+    fetchedResponses.push({postId, responseId});
+  }
 
   const fetchComments = async () => {
-    // console.log("fetchComments");
-    // console.log(postId);
     try {
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const response = await axios.get(`http://localhost:8080/responses/${postId.postId}`,{
@@ -23,21 +24,37 @@ function ResponseList(postId) {
         },
         params: {
           page: page,
-          size: 10
+          size: 5
         }
       });
-      // console.log(response);
-      setResponses([...responses, ...response.data.respList]);  // Append new posts
 
-      if (response.data.last || response.data.totalPages - 1 === page) {
-        setHasMore(false);  // No more posts to load
+      console.log("postId.postId");
+      console.log(postId.postId);
+      console.log("page");
+      console.log(page);
+      console.log("response.data.respList[0].responseId");
+      console.log(response.data.respList[0].responseId);
+      if (!fetchedResponses.find(item => item.postId === postId.postId && item.responseId === response.data.respList[0].responseId)) {
+        console.log(response);
+        setResponses([...responses, ...response.data.respList]);  // Append new posts
+
+        // Update hasMore based on the API response
+        setHasMore(!response.data.last && response.data.totalPages > page + 1);
+
+        // Fetch user details for the new responses
+        const userIds = response.data.respList.map(resp => resp.userId);
+        fetchUsers(userIds);
+          
+        // Increment the page number
+        setPage(prevPage => prevPage + 1);
+
+        storeResponseIds(postId.postId, response.data.respList[0].responseId);
+      } else {
+        console.log("already fetched");
       }
-
-      // Fetch user details for the new responses
-      const userIds = response.data.respList.map(resp => resp.userId);
-      fetchUsers(userIds);
     } catch (error) {
       console.error("fetchComments: " + error);
+      setHasMore(false); // Set hasMore to false if there's an error
     }
   }
 
@@ -67,22 +84,27 @@ function ResponseList(postId) {
   }
 
   useEffect(() => {
+    // setPage(0);
+    // setResponses([]);
+    // setHasMore(true);
     fetchComments();
   }, [postId, page]);
 
   return (
     <InfiniteScroll
       dataLength={responses.length}
-      next={() => setPage(page + 1)}  // Load next page
+      next={fetchComments}
       hasMore={hasMore}
-      loader={<p className="text-secondary text-center pt-5 pb-3">Loading...</p>}
-      endMessage={<p className="text-secondary text-center pt-5 pb-3">No more replies</p>}
+      loader={<h4 className="text-secondary text-center pt-5 pb-3">Loading...</h4>}
+      endMessage={<p className="text-secondary text-center pt-5 pb-3">No more posts</p>}
     >
-      {responses.map((response) => (
-        <div
-  className="border-top pt-3 hide-comments"
-  key={response.id}
+      <div>
+        {responses.map((response) => (
+<div
+  className="border-top pt-3 hide-comments px-3"
+  key={response.responseId}
 >
+  {/* {response.currentPage >= response.totalPages? hasMore = false : hasMore = true} */}
   <div className="row bootstrap snippets">
   <div className="col-md-12">
     <div className="comment-wrapper">
@@ -90,74 +112,6 @@ function ResponseList(postId) {
       <div className="panel-body">
       <ul className="media-list comments-list">
         <li className="media comment-form">
-        {users[response.userId] ? (
-        <a href="#" className="pull-left">
-          <Link to="/profile">
-            <img
-            src={avatar}
-            alt="User Avatar"
-            className="img-circle"
-            />
-          </Link>
-        </a>
-        ) : (
-          <p>Loading user data...</p>
-        )
-        }
-        {/* {console.log(users[response.userId])} */}
-        <div className="media-body">
-          <form action="" method="" role="form">
-          <div className="row">
-            <div className="col-md-12">
-            <div className="input-group">
-              <input
-              type="text"
-              className="form-control comment-input"
-              placeholder="Write a comment..."
-              />
-              <div className="input-group-btn">
-              <button
-                type="button"
-                className="btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bxs-smiley-happy" />
-              </button>
-              <button
-                type="button"
-                className="btn comment-form-btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bx-camera" />
-              </button>
-              <button
-                type="button"
-                className="btn comment-form-btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bx-microphone" />
-              </button>
-              <button
-                type="button"
-                className="btn comment-form-btn"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Tooltip on top"
-              >
-                <i className="bx bx-file-blank" />
-              </button>
-              </div>
-            </div>
-            </div>
-          </div>
-          </form>
-        </div>
         </li>
         <li className="media">
         {users[response.userId] ? (
@@ -169,7 +123,7 @@ function ResponseList(postId) {
           />
         </a>
         ) : (
-          <p>Loading user data...</p>
+          <p className="text-secondary">Loading user data...</p>
         )}
         <div className="media-body">
           <div className="d-flex justify-content-between w-100">
@@ -206,9 +160,9 @@ function ResponseList(postId) {
         </div>
         </li>
         <li className="media">
-        {response.length > 0?
+        {/* {response.length > 0?
         <div className="media-body">
-          <div className="comment-see-more text-center">
+          <div className="comment-see-more text-center" onClick={() => fetchComments()}>
             <button
               type="button"
               className="btn btn-link fs-8"
@@ -216,7 +170,8 @@ function ResponseList(postId) {
               See More
             </button>
           </div>
-        </div> : null}
+        </div>
+        : null} */}
         </li>
       </ul>
       </div>
@@ -226,6 +181,7 @@ function ResponseList(postId) {
   </div>
 </div>
       ))}
+      </div>
     </InfiniteScroll>
   );
 }
