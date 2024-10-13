@@ -15,6 +15,7 @@ const PostList = () => {
   const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
   const [openComments, setOpenComments] = useState({});
   const [likedPosts, setLikedPosts] = useState([]);
+  const [commentContent, setCommentContent] = useState("");
 
   // initialize page
   useEffect(() => {
@@ -85,6 +86,28 @@ const PostList = () => {
       ...prev,
       [postId]: !prev[postId]
     })); // hide : show
+  }
+
+  const handleAddComment = async (postId) => {
+    if (!commentContent.trim()) {
+      alert("回覆內容不能為空");
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      const response = await axios.post(`http://localhost:8080/responses/${postId}`, {
+        content: commentContent,
+        userId: userId // 添加 userId
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setCommentContent(""); // 清空輸入框
+      // TODO: 更新回覆列表或重新加載回覆
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    }
   }
 
   // Function to reset the page to 0
@@ -239,7 +262,7 @@ const PostList = () => {
   className="post-card-buttons"
   id="show-comments"
   >
-  <i className="bx bx-message-rounded mr-2" /> 5
+  <i className="bx bx-message-rounded mr-2" /> {post.commentCount || 0}
   </a>
   <div className="dropdown dropup share-dropup">
     <a
@@ -255,7 +278,7 @@ const PostList = () => {
 </div>
 <div className="media-body">
   <div className="comment-see-more">
-    <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)}>
+    <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)} style={{ cursor: 'pointer' }}>
       <hr></hr>
       {openComments[post.postId] ? 'Hide Comments' : 'See Comments'}
     </div>
@@ -273,18 +296,20 @@ const PostList = () => {
             </Link>
           </a>
           <div className="media-body">
-            <form action="" method="" role="form">
-            <div className="row">
-              <div className="col-md-12">
-              <div className="input-group">
-                <input
-                type="text"
-                className="form-control comment-input"
-                placeholder="Write a comment..."
-                />
+            <form action="" method="" role="form" onSubmit={(e) => { e.preventDefault(); handleAddComment(post.postId); }}>
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="input-group">
+                    <input
+                    type="text"
+                    className="form-control comment-input"
+                    placeholder="Write a comment..."
+                    value={commentContent}
+                    onChange={(e) => setCommentContent(e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
-              </div>
-            </div>
             </form>
           </div>
         </div>

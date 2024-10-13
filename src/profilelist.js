@@ -6,6 +6,7 @@ import TimePassedComponent from "./timepassedcomponent";
 import ResponseList from "./responselist";
 import { Link, useLocation } from "react-router-dom";
 
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
 const ProfileList = () => {
 
@@ -22,7 +23,7 @@ const ProfileList = () => {
     const fetchPosts = async () => {
         try {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-            const response = await axios.get(`http://localhost:8080/posts/${userId}`, {
+            const response = await axios.get(`${BASE_URL}/posts/${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}` // 添加 Authorization header
                 },
@@ -33,7 +34,6 @@ const ProfileList = () => {
             });
             console.log("Fetched posts:", response.data);  // 查看 response.data 的結構
 
-            console.log(response);
             setPosts([...posts, ...response.data]);  // Append new posts
 
             if (response.data.length < 10) {
@@ -54,17 +54,13 @@ const ProfileList = () => {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
             const fetchedUsers = {};
             await Promise.all(userIds.map(async (id) => {
-                console.log("userIds: ");
-                console.log(userIds);
                 if (!users[id]) {  // Avoid refetching already loaded users
-                    const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
+                    const response = await axios.get(`${BASE_URL}/api/auth/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
                     fetchedUsers[id] = response.data;
-                    console.log("id: ");
-                    console.log(id);
                 }
             }));
             setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
@@ -79,7 +75,6 @@ const ProfileList = () => {
     
 
     const toggleComments = (postId) => {
-        console.log(postId);
         setOpenComments(prev => ({
             ...prev,
             [postId]: !prev[postId]
@@ -119,7 +114,6 @@ const ProfileList = () => {
                     <div className="post border-bottom p-3 bg-white w-shadow" >
                         <div className="media text-muted pt-3">
                             <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
-                                {console.log(users[post.userId])}
                                 {users[post.userId] ? (
                                     <img
                                         src={users[post.userId].imagePath}
@@ -162,7 +156,7 @@ const ProfileList = () => {
                             <div className="argon-reaction">
                                 <span className="like-btn">
                                     <a href="#" className="post-card-buttons" id="reactions">
-                                        <i className="bx bxs-like mr-2" /> 67
+                                        <i className="bx bxs-like mr-2" /> {post.likes || 0}
                                     </a>
                                     <ul className="dropdown-shadow">
                                         <li
@@ -177,7 +171,7 @@ const ProfileList = () => {
                                 className="post-card-buttons"
                                 id="show-comments"
                             >
-                                <i className="bx bx-message-rounded mr-2" /> 5
+                                <i className="bx bx-message-rounded mr-2" /> {post.commentCount || 0}
                             </a>
                             <div className="dropdown dropup share-dropup">
                                 <a
@@ -225,10 +219,9 @@ const ProfileList = () => {
                         </div>
                         <div className="media-body">
                             <div className="comment-see-more">
-                                <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)}>
+                                <div className="h6 text-secondary text-center" style={{ cursor: 'pointer' }} onClick={() => toggleComments(post.postId)}>
                                     <hr></hr>
                                     {openComments[post.postId] ? 'Hide Comments' : 'See Comments'}
-                                    {/* {console.log(post.postId)} */}
                                 </div>
                                 {openComments[post.postId] && (
                                     <ResponseList postId={post.postId} />
