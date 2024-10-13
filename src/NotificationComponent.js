@@ -69,7 +69,7 @@ const NotificationComponent = ({ userId }) => {
   };
 
   return (
-    <li className="nav-item s-nav dropdown notification">
+    <li className="nav-item s-nav dropdown notification" style={{width:80}}>
       <a
         href="#"
         className="nav-link nav-links rm-drop-mobile drop-w-tooltip"
@@ -87,36 +87,76 @@ const NotificationComponent = ({ userId }) => {
         />
         <span className="badge badge-pill badge-primary">{unreadCount}</span>
       </a>
-      {notificationDropdownVisible && (
-        <ul
-          className={`dropdown-menu notify-drop dropdown-menu-right nav-drop ${notificationDropdownVisible ? 'show' : ''}`}
-        >
-          <div className="notify-drop-title">
-            <div className="row">
-              <div className="col-md-6 col-sm-6 col-xs-6 fs-8">
-                Notifications
-              </div>
-              <div className="col-md-6 col-sm-6 col-xs-6 text-right">
-                <a href="#" className="notify-right-icon">
-                  Mark All as Read
-                </a>
-              </div>
+      <ul
+        className={`dropdown-menu notify-drop dropdown-menu-right nav-drop ${notificationDropdownVisible ? 'show' : ''}`}
+      >
+        <div className="notify-drop-title">
+          <div className="row">
+            <div className="col-md-6 col-sm-6 col-xs-6 fs-8">
+              Notifications
+              <span className="badge badge-pill badge-primary ml-2">
+                {unreadCount}
+              </span>
+            </div>
+            <div className="col-md-6 col-sm-6 col-xs-6 text-right">
+              {/* <button className="btn btn-link notify-right-icon" onClick={props.markAllAsRead}>
+                Mark All as Read
+              </button> */}
             </div>
           </div>
-          <div className="notification-list">
-            {notifications.map((notification) => (
-              <div key={notification.notificationId} className="notification-item">
-                <p>{notification.contextType}</p>
-                <button onClick={() => markAsRead(notification.notificationId)}>Mark as Read</button>
-              </div>
-            ))}
-            <button onClick={() => setPage(page + 1)}>Load More</button>
-          </div>
-          <div className="notify-drop-footer text-center">
-            <a href="#">See More</a>
-          </div>
-        </ul>
-      )}
+        </div>
+        <div className="drop-content">
+          {notifications.length > 0 ? (
+            notifications.map((notification) => {
+              const timeDifference = Math.floor((new Date() - new Date(notification.createdAt)) / 1000);
+              let timeAgo = '';
+              if (timeDifference < 60) {
+                timeAgo = `${timeDifference} seconds ago`;
+              } else if (timeDifference < 3600) {
+                timeAgo = `${Math.floor(timeDifference / 60)} minutes ago`;
+              } else if (timeDifference < 86400) {
+                timeAgo = `${Math.floor(timeDifference / 3600)} hours ago`;
+              } else {
+                timeAgo = `${Math.floor(timeDifference / 86400)} days ago`;
+              }
+              return (
+                <li key={notification.notificationId} className="row">
+                  {console.log(notification)}
+                  <div className="col-md-2 col-sm-2 col-xs-2">
+                  </div>
+                  <div className="col-md-10 col-sm-10 col-xs-10">
+                    <a href="#" className="notification-user">
+                      {notification.senderName || `User ${notification.senderId}`}
+                    </a>
+                    <span className="notification-type">
+                      {notification.contextType}
+                    </span>
+                    <button
+                      className="btn btn-link notify-right-icon mark-read-btn"
+                      onClick={() => markAsRead(notification.notificationId)}
+                    >
+                      Mark as Read
+                    </button>
+                    <p className="time">
+                      <span className="badge badge-pill badge-primary">
+                        <i className="bx bxs-time" />
+                      </span>
+                      {timeAgo}
+                    </p>
+                  </div>
+                </li>
+              );
+            })
+          ) : (
+            <li className="text-center">No new notifications</li>
+          )}
+        </div>
+        <div className="notify-drop-footer text-center">
+          {/* <a href="#" onClick={props.loadMoreNotifications}>
+            See More
+          </a> */}
+        </div>
+      </ul>
     </li>
   );
 };
