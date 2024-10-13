@@ -171,6 +171,7 @@ function Settings() {
   };
 
   return (
+    
     <div className="Settings">
       <>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -197,7 +198,7 @@ function Settings() {
         <link href="assets/css/settings.css" rel="stylesheet" />
         <link href="assets/css/forms.css" rel="stylesheet" />
         <link href="assets/css/media.css" rel="stylesheet" />
-        <div className="container-fluid newsfeed d-flex" id="wrapper">
+        <div className="container-fluid newsfeed " id="wrapper">
           <div className="row newsfeed-size f-width">
             <div className="col-md-12 message-right-side">
 
@@ -406,7 +407,7 @@ function Settings() {
                               </div>
                             </div>
                           </div>
-                          <div className="col-md-12 d-flex justify-content-end" style={{ position: "fixed", bottom: "20px", right: "20px" }}>
+                          <div className="col-md-12 d-flex justify-content-end" style={{ position: "sticky", bottom: "20px", right: "20px" }}>
                             <button type="submit" className="btn btn-primary btn-sm">
                               Save Changes
                             </button>
@@ -425,6 +426,7 @@ function Settings() {
       </>
 
     </div>
+    
   );
 }
 
