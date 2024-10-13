@@ -99,7 +99,7 @@ const PostForm = ({ onPostPublish }) => {
                             {isDragActive ? (
                                 <p>拖放圖片至此...</p>
                             ) : (
-                                <p>拖拉或點擊上傳圖片</p>
+                                <p>Drag or click to upload an image</p>
                             )}
                         </div>
                     )}

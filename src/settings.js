@@ -171,6 +171,7 @@ function Settings() {
   };
 
   return (
+    
     <div className="Settings">
       <>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -197,7 +198,7 @@ function Settings() {
         <link href="assets/css/settings.css" rel="stylesheet" />
         <link href="assets/css/forms.css" rel="stylesheet" />
         <link href="assets/css/media.css" rel="stylesheet" />
-        <div className="container-fluid newsfeed d-flex" id="wrapper">
+        <div className="container-fluid newsfeed " id="wrapper">
           <div className="row newsfeed-size f-width">
             <div className="col-md-12 message-right-side">
 
@@ -293,10 +294,10 @@ function Settings() {
 
                               <div className="form-group">
                                 {/* 使用react-dropzone來實現拖放上傳 */}
-                                <h5>個人頭像</h5>
+                                <h5>Avatar</h5>
                                   <div {...getImageRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
                                     <input {...getImageInputProps()} />
-                                    <p>拖拉或點擊上傳個人頭像</p>
+                                    <p>Drag or click to upload your avatar picture</p>
                                   </div>
                                   {previewSrc.image && (
                                     <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
@@ -307,10 +308,10 @@ function Settings() {
                               </div>
                               <div className="col-md-6">
                                 <div className="form-group">
-                                  <h5>封面照片</h5>
+                                  <h5>cover photo</h5>
                                   <div {...getCoverRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
                                     <input {...getCoverInputProps()} />
-                                    <p>拖拉或點擊上傳封面照片</p>
+                                    <p>Drag or click to upload a cover photo</p>
                                   </div>
                                   {previewSrc.cover && (
                                     <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
@@ -406,7 +407,7 @@ function Settings() {
                               </div>
                             </div>
                           </div>
-                          <div className="col-md-12 d-flex justify-content-end" style={{ position: "fixed", bottom: "20px", right: "20px" }}>
+                          <div className="col-md-12 d-flex justify-content-end" style={{ position: "sticky", bottom: "20px", right: "20px" }}>
                             <button type="submit" className="btn btn-primary btn-sm">
                               Save Changes
                             </button>
@@ -425,6 +426,7 @@ function Settings() {
       </>
 
     </div>
+    
   );
 }
 
