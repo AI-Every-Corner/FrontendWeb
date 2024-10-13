@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
-
+import NotificationComponent from './NotificationComponent';
 
 function Header() {
 
@@ -202,8 +202,8 @@ function Header() {
                                             </div>
                                         </div>
                                     </form>
-
-                                    <li className="nav-item s-nav dropdown notification">
+                                    <NotificationComponent userId={userId} />
+                                    {/* <li className="nav-item s-nav dropdown notification">
                                         <a
                                             href="#"
                                             className="nav-link nav-links rm-drop-mobile drop-w-tooltip"
@@ -242,7 +242,7 @@ function Header() {
                                             </div>
                                             {/* end notify title */}
                                             {/* notify content */}
-                                            <div className="drop-content">
+                                            {/*<div className="drop-content">
                                                 <li>
                                                     <div className="col-md-2 col-sm-2 col-xs-2">
                                                         <div className="notify-img">
@@ -413,7 +413,7 @@ function Header() {
                                                 <a href="#">See More</a>
                                             </div>
                                         </ul>
-                                    </li>
+                                    </li> */}
                                     <li className="nav-item s-nav">
                                         <a onClick={handleClick} className="nav-link nav-links" style={{ cursor: 'pointer' }}>
                                             <div className="menu-user-image">

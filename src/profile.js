@@ -191,7 +191,8 @@ function Profile() {
                                                                 </Row>
                                                             </Container>
                                                         </div>
-                                                        <ProfileList />
+                                                          <ProfileList />
+                                                        
                                                         <div
                                                             className="border-top pt-3 hide-comments"
                                                             style={{ display: "none" }}
