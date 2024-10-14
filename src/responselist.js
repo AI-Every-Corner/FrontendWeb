@@ -1,7 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
 import TimePassedComponent from './timepassedcomponent';
 
 function ResponseList(postId) {
@@ -9,6 +8,7 @@ function ResponseList(postId) {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [likedResponses, setLikedResponses] = useState([]);
   var fetchedResponses = fetchedResponses || [];
 
   const storeResponseIds = (postId, responseId) => {
@@ -94,6 +94,60 @@ function ResponseList(postId) {
     fetchComments();
   }, [postId, page]);
 
+  const addLike = async (postId, responseId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.error("User ID not found in localStorage");
+        return;
+      }
+      console.log("type of userId: " + typeof userId);
+      const response = await axios.put(`http://localhost:8080/responses/${postId.postId}/${responseId}/like`, null, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'userId': userId
+        }
+      });
+
+      console.log(response);
+
+      setLikedResponses([...likedResponses, responseId]);
+    } catch (error) {
+      console.error("addLike: " + error);
+    }
+  }
+
+  const removeLike = async (postId, responseId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const response = await axios.delete(`http://localhost:8080/responses/${postId.postId}/${responseId}/unlike`, null, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'userId': userId
+        }
+      });
+      
+      console.log(response);
+
+      setLikedResponses(likedResponses.filter(id => id !== responseId));
+    } catch (error) {
+      console.error("removeLike: " + error);
+    }
+  }
+
+  const handleLike = (postId, responseId) => {
+    if (likedResponses.includes(responseId)) {
+      removeLike(postId, responseId);
+    } else {
+      addLike(postId, responseId);
+    }
+  }
+
+  useEffect(() => {
+    console.log(likedResponses);
+  }, [likedResponses]);
   return (
     <InfiniteScroll
       dataLength={responses.length}
@@ -155,8 +209,11 @@ function ResponseList(postId) {
           <div className="d-flex flex-row justify-content-between">
             <div className="d-flex align-items-center w-100 commentLR mb-3">
               <span className="like-btn">
-                <a className="post-card-buttons p-1" id="reactions">
-                  <i className="bx bxs-like mr-2 text-start" /> {response.likes}
+                <a className="post-card-buttons p-1" id="reactions" onClick={() => handleLike(postId, response.responseId)}>
+                  <i className="bx bxs-like mr-2 text-start" /> 
+                  {likedResponses.includes(response.responseId) ? 
+                  <span>{response.likes + 1}</span> : 
+                  <span>{response.likes}</span>}
                 </a>
               </span>
             </div>
