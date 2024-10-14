@@ -148,7 +148,7 @@ const PostList = () => {
       console.log(response);
 
       setLikedPosts([...likedPosts, postId]);
-  } catch (error) {
+    } catch (error) {
       console.error("addLike: " + error);
     }
   }
