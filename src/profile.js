@@ -181,7 +181,7 @@ function Profile() {
                                                         </ul>
 
                                                         <div className="bg-white profile-posts-options mt-5 mb-4 py-3 justify-content-between shadow-sm" >
-                                                            <Container >
+                                                        <Container >
                                                                 <Row className="justify-content-center" >
                                                                     <Col md={1} lg={1} xl={1}></Col>
                                                                     <Col>
@@ -339,7 +339,7 @@ function CalendarChart({ isCurrentUser }) {
                 data={data}
                 options={options}
                 width="100%"  // 寬度設為 100%
-                height="auto"  // 高度設為 100%
+                height="100%"  // 高度設為 100%
                 loader={<div>Loading Chart...</div>}
             />
         </div>
