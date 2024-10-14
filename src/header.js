@@ -13,6 +13,7 @@ function Header() {
     const location = useLocation(); // 使用 useLocation 來獲取當前路徑
     const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
     const navigate = useNavigate();
+    // const { setIsLoggedIn } = useContext(UserContext);
     const handleClick = () => {
         navigate(`/profile?userId=${userId}`);
         //navigate(`/profile/${userId}`);
@@ -39,6 +40,7 @@ function Header() {
 
     // Function to handle logout
     const handleLogout = async () => {
+        // setIsLoggedIn(false);
         await logout();
         alert('登出成功');
         navigate('/sign-in');

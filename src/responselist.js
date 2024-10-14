@@ -94,7 +94,7 @@ function ResponseList(postId) {
     fetchComments();
   }, [postId, page]);
 
-  const addLike = async (postId, responseId) => {
+  const addLike = async (responseId) => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
@@ -103,7 +103,7 @@ function ResponseList(postId) {
         return;
       }
       console.log("type of userId: " + typeof userId);
-      const response = await axios.put(`http://localhost:8080/responses/${postId.postId}/${responseId}/like`, null, {
+      const response = await axios.put(`http://localhost:8080/responses/${responseId}/like`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
@@ -118,11 +118,11 @@ function ResponseList(postId) {
     }
   }
 
-  const removeLike = async (postId, responseId) => {
+  const removeLike = async (responseId) => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
-      const response = await axios.delete(`http://localhost:8080/responses/${postId.postId}/${responseId}/unlike`, null, {
+      const response = await axios.delete(`http://localhost:8080/responses/${responseId}/unlike`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
@@ -221,18 +221,6 @@ function ResponseList(postId) {
         </div>
         </li>
         <li className="media">
-        {/* {response.length > 0?
-        <div className="media-body">
-          <div className="comment-see-more text-center" onClick={() => fetchComments()}>
-            <button
-              type="button"
-              className="btn btn-link fs-8"
-            >
-              See More
-            </button>
-          </div>
-        </div>
-        : null} */}
         </li>
       </ul>
       </div>

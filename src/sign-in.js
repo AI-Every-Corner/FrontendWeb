@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
 
 function SignIn() {
   
@@ -9,8 +11,10 @@ function SignIn() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [weather, setWeather] = useState({ temp: '', city: '', icon: '' });
+  // const { setIsLoggedIn } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
     setError('');
     try {
@@ -31,6 +35,7 @@ function SignIn() {
       localStorage.setItem('userImage', response.data.imagePath);
       localStorage.setItem('coverImage', response.data.coverPath);
       alert('登錄成功');
+      // setIsLoggedIn(true);  // Set login state to true after successful login
       navigate('/');
 
     } catch (error) {

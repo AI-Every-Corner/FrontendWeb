@@ -20,6 +20,7 @@ import SignUp from './sign-up';
 import reportWebVitals from './reportWebVitals';
 import PrivateRoute from './PrivateRoute';
 import { UserProvider } from './context';
+import { RefreshProvider } from './refreshContext';
 import Header from './header';
 import Intro from './intro';
 

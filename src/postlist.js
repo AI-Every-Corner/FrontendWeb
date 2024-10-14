@@ -13,8 +13,9 @@ const PostList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [users, setUsers] = useState([]);
   const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+  // const { isLoggedIn } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
   const [openComments, setOpenComments] = useState({});
-  const [likedPosts, setLikedPosts] = useState([]);
+  const [likedPosts, setLikedPosts] = useState({});
   const [commentContent, setCommentContent] = useState("");
 
   // initialize page
@@ -22,6 +23,8 @@ const PostList = () => {
     setPage(0);
     setPosts([]);
     setHasMore(true);
+    fetchPosts();
+    fetchLikedPosts();
   }, []);
 
   const fetchPosts = async () => {
@@ -95,14 +98,16 @@ const PostList = () => {
     }
     try {
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-      const response = await axios.post(`http://localhost:8080/responses/${postId}`, {
-        content: commentContent,
-        userId: userId // 添加 userId
+      const response = await axios.post(`http://localhost:8080/createResponse`, {
+        postId: postId,
+        userId: userId, // 添加 userId
+        content: commentContent
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+      console.log(response);
       setCommentContent(""); // 清空輸入框
       // TODO: 更新回覆列表或重新加載回覆
     } catch (error) {
@@ -137,7 +142,6 @@ const PostList = () => {
         console.error("User ID not found in localStorage");
         return;
       }
-      console.log("type of userId: " + typeof userId);
       const response = await axios.put(`http://localhost:8080/posts/${postId}/like`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -147,7 +151,15 @@ const PostList = () => {
 
       console.log(response);
 
-      setLikedPosts([...likedPosts, postId]);
+      setLikedPosts(prevLikedPosts => ({
+        ...prevLikedPosts,
+        [postId]: true
+      }));
+
+      // Update the posts state
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.postId === postId ? { ...post, likes: post.likes + 1 } : post
+      ));
     } catch (error) {
       console.error("addLike: " + error);
     }
@@ -157,7 +169,7 @@ const PostList = () => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
-      const response = await axios.delete(`http://localhost:8080/posts/${postId}/unlike`, null, {
+      const response = await axios.put(`http://localhost:8080/posts/${postId}/unlike`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
@@ -166,14 +178,25 @@ const PostList = () => {
       
       console.log(response);
 
-      setLikedPosts(likedPosts.filter(id => id !== postId));
+      setLikedPosts(prevLikedPosts => {
+        const newLikedPosts = { ...prevLikedPosts };
+        delete newLikedPosts[postId];
+        return newLikedPosts;
+      });
+
+      // Update the posts state
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.postId === postId ? { ...post, likes: post.likes - 1 } : post
+      ));
     } catch (error) {
       console.error("removeLike: " + error);
     }
   }
 
   const handleLike = (postId) => {
-    if (likedPosts.includes(postId)) {
+    console.log("postId:", postId);
+    console.log("likedPosts:", likedPosts);
+    if (likedPosts[postId]) {
       removeLike(postId);
     } else {
       addLike(postId);
@@ -181,8 +204,33 @@ const PostList = () => {
   }
 
   useEffect(() => {
+    console.log("likedPosts");
     console.log(likedPosts);
   }, [likedPosts]);
+
+  const fetchLikedPosts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const response = await axios.get(`http://localhost:8080/posts/getLikedPostIds/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log(response.data);
+
+      const newLikedPosts = {};
+      response.data.forEach((item) => {
+        if (item.postId) {
+          newLikedPosts[item.postId] = true;
+        }
+      });
+      console.log("newLikedPosts", newLikedPosts);
+      setLikedPosts(newLikedPosts);
+    } catch (error) {
+      console.error("fetchLikedPosts: " + error);
+    }
+  }
 
   return (
     <InfiniteScroll
@@ -239,15 +287,18 @@ const PostList = () => {
   <div className="argon-reaction">
   <span className="like-btn" onClick={() => handleLike(post.postId)}>
     {
-      likedPosts.includes(post.postId) ? (
-        <a className="post-card-buttons" id="reactions">
-          <i className="bx bxs-like mr-2" /> {post.likes + 1}
-        </a>
-      ) : (
-        <a className="post-card-buttons" id="reactions">
-          <i className="bx bxs-like mr-2" /> {post.likes}
-        </a>
-      )
+      likedPosts[post.postId] ? 
+        (
+          <a className="post-card-buttons" id="reactions">
+            <i className="bx bxs-like mr-2" /> {post.likes}
+          </a>
+        )
+      :
+        (
+          <a className="post-card-buttons" id="reactions">
+            <i className="bx bxs-like mr-2" /> {post.likes}
+          </a>
+        )
     }
     <ul className="dropdown-shadow">
     <li
