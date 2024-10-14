@@ -6,7 +6,7 @@ import { useDropzone } from 'react-dropzone';
 
 function Settings() {
 
-  const [previewSrc, setPreviewSrc] = useState({ image: null, cover: null });
+  const [preview, setPreview] = useState({ image: null, cover: null });
 
   // States for handling password match
   const [newPassword, setNewPassword] = useState('');
@@ -79,18 +79,18 @@ function Settings() {
     setFormData(prevData => ({ ...prevData, [type]: file }));
 
     const previewUrl = URL.createObjectURL(file);
-    setPreviewSrc(prevPreview => ({ ...prevPreview, [type]: previewUrl }));
+    setPreview(prevPreview => ({ ...prevPreview, [type]: previewUrl }));
     setImageUploaded(prevUploaded => ({ ...prevUploaded, [type]: true }));
   };
 
   // 為頭像和封面照片創建單獨的 dropzone
-  const { getRootProps: getImageRootProps, getInputProps: getImageInputProps } = useDropzone({
+  const { getRootProps: getImageRootProps, getInputProps: getImageInputProps, isDragActive: isImageDragActive } = useDropzone({
     onDrop: (files) => onDrop(files, 'image'),
     accept: 'image/*',
     multiple: false
   });
 
-  const { getRootProps: getCoverRootProps, getInputProps: getCoverInputProps } = useDropzone({
+  const { getRootProps: getCoverRootProps, getInputProps: getCoverInputProps, isDragActive: isCoverDragActive } = useDropzone({
     onDrop: (files) => onDrop(files, 'cover'),
     accept: 'image/*',
     multiple: false
@@ -294,28 +294,40 @@ function Settings() {
 
                               <div className="form-group">
                                 {/* 使用react-dropzone來實現拖放上傳 */}
-                                <h5>Avatar</h5>
-                                  <div {...getImageRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
+                                <h5>Profile </h5>
+                                {!imageUploaded.image && (
+                                  <div {...getImageRootProps()} style={dropzoneStyle} >
                                     <input {...getImageInputProps()} />
-                                    <p>Drag or click to upload your avatar picture</p>
+                                    {isImageDragActive ? (
+                                      <p>Drop the profile picture here...</p>
+                                    ) : (
+                                      <p>Drag and drop or click to upload profile picture</p>
+                                    )}
                                   </div>
-                                  {previewSrc.image && (
-                                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                                      <img src={previewSrc.image} alt="預覽頭像" style={{ maxWidth: '100%', maxHeight: '200px' }} />
-                                    </div>
-                                  )}
+                                )}
+                                {preview.image && (
+                                  <div style={previewContainerStyle}>
+                                    <img src={preview.image} alt="Preview profile" style={previewImageStyle} />
+                                  </div>
+                                )}
                                 </div>
                               </div>
                               <div className="col-md-6">
                                 <div className="form-group">
-                                  <h5>cover photo</h5>
-                                  <div {...getCoverRootProps()} style={{ border: '2px dashed #cccccc', padding: '20px', textAlign: 'center' }}>
-                                    <input {...getCoverInputProps()} />
-                                    <p>Drag or click to upload a cover photo</p>
-                                  </div>
-                                  {previewSrc.cover && (
-                                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                                      <img src={previewSrc.cover} alt="預覽封面" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                                  <h5>Cover Photo</h5>
+                                  {!imageUploaded.cover && (
+                                    <div {...getCoverRootProps()} style={dropzoneStyle} >
+                                      <input {...getCoverInputProps()} />
+                                      {isCoverDragActive ? (
+                                        <p>Drop the cover photo here...</p>
+                                      ) : (
+                                        <p>Drag and drop or click to upload cover photo</p>
+                                      )}
+                                    </div>
+                                  )}
+                                  {preview.cover && (
+                                    <div style={previewContainerStyle}>
+                                      <img src={preview.cover} alt="Preview cover" style={previewCoverStyle} />
                                     </div>
                                   )}
                               </div>
@@ -424,10 +436,40 @@ function Settings() {
         {/* Core */}
         {/* Optional */}
       </>
-
     </div>
-    
   );
 }
+
+// 樣式設置
+const dropzoneStyle = {
+  width: '100%',
+  height: '150px',
+  border: '2px dashed #ccc',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+};
+
+const previewContainerStyle = {
+  marginTop: '10px',
+  textAlign: 'center',
+};
+
+const previewImageStyle = {
+  width: '150px',
+  height: '150px',
+  borderRadius: '50%',
+  objectFit: 'cover',
+};
+
+const previewCoverStyle = {
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
+  width: '100%',
+  height: '250px',  
+};
+
 
 export default Settings;

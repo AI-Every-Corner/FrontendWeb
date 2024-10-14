@@ -64,14 +64,25 @@ function Friends() {
         });
 
         // 獲取好友列表
-        const friendsResponse = await axios.get(`http://localhost:8080/friends/${userId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setFriends(friendsResponse.data);
-      } catch (error) {
-        console.error("獲取好友數據時發生錯誤:", error);
+         // 獲取好友列表（使用 fetch）
+      const friendsResponse = await fetch(`http://localhost:8080/friends/${userId}`, {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!friendsResponse.ok) {
+        throw new Error(`HTTP error! status: ${friendsResponse.status}`);
       }
-    };
+
+      const friendsData = await friendsResponse.json();
+      setFriends(friendsData);
+    } catch (error) {
+      console.error("獲取數據時發生錯誤:", error);
+    }
+  };
 
     fetchUserDataAndFriends();
   }, [userId]);
@@ -163,96 +174,9 @@ function Friends() {
                               </div>
                             </li>
                           </ul>
-                          <ul className="list-group list-group-horizontal types-list fs-8">
-                            <form className="list-group-item d-flex w-100 align-items-center p-0 form-inline dropdown search-form">
-                              <div className="input-group w-95" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="searchDropdown">
-                                <input type="text" className="form-control search-input" placeholder="Search for people, companies, events and more..." aria-label="Search" aria-describedby="search-addon" />
-                                <div className="input-group-append">
-                                  <button className="btn search-button" type="button">
-                                    <i className='bx bx-search'></i>
-                                  </button>
-                                </div>
-                              </div>
-                              <ul className="dropdown-menu notify-drop nav-drop shadow-sm" aria-labelledby="searchDropdown">
-                                <div className="notify-drop-title">
-                                  <div className="row">
-                                    <div className="col-md-6 col-sm-6 col-xs-6 fs-8">Search Results
-                                      <span className="badge badge-pill badge-primary ml-2">29</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="drop-content">
-                                  <h6 className="dropdown-header">Peoples</h6>
-                                  <li className="dropdown-item">
-                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                      <div className="notify-img">
-                                        <img src="assets/images/users/user-6.png" alt="Search result" />
-                                      </div>
-                                    </div>
-                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                      <a href="#" className="notification-user">Susan P. Jarvis</a>
-                                      <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                        Add Friend
-                                      </a>
-                                      <p className="time">6 Mutual friends</p>
-                                    </div>
-                                  </li>
-                                  <li className="dropdown-item">
-                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                      <div className="notify-img">
-                                        <img src="assets/images/users/user-5.png" alt="Search result" />
-                                      </div>
-                                    </div>
-                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                      <a href="#" className="notification-user">Ruth D. Greene</a>
-                                      <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                        Add Friend
-                                      </a>
-                                    </div>
-                                  </li>
-                                  <h6 className="dropdown-header">Groups</h6>
-                                  <li className="dropdown-item">
-                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                      <div className="notify-img">
-                                        <img src="assets/images/groups/group-2.jpg" alt="Search result" />
-                                      </div>
-                                    </div>
-                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                      <a href="#" className="notification-user">Tourism</a>
-                                      <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                        Join
-                                      </a>
-                                      <p className="time">2.5k Members 35+ post a week</p>
-                                    </div>
-                                  </li>
-                                  <li className="dropdown-item">
-                                    <div className="col-md-2 col-sm-2 col-xs-2">
-                                      <div className="notify-img">
-                                        <img src="assets/images/groups/group-1.png" alt="Search result" />
-                                      </div>
-                                    </div>
-                                    <div className="col-md-10 col-sm-10 col-xs-10">
-                                      <a href="#" className="notification-user">Argon Social Network
-                                        <img src="assets/images/theme/verify.png" width="10px" className="verify" alt="Group verified" />
-                                      </a>
-                                      <a href="#" className="btn btn-quick-link join-group-btn border text-right float-right">
-                                        Join
-                                      </a>
-                                      <p className="time">10k Members 20+ post a week</p>
-                                    </div>
-                                  </li>
-                                </div>
-                                <div className="notify-drop-footer text-center">
-                                  <a href="#">See More</a>
-                                </div>
-                              </ul>
-                            </form>
-                          </ul>
                           <div className="bg-white py-3 px-4 shadow-sm">
                             <div className="card-head d-flex justify-content-between">
                               <h5 className="mb-4">Latest Active Friends</h5>
-                              <a href="#" className="btn btn-link">See All</a>
                             </div>
                             <div className="friend-card">
                               {friends.map(friend => (
@@ -266,22 +190,7 @@ function Friends() {
                                     <h5 className="friend-card-title"><Link to={`/profile?userId=${friend.friendId}`}>{friend.nickname}</Link></h5>
                                     <p className="card-text text-muted"></p>
                                     <div className="friend-card-buttons" role="group">
-                                      <a href="#" className="btn btn-light border w-100">Send message</a>
-                                      <div className="btn-group" role="group">
-                                        <button 
-                                          type="button" 
-                                          className="btn btn-light border friend-card-options-btn" 
-                                          data-toggle="dropdown" 
-                                          aria-haspopup="true" 
-                                          aria-expanded="false"
-                                        >
-                                          <i className='bx bx-dots-horizontal-rounded'></i>
-                                        </button>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                          <a className="dropdown-item" href="#">查看個人資料</a>
-                                          <a className="dropdown-item" href="#">取消好友</a>
-                                        </div>
-                                      </div>
+                                      <a href="#" className="btn btn-light border w-100"><Link to={`/profile?userId=${friend.friendId}`}>查看個人資料</Link></a>
                                     </div>
                                   </div>
                                 </div>
