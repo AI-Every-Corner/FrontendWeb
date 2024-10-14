@@ -91,104 +91,10 @@ function Header() {
                                             alt="Logo"
                                         />
                                     </a>
-                                    {!isHomePage && (
-                                        <li
-                                            className="dropdown nav-item nav-quick-links"
-                                            data-toggle="tooltip"
-                                            data-placement="bottom"
-                                            title="Quick Links"
-                                        >
-                                            <a
-
-                                                className="nav-link nav-links nav-icon"
-                                                role="button"
-                                                aria-haspopup="true"
-                                                aria-expanded="false"
-                                                onClick={toggleDropdown}
-                                            >
-                                                <i className="bx bx-align-middle" />
-                                            </a>
-                                            {dropdownVisible && ( // Conditionally render the dropdown menu
-                                                <div className="dropdown-menu nav-drop show"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        zIndex: 999, // Ensure dropdown appears above content
-                                                    }}>
-                                                    <ul className="list-group list-group-flush">
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="index.html" className="sidebar-item">
-                                                                <i className="bx bx-news text-primary" /> News Feed
-                                                            </a>
-                                                            <a href="#" className="newsfeedListicon">
-                                                                <i className="bx bx-dots-horizontal-rounded" />
-                                                            </a>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="messages.html" className="sidebar-item">
-                                                                <i className="bx bx-envelope text-primary" /> Messages
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">2</span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="groups.html" className="sidebar-item">
-                                                                <i className="bx bx-group text-primary" /> Groups
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">17</span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="events.html" className="sidebar-item">
-                                                                <i className="bx bx-calendar text-primary" /> Events
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">3</span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="saved.html" className="sidebar-item">
-                                                                <i className="bx bx-bookmarks text-primary" /> Saved
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">8</span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="find-friends.html" className="sidebar-item">
-                                                                <i className="bx bxs-user-detail text-primary" /> Find
-                                                                Friends
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">
-                                                                <i className="bx bx-chevron-right" />
-                                                            </span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="matches.html" className="sidebar-item">
-                                                                <i className="bx bx-carousel text-primary" /> Matches
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">
-                                                                <i className="bx bx-chevron-right" />
-                                                            </span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="teams.html" className="sidebar-item">
-                                                                <i className="bx bxl-slack-old text-primary" /> Argon For
-                                                                Teams
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">
-                                                                <i className="bx bx-chevron-right" />
-                                                            </span>
-                                                        </li>
-                                                        <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                            <a href="news.html" className="sidebar-item">
-                                                                <i className="bx bx-file text-primary" /> News
-                                                            </a>
-                                                            <span className="badge badge-primary badge-pill">
-                                                                <i className="bx bx-chevron-right" />
-                                                            </span>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            )}
-                                        </li>
-                                    )}
+                                    
                                     {/* Collect the nav links, forms, and other content for toggling */}
-                                    <Search />
                                     <NotificationComponent userId={userId} />
+                                    <Search />
                                     {/* <li className="nav-item s-nav dropdown notification">
                                         <a
                                             href="#"

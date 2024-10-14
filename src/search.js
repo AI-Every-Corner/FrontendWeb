@@ -92,8 +92,8 @@ function Search() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="form-control search-input"
-                    placeholder={searchType === 'user' ? "搜索用戶..." : "搜索貼文..."}
-                    aria-label="搜索"
+                    placeholder={searchType === 'user' ? "Search User..." : "Search Post..."}
+                    aria-label="Search"
                     aria-describedby="search-addon"
                 />
                 
