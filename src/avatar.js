@@ -58,22 +58,12 @@ function Avatar() {
 
     return (
         <div>
-            <div className="profile-img-overlay" />
+            <div className="mr-3 post-user-image" />
             <img
                 src={formData.imagePath}
                 alt="Avatar"
                 className="avatar img-circle"
             />
-            <div className="profile-img-caption">
-                <label htmlFor="updateProfilePic" className="upload">
-                    <i className="bx bxs-camera" /> Update
-                    <input
-                        type="file"
-                        id="updateProfilePicInput"
-                        className="text-center upload"
-                    />
-                </label>
-            </div>
         </div>
     );
 }
