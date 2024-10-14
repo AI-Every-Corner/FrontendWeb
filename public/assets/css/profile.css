@@ -77,7 +77,7 @@
     margin: 0 auto;
 }
 
-.profile-info-left .profile-img .profile-img-overlay {
+.profile-info-left  .profile-img-overlay {
     background: rgba(0, 0, 0, 0.5);
     position: absolute;
     width: 146px;
