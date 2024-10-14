@@ -55,20 +55,13 @@ function Cover() {
     return (
         <div>
             <div className="profile-header-background">
-                <a href="#" className="profile-cover">
+                <a className="profile-cover">
                     <img
                         src={formData.coverUrl}
                         alt="Profile Header Background"
                     />
                 </a>
-                <div className="cover-overlay">
-                    <a href="#" className="profile-cover"></a>
-                    {isCurrentUser && (
-                    <a href="#" className="btn btn-update-cover">
-                        <i className="bx bxs-camera" /> Update Cover Photo
-                    </a>
-                    )}
-                </div>
+                
             </div>
         </div>
     );
