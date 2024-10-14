@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { UserContext } from './context';
 import { logout } from './api';
 import NotificationComponent from './NotificationComponent';
+import Search from './search';
 
 function Header() {
 
@@ -186,22 +187,7 @@ function Header() {
                                         </li>
                                     )}
                                     {/* Collect the nav links, forms, and other content for toggling */}
-                                    <form className="w-30 mx-2 my-auto d-inline form-inline mr-5">
-                                        <div className="input-group">
-                                            <input
-                                                type="text"
-                                                className="form-control search-input w-75"
-                                                placeholder="Search for people, companies, events and more..."
-                                                aria-label="Search"
-                                                aria-describedby="search-addon"
-                                            />
-                                            <div className="input-group-append">
-                                                <button className="btn search-button" type="button">
-                                                    <i className="bx bx-search" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
+                                    <Search />
                                     <NotificationComponent userId={userId} />
                                     {/* <li className="nav-item s-nav dropdown notification">
                                         <a
