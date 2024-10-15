@@ -124,7 +124,7 @@ const PostList = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log("New comment response:", response.data);
+      // console.log("New comment response:", response.data);
       setCommentContent(""); // 清空輸入框
       // Update the post's comment count
       setPosts(prevPosts => prevPosts.map(post => 
@@ -175,7 +175,7 @@ const PostList = () => {
         }
       });
 
-      console.log(response);
+      // console.log(response);
 
       setLikedPosts(prevLikedPosts => ({
         ...prevLikedPosts,
