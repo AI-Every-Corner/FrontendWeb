@@ -24,75 +24,6 @@ const ResponseList = forwardRef(({ postId }, ref) => {
     fetchedResponses.push({postId, responseId});
   }
 
-  const fetchComments = async () => {
-    try {
-      fetchLikedResponses();
-      // console.log("postId: ");
-      // console.log(postId);
-      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-      const response = await axios.get(`http://localhost:8080/responses/${postId}`,{
-        headers: {
-          'Authorization': `Bearer ${token}` // 添加 Authorization header
-        },
-        params: {
-          page: page,
-          size: 5
-        }
-      });
-      // console.log("response");
-      // console.log(response);
-
-      // console.log("postId");
-      // console.log(postId);
-      // console.log("page");
-      // console.log(page);
-      // console.log("response.data.respList[0].responseId");
-      // console.log(response.data.respList[0].responseId);
-
-      if (page === 0) {
-        setResponses(response.data.respList);
-      } else {
-        setResponses(prevResponses => [...prevResponses, ...response.data.respList]);
-      }
-  
-      setHasMore(!response.data.last && response.data.totalPages > page + 1);
-      setPage(prevPage => prevPage + 1);
-  
-      // Fetch user details for the new responses
-      const userIds = response.data.respList.map(resp => resp.userId);
-      fetchUsers(userIds);
-
-      // if (page >= response.data.totalPages) {
-      //   setHasMore(false);
-      //   return;
-      // } else if (!fetchedResponses.find(item => item.postId === postId && item.responseId === response.data.respList[0].responseId)) {
-      //   // console.log(response);
-      //   setResponses([...responses, ...response.data.respList]);  // Append new posts
-
-      //   // Update hasMore based on the API response
-      //   setHasMore(!response.data.last && response.data.totalPages > page + 1);
-
-      //   // Fetch user details for the new responses
-      //   const userIds = response.data.respList.map(resp => resp.userId);
-      //   fetchUsers(userIds);
-          
-      //   // Increment the page number
-      //   setPage(prevPage => prevPage + 1);
-
-      //   storeResponseIds(postId, response.data.respList[0].responseId);
-      // } else {
-      //   console.log("already fetched");
-      //   setHasMore(false);
-      // }
-
-      console.log("likedResponses");
-      console.log(likedResponses);
-    } catch (error) {
-      console.error("fetchComments: " + error);
-      setHasMore(false); // Set hasMore to false if there's an error
-    }
-  }
-
   // Fetch user data based on userIds and update the state
   const fetchUsers = async (userIds) => {
     try {
@@ -124,12 +55,39 @@ const ResponseList = forwardRef(({ postId }, ref) => {
     }
   }
 
+  const fetchComments = async () => {
+    try {
+      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      const response = await axios.get(`http://localhost:8080/responses/${postId}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+        params: { page, size: 5 }
+      });
+  
+      if (page === 0) {
+        setResponses(response.data.respList);
+      } else {
+        setResponses(prevResponses => [...prevResponses, ...response.data.respList]);
+      }
+  
+      setHasMore(!response.data.last && response.data.totalPages > page + 1);
+      if (response.data.totalPages > page + 1) {
+        setPage(prevPage => prevPage + 1);  // 只在有更多頁時增加 page
+      }
+      
+      const userIds = response.data.respList.map(resp => resp.userId);
+      fetchUsers(userIds);
+    } catch (error) {
+      console.error("fetchComments: " + error);
+      setHasMore(false);
+    }
+  };
+
   useEffect(() => {
     // setPage(0);
     // setResponses([]);
     // setHasMore(true);
     fetchComments();
-  }, [postId, page]);
+  }, [postId]);
 
   const addLike = async (responseId) => {
     try {
