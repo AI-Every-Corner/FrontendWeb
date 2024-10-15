@@ -111,12 +111,12 @@ function Photo() {
                                                     </p>
                                                 </div>
                                                 <Follow />
-                                                <div className="intro mt-5 mv-hidden">
+                                                {/* <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                         <div className="col-md-9 p-0">
@@ -128,16 +128,16 @@ function Photo() {
                                                             <li className="list-inline-item ">
                                                                 <a href={`/profile?userId=${userId}`}>Timeline</a>
                                                             </li>
-                                                            <li className="list-inline-item">
+                                                            {/* <li className="list-inline-item">
                                                                 <a href={`/about?userId=${userId}`}>About</a>
-                                                            </li>
+                                                            </li> */}
                                                             <li className="list-inline-item">
                                                                 <a href={`/friends?userId=${userId}`}>Friends</a>
                                                             </li>
                                                             <li className="list-inline-item profile-active">
                                                                 <a href={`/photo?userId=${userId}`}>Photos</a>
                                                             </li>
-                                                            <li className="list-inline-item dropdown">
+                                                            {/* <li className="list-inline-item dropdown">
                                                                 <a
                                                                     href="#"
                                                                     data-toggle="dropdown"
@@ -163,7 +163,7 @@ function Photo() {
                                                                         Likes
                                                                     </a>
                                                                 </div>
-                                                            </li>
+                                                            </li> */}
                                                         </ul>
                                                         <ul className="list-group list-group-horizontal types-list fs-8">
                                                             <form className="list-group-item d-flex w-100 align-items-center p-0 form-inline dropdown search-form">
