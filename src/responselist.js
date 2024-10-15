@@ -1,9 +1,9 @@
-import { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, forwardRef, useImperativeHandle } from 'react';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from 'axios';
 import TimePassedComponent from './timepassedcomponent';
 
-function ResponseList(postId) {
+const ResponseList = forwardRef(({ postId }, ref) => {
   const [responses, setResponses] = useState([]);
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
@@ -148,6 +148,15 @@ function ResponseList(postId) {
   useEffect(() => {
     console.log(likedResponses);
   }, [likedResponses]);
+
+  useImperativeHandle(ref, () => ({
+    refreshComments: (newComment) => {
+      setResponses(prevResponses => [newComment, ...prevResponses]);
+      // Optionally, you might want to fetch user data for the new comment
+      fetchUsers([newComment.userId]);
+    }
+  }));
+
   return (
     <InfiniteScroll
       dataLength={responses.length}
@@ -195,7 +204,7 @@ function ResponseList(postId) {
               </div>
               <div>
                 <a className="comment-created-time">
-                &nbsp; <TimePassedComponent updateAt={response.updateAt} />
+                &nbsp; <TimePassedComponent updateAt={response.updateAt} />&ensp;ago
                 </a>
               </div>
             </div>
@@ -233,6 +242,6 @@ function ResponseList(postId) {
       </div>
     </InfiniteScroll>
   );
-}
+});
 
 export default ResponseList;
