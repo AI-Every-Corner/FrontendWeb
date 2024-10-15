@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 // Unified Notification Component to handle badge and dropdown list
 const NotificationComponent = ({ userId }) => {
@@ -69,7 +70,7 @@ const NotificationComponent = ({ userId }) => {
   };
 
   return (
-    <li className="nav-item s-nav dropdown notification" style={{width:80}}>
+    <li className="nav-item s-nav dropdown notification" style={{width:80}} >
       <a
         href="#"
         className="nav-link nav-links rm-drop-mobile drop-w-tooltip"
@@ -123,11 +124,18 @@ const NotificationComponent = ({ userId }) => {
                 <li key={notification.notificationId} className="row">
                   {console.log(notification)}
                   <div className="col-md-2 col-sm-2 col-xs-2">
+                  <img 
+                      src={notification.imagepath} 
+                      alt={notification.username}
+                      className="notification-avatar"
+                      style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                    />
                   </div>
                   <div className="col-md-10 col-sm-10 col-xs-10">
                     <a href="#" className="notification-user">
-                      {notification.senderName || `User ${notification.senderId}`}
+                      <Link to={`/profile?userId=${notification.senderId}`}>{notification.username}</Link>
                     </a>
+                  <br/>
                     <span className="notification-type">
                       {notification.contextType}
                     </span>
@@ -135,10 +143,10 @@ const NotificationComponent = ({ userId }) => {
                       className="btn btn-link notify-right-icon mark-read-btn"
                       onClick={() => markAsRead(notification.notificationId)}
                     >
-                      Mark as Read
+                     <a> Mark as Read </a>
                     </button>
                     <p className="time">
-                      <span className="badge badge-pill badge-primary">
+                      <span className="badge badge-pill badge-primary" style={{width: 10,  height: 10, backgroundColor: '#007bff', borderRadius: '50%'}}>
                         <i className="bx bxs-time" />
                       </span>
                       {timeAgo}
