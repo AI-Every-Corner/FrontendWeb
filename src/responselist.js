@@ -9,7 +9,8 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [likedResponses, setLikedResponses] = useState({});
-  var fetchedResponses = fetchedResponses || [];
+  const [fetchedResponses, setFetchedResponses] = useState([]);
+
   
   // initialize page
   useEffect(() => {
@@ -27,98 +28,103 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   // Fetch user data based on userIds and update the state
   const fetchUsers = async (userIds) => {
     try {
-      // console.log("userIds");
-      // console.log(userIds);
-      const userIdsArray = Array.isArray(userIds) ? userIds : [userIds];
-    
-      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      const token = localStorage.getItem('token');
       const fetchedUsers = {};
-      await Promise.all(userIdsArray.map(async (userId) => {
-        // console.log("fetching userIds: ");
-        // console.log(userIds);
-        if (!users[userId]) {  // Avoid refetching already loaded users
+  
+      await Promise.all(userIds.map(async (userId) => {
+        if (!users[userId]) {
           const response = await axios.get(`http://localhost:8080/api/auth/${userId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
           fetchedUsers[userId] = response.data;
-          // console.log("fetchedUsers: ");
-          // console.log(fetchedUsers);
-          // console.log("id: ");
-          // console.log(id);
         }
       }));
+  
       setUsers((prevUsers) => ({ ...prevUsers, ...fetchedUsers }));
+  
     } catch (error) {
       console.error("fetchUsers: " + error);
     }
-  }
+  };
+  
 
-  const fetchComments = async () => {
+  const fetchComments = async (currentPage) => {
     try {
-      const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      const token = localStorage.getItem('token');
       const response = await axios.get(`http://localhost:8080/responses/${postId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
-        params: { page, size: 5 }
+        params: { page: currentPage, size: 5 }
       });
   
-      if (page === 0) {
+      if (currentPage === 0) {
         setResponses(response.data.respList);
       } else {
         setResponses(prevResponses => [...prevResponses, ...response.data.respList]);
       }
   
-      setHasMore(!response.data.last && response.data.totalPages > page + 1);
-      if (response.data.totalPages > page + 1) {
-        setPage(prevPage => prevPage + 1);  // 只在有更多頁時增加 page
+      // 設定是否有更多頁面
+      const morePagesAvailable = response.data.totalPages > currentPage + 1;
+      setHasMore(morePagesAvailable);
+  
+      if (morePagesAvailable) {
+        setPage(currentPage + 1);
       }
-      
+  
+      // 加載用戶信息
       const userIds = response.data.respList.map(resp => resp.userId);
-      fetchUsers(userIds);
+      await fetchUsers(userIds);
+  
     } catch (error) {
       console.error("fetchComments: " + error);
       setHasMore(false);
     }
   };
+  
+  
 
   useEffect(() => {
-    // setPage(0);
-    // setResponses([]);
-    // setHasMore(true);
-    fetchComments();
+    setPage(0);
+    setResponses([]);
+    setHasMore(true);
+    fetchComments(0);
   }, [postId]);
+  
 
   const addLike = async (responseId) => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
+  
       if (!userId) {
         console.error("User ID not found in localStorage");
         return;
       }
-      // console.log("type of userId: " + typeof userId);
+  
       const response = await axios.put(`http://localhost:8080/responses/${responseId}/like`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
         }
       });
-
-      // console.log(response);
-
-      setLikedResponses(prevLikedResponses => ({
-        ...prevLikedResponses,
-        [responseId]: true
-      }));
-
-      setResponses(prevResponses => prevResponses.map(response =>
-        response.responseId === responseId ? { ...response, likes: response.likes + 1} : response
-      ))
+  
+      if (response.status === 200) {
+        setLikedResponses(prevLikedResponses => ({
+          ...prevLikedResponses,
+          [responseId]: true
+        }));
+  
+        setResponses(prevResponses => prevResponses.map(response =>
+          response.responseId === responseId ? { ...response, likes: response.likes + 1 } : response
+        ));
+      }
+  
     } catch (error) {
       console.error("addLike: " + error);
     }
-  }
+  };
+  
 
   const removeLike = async (responseId) => {
     try {
@@ -188,7 +194,7 @@ const ResponseList = forwardRef(({ postId }, ref) => {
     setPage(0);
     setResponses([]);
     setHasMore(true);
-    await fetchComments();
+    await fetchComments(0);
   };
 
   useImperativeHandle(ref, () => ({
@@ -213,17 +219,12 @@ const ResponseList = forwardRef(({ postId }, ref) => {
       loader={<h4 className="text-secondary text-center pt-5 pb-3">Loading...</h4>}
       endMessage={<p className="text-secondary text-center pt-5 pb-3">No more comments</p>}
     >
-      <div>
+      {/* <div> */}
         {responses.map((response) => (
 <div
   key={response.responseId}
   className="border-top pt-3 hide-comments px-3"
 >
-  {/* {console.log("response: ")}
-  {console.log(response)} */}
-  {/* {console.log("userId: " + response.userId)} */}
-  {/* {console.log("users: ")}
-  {console.log(users)} */}
   <div className="row bootstrap snippets">
   <div className="col-md-12">
     <div className="comment-wrapper">
@@ -293,7 +294,7 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   </div>
 </div>
       ))}
-      </div>
+      {/* </div> */}
     </InfiniteScroll>
   );
 });
