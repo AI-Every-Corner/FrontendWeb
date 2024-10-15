@@ -47,28 +47,42 @@ const ResponseList = forwardRef(({ postId }, ref) => {
       // console.log(page);
       // console.log("response.data.respList[0].responseId");
       // console.log(response.data.respList[0].responseId);
-      if (page >= response.data.totalPages) {
-        setHasMore(false);
-        return;
-      } else if (!fetchedResponses.find(item => item.postId === postId && item.responseId === response.data.respList[0].responseId)) {
-        // console.log(response);
-        setResponses([...responses, ...response.data.respList]);  // Append new posts
 
-        // Update hasMore based on the API response
-        setHasMore(!response.data.last && response.data.totalPages > page + 1);
-
-        // Fetch user details for the new responses
-        const userIds = response.data.respList.map(resp => resp.userId);
-        fetchUsers(userIds);
-          
-        // Increment the page number
-        setPage(prevPage => prevPage + 1);
-
-        storeResponseIds(postId, response.data.respList[0].responseId);
+      if (page === 0) {
+        setResponses(response.data.respList);
       } else {
-        console.log("already fetched");
-        setHasMore(false);
+        setResponses(prevResponses => [...prevResponses, ...response.data.respList]);
       }
+  
+      setHasMore(!response.data.last && response.data.totalPages > page + 1);
+      setPage(prevPage => prevPage + 1);
+  
+      // Fetch user details for the new responses
+      const userIds = response.data.respList.map(resp => resp.userId);
+      fetchUsers(userIds);
+
+      // if (page >= response.data.totalPages) {
+      //   setHasMore(false);
+      //   return;
+      // } else if (!fetchedResponses.find(item => item.postId === postId && item.responseId === response.data.respList[0].responseId)) {
+      //   // console.log(response);
+      //   setResponses([...responses, ...response.data.respList]);  // Append new posts
+
+      //   // Update hasMore based on the API response
+      //   setHasMore(!response.data.last && response.data.totalPages > page + 1);
+
+      //   // Fetch user details for the new responses
+      //   const userIds = response.data.respList.map(resp => resp.userId);
+      //   fetchUsers(userIds);
+          
+      //   // Increment the page number
+      //   setPage(prevPage => prevPage + 1);
+
+      //   storeResponseIds(postId, response.data.respList[0].responseId);
+      // } else {
+      //   console.log("already fetched");
+      //   setHasMore(false);
+      // }
     } catch (error) {
       console.error("fetchComments: " + error);
       setHasMore(false); // Set hasMore to false if there's an error
@@ -80,9 +94,11 @@ const ResponseList = forwardRef(({ postId }, ref) => {
     try {
       console.log("userIds");
       console.log(userIds);
+      const userIdsArray = Array.isArray(userIds) ? userIds : [userIds];
+    
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const fetchedUsers = {};
-      await Promise.all(userIds.map(async (userId) => {
+      await Promise.all(userIdsArray.map(async (userId) => {
         console.log("fetching userIds: ");
         console.log(userIds);
         if (!users[userId]) {  // Avoid refetching already loaded users
@@ -199,14 +215,25 @@ const ResponseList = forwardRef(({ postId }, ref) => {
     }
   }
 
+  const refreshComments = async () => {
+    setPage(0);
+    setResponses([]);
+    setHasMore(true);
+    await fetchComments();
+  };
+
   useImperativeHandle(ref, () => ({
-    refreshComments: (newComment) => {
-      console.log("newComment");
-      console.log(newComment);
-      setResponses(prevResponses => [newComment, ...prevResponses]);
-      // Optionally, you might want to fetch user data for the new comment
-      fetchUsers(newComment[0].userId);
-    }
+    // refreshComments: (newComment) => {
+    //   console.log("newComment");
+    //   console.log(newComment);
+      // if (newComment && newComment.userId) {
+      //   setResponses(prevResponses => [newComment, ...prevResponses]);
+      //   fetchUsers([newComment[0].userId]);
+      // } else {
+      //   console.error("Invalid new comment data:", newComment);
+      // }
+    // }
+    refreshComments: refreshComments
   }));
 
   return (
@@ -220,11 +247,11 @@ const ResponseList = forwardRef(({ postId }, ref) => {
       <div>
         {responses.map((response) => (
 <div
-  className="border-top pt-3 hide-comments px-3"
   key={response.responseId}
+  className="border-top pt-3 hide-comments px-3"
 >
-  {/* {console.log("response: ")}
-  {console.log(response)} */}
+  {console.log("response: ")}
+  {console.log(response)}
   {/* {console.log("userId: " + response.userId)} */}
   {console.log("users: ")}
   {console.log(users)}
@@ -260,6 +287,8 @@ const ResponseList = forwardRef(({ postId }, ref) => {
               </div>
               <div>
                 <a className="comment-created-time">
+                {console.log("response.updateAt: ")}
+                {console.log(response.updateAt)}
                 &nbsp; <TimePassedComponent updateAt={response.updateAt} />&ensp;ago
                 </a>
               </div>

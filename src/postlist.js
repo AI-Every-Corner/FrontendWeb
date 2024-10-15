@@ -92,6 +92,14 @@ const PostList = () => {
     })); // hide : show
   }
 
+  const refreshAllComments = () => {
+    Object.values(responseListRefs.current).forEach(ref => {
+      if (ref && ref.refreshComments) {
+        ref.refreshComments();
+      }
+    });
+  };
+
   const handleAddComment = async (postId) => {
     if (!commentContent.trim()) {
       alert("回覆內容不能為空");
@@ -100,11 +108,14 @@ const PostList = () => {
     try {
       console.log("commentContent:", commentContent);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
+      
       const requestBody = {
         postId: postId,
         userId: userId, // 添加 userId
-        content: commentContent
+        content: commentContent,
+        updateAt: new Date().toISOString()
       }
+      console.log("requestBody: ");
       console.log(requestBody);
 
       const response = await axios.post(`http://localhost:8080/createResponse`, requestBody, {
@@ -113,7 +124,7 @@ const PostList = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(response);
+      console.log("New comment response:", response.data);
       setCommentContent(""); // 清空輸入框
       // Update the post's comment count
       setPosts(prevPosts => prevPosts.map(post => 
@@ -124,6 +135,7 @@ const PostList = () => {
       if (responseListRefs.current[postId]) {
         responseListRefs.current[postId].refreshComments(response.data);
       }
+      refreshAllComments();
     } catch (error) {
       console.error("Failed to add comment:", error);
     }

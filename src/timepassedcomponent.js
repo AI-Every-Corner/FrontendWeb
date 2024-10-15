@@ -41,6 +41,8 @@ const TimePassedComponent = ({ updateAt }) => {
                   if (second > tmpTime.split(':')[2] - 0) {
                     const seconds = second - tmpTime.split(':')[2] - 0;
                     return seconds + ' seconds';
+                  } else {
+                    return '0 seconds';
                   }
                 }
               }
