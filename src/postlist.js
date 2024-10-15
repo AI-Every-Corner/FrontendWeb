@@ -16,7 +16,7 @@ const PostList = () => {
   // const { isLoggedIn } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
   const [openComments, setOpenComments] = useState({});
   const [likedPosts, setLikedPosts] = useState({});
-  const [commentContent, setCommentContent] = useState("");
+  const [commentContent, setCommentContent] = useState({});
   const responseListRefs = useRef({});
 
   // initialize page
@@ -101,45 +101,53 @@ const PostList = () => {
   };
 
   const handleAddComment = async (postId) => {
-    if (!commentContent.trim()) {
+    const content = commentContent[postId]?.trim(); // 提取對應 postId 的評論內容並修剪
+  
+    if (!content) {
       alert("回覆內容不能為空");
       return;
     }
+  
     try {
-      console.log("commentContent:", commentContent);
+      console.log("commentContent:", content);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-      
+  
       const requestBody = {
         postId: postId,
         userId: userId, // 添加 userId
-        content: commentContent,
+        content: content,
         updateAt: new Date().toISOString()
-      }
-      console.log("requestBody: ");
-      console.log(requestBody);
-
-      const response = await axios.post(`http://localhost:8080/createResponse`, requestBody, {
+      };
+      console.log("requestBody: ", requestBody);
+  
+      // 發送添加評論的請求
+      const response = await axios.post(`http://localhost:8080/responses/${postId}`, requestBody, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      // console.log("New comment response:", response.data);
-      setCommentContent(""); // 清空輸入框
-      // Update the post's comment count
-      setPosts(prevPosts => prevPosts.map(post => 
+  
+      // 清空對應輸入框的內容
+      setCommentContent(prev => ({ ...prev, [postId]: "" }));
+      
+      // 更新帖子的評論計數
+      setPosts(prevPosts => prevPosts.map(post =>
         post.postId === postId ? { ...post, commentCount: post.commentCount + 1 } : post
       ));
-
-      // Trigger a refresh of the ResponseList
+  
+      // 觸發對應 ResponseList 的刷新，以重新加載所有評論
       if (responseListRefs.current[postId]) {
-        responseListRefs.current[postId].refreshComments(response.data);
+        responseListRefs.current[postId].refreshComments();
       }
-      refreshAllComments();
+  
     } catch (error) {
       console.error("Failed to add comment:", error);
     }
   };
+  
+  
+  
 
   // Function to reset the page to 0
   const resetPageOnBack = () => {
@@ -278,7 +286,7 @@ const PostList = () => {
         <div key={post.postId}>
         {console.log("post")}
         {console.log(post)}
-<div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
+<div className="post border-bottom p-3 bg-white w-shadow">
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
     {users[post.userId] ? (
@@ -291,9 +299,9 @@ const PostList = () => {
     )}
     <div className="media-body pb-3 mb-0 small lh-125">
     <div className="d-flex justify-content-between align-items-center w-100">
-      <a to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
+    <Link to={`/profile?userId=${post.userId}`} className="h5 text-gray-dark post-user-name">
         {post.nickname}
-      </a>
+      </Link>
     </div>
     <span className="d-block">
       <TimePassedComponent updateAt={post.updateAt} /> ago, {post.updateAt}<i className="bx bx-globe ml-3" />
@@ -389,9 +397,9 @@ const PostList = () => {
                       type="text"
                       className="form-control comment-input"
                       placeholder="Write a comment..."
-                      value={commentContent}
-                      onChange={(e) => setCommentContent(e.target.value)}
-                      onKeyPress={(e) => handleKeyPress(e, post.postId)}
+                      value={commentContent[post.postId] || ""}
+                      onChange={(e) => setCommentContent(prev => ({ ...prev, [post.postId]: e.target.value }))}
+                      onKeyDown={(e) => handleKeyPress(e, post.postId)}
                       />
                     </div>
                   </div>
