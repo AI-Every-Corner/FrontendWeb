@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import { UserContext } from './context';
@@ -13,15 +13,19 @@ const PostList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [users, setUsers] = useState([]);
   const { avatar, userId } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+  // const { isLoggedIn } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
   const [openComments, setOpenComments] = useState({});
-  const [likedPosts, setLikedPosts] = useState([]);
+  const [likedPosts, setLikedPosts] = useState({});
   const [commentContent, setCommentContent] = useState("");
+  const responseListRefs = useRef({});
 
   // initialize page
   useEffect(() => {
     setPage(0);
     setPosts([]);
     setHasMore(true);
+    fetchPosts();
+    fetchLikedPosts();
   }, []);
 
   const fetchPosts = async () => {
@@ -88,27 +92,54 @@ const PostList = () => {
     })); // hide : show
   }
 
+  const refreshAllComments = () => {
+    Object.values(responseListRefs.current).forEach(ref => {
+      if (ref && ref.refreshComments) {
+        ref.refreshComments();
+      }
+    });
+  };
+
   const handleAddComment = async (postId) => {
     if (!commentContent.trim()) {
       alert("回覆內容不能為空");
       return;
     }
     try {
+      console.log("commentContent:", commentContent);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-      const response = await axios.post(`http://localhost:8080/responses/${postId}`, {
+      
+      const requestBody = {
+        postId: postId,
+        userId: userId, // 添加 userId
         content: commentContent,
-        userId: userId // 添加 userId
-      }, {
+        updateAt: new Date().toISOString()
+      }
+      console.log("requestBody: ");
+      console.log(requestBody);
+
+      const response = await axios.post(`http://localhost:8080/createResponse`, requestBody, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+      console.log("New comment response:", response.data);
       setCommentContent(""); // 清空輸入框
-      // TODO: 更新回覆列表或重新加載回覆
+      // Update the post's comment count
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.postId === postId ? { ...post, commentCount: post.commentCount + 1 } : post
+      ));
+
+      // Trigger a refresh of the ResponseList
+      if (responseListRefs.current[postId]) {
+        responseListRefs.current[postId].refreshComments(response.data);
+      }
+      refreshAllComments();
     } catch (error) {
       console.error("Failed to add comment:", error);
     }
-  }
+  };
 
   // Function to reset the page to 0
   const resetPageOnBack = () => {
@@ -137,7 +168,6 @@ const PostList = () => {
         console.error("User ID not found in localStorage");
         return;
       }
-      console.log("type of userId: " + typeof userId);
       const response = await axios.put(`http://localhost:8080/posts/${postId}/like`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -147,7 +177,15 @@ const PostList = () => {
 
       console.log(response);
 
-      setLikedPosts([...likedPosts, postId]);
+      setLikedPosts(prevLikedPosts => ({
+        ...prevLikedPosts,
+        [postId]: true
+      }));
+
+      // Update the posts state
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.postId === postId ? { ...post, likes: post.likes + 1 } : post
+      ));
     } catch (error) {
       console.error("addLike: " + error);
     }
@@ -157,7 +195,7 @@ const PostList = () => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
-      const response = await axios.delete(`http://localhost:8080/posts/${postId}/unlike`, null, {
+      const response = await axios.put(`http://localhost:8080/posts/${postId}/unlike`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
@@ -166,14 +204,25 @@ const PostList = () => {
       
       console.log(response);
 
-      setLikedPosts(likedPosts.filter(id => id !== postId));
+      setLikedPosts(prevLikedPosts => {
+        const newLikedPosts = { ...prevLikedPosts };
+        delete newLikedPosts[postId];
+        return newLikedPosts;
+      });
+
+      // Update the posts state
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.postId === postId ? { ...post, likes: post.likes - 1 } : post
+      ));
     } catch (error) {
       console.error("removeLike: " + error);
     }
   }
 
   const handleLike = (postId) => {
-    if (likedPosts.includes(postId)) {
+    console.log("postId:", postId);
+    console.log("likedPosts:", likedPosts);
+    if (likedPosts[postId]) {
       removeLike(postId);
     } else {
       addLike(postId);
@@ -181,8 +230,40 @@ const PostList = () => {
   }
 
   useEffect(() => {
+    console.log("likedPosts");
     console.log(likedPosts);
   }, [likedPosts]);
+
+  const fetchLikedPosts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const response = await axios.get(`http://localhost:8080/posts/getLikedPostIds/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log(response.data);
+
+      const newLikedPosts = {};
+      response.data.forEach((item) => {
+        if (item.postId) {
+          newLikedPosts[item.postId] = true;
+        }
+      });
+      console.log("newLikedPosts", newLikedPosts);
+      setLikedPosts(newLikedPosts);
+    } catch (error) {
+      console.error("fetchLikedPosts: " + error);
+    }
+  }
+
+  const handleKeyPress = (e, postId) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent the default form submission
+      handleAddComment(postId);
+    }
+  };
 
   return (
     <InfiniteScroll
@@ -200,9 +281,9 @@ const PostList = () => {
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
     {users[post.userId] ? (
     <img
-    src={users[post.userId].imagePath}
-    alt="Online user"
-    className="mr-3 post-user-image"
+      src={users[post.userId].imagePath}
+      alt="Online user"
+      className="mr-3 post-user-image"
     /> ) : (
       <p>Loading user data...</p>
     )}
@@ -218,106 +299,112 @@ const PostList = () => {
     </div>
     </Link>
   </div>
-<div className="mt-3">
-  <p>
-  {post.content}
-  </p>
-</div>
-<div className="d-block mt-3">
-  {post.imagePath ? 
-  <img
-  src={post.imagePath}
-  className="post-content"
-  alt="post image"
-  style={{ display: post.imagePath === "" ? "none" : "block" }} 
-  /> : (
-    <pre></pre>
-  )}
-</div>
-<div className="mb-3">
-
-  <div className="argon-reaction">
-  <span className="like-btn" onClick={() => handleLike(post.postId)}>
-    {
-      likedPosts.includes(post.postId) ? (
-        <a className="post-card-buttons" id="reactions">
-          <i className="bx bxs-like mr-2" /> {post.likes + 1}
-        </a>
-      ) : (
-        <a className="post-card-buttons" id="reactions">
-          <i className="bx bxs-like mr-2" /> {post.likes}
-        </a>
-      )
-    }
-    <ul className="dropdown-shadow">
-    <li
-      className="reaction reaction-like-edited"
-      data-reaction="Like"
-    />
-    </ul>
-  </span>
+  <div className="mt-3">
+    <p>
+    {post.content}
+    </p>
   </div>
-  <a
-  href="javascript:void(0)"
-  className="post-card-buttons"
-  id="show-comments"
-  >
-  <i className="bx bx-message-rounded mr-2" /> {post.commentCount || 0}
-  </a>
-  <div className="dropdown dropup share-dropup">
-    <a
-      href="#"
-      className="post-card-buttons"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <i className="bx bx-share-alt mr-2" /> Share
-    </a>
-  </div>
-</div>
-<div className="media-body">
-  <div className="comment-see-more">
-    <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)} style={{ cursor: 'pointer' }}>
-      <hr></hr>
-      {openComments[post.postId] ? 'Hide Comments' : 'See Comments'}
-    </div>
-    {openComments[post.postId] && (
-      <div className="px-3">
-        <hr></hr>
-        <div className="row justify-content-start mb-3 media">
-          <a href="#" className="pull-left">
-            <Link to="/profile">
-              <img
-              src={avatar}
-              alt="User Avatar"
-              className="comment-user-img"
-              />
-            </Link>
-          </a>
-          <div className="media-body">
-            <form action="" method="" role="form" onSubmit={(e) => { e.preventDefault(); handleAddComment(post.postId); }}>
-              <div className="row">
-                <div className="col-md-12">
-                  <div className="input-group">
-                    <input
-                    type="text"
-                    className="form-control comment-input"
-                    placeholder="Write a comment..."
-                    value={commentContent}
-                    onChange={(e) => setCommentContent(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <ResponseList postId={post.postId} />
-      </div>
+  <div className="d-block mt-3">
+    {post.imagePath ? 
+    <img
+      src={post.imagePath}
+      className="post-content"
+      alt="post image"
+      style={{ display: post.imagePath === "" ? "none" : "block" }} 
+    /> : (
+      <pre></pre>
     )}
   </div>
-</div>
+<div className="mb-3">
+  <div className="argon-reaction">
+    <span className="like-btn" onClick={() => handleLike(post.postId)}>
+      {
+        likedPosts[post.postId] ? 
+          (
+            <a className="post-card-buttons" id="reactions">
+              <i className="bx bxs-like mr-2" /> {post.likes}
+            </a>
+          )
+        :
+          (
+            <a className="post-card-buttons" id="reactions">
+              <i className="bx bxs-like mr-2" /> {post.likes}
+            </a>
+          )
+      }
+      <ul className="dropdown-shadow">
+        <li
+          className="reaction reaction-like-edited"
+          data-reaction="Like"
+        />
+      </ul>
+    </span>
+  </div>
+    <a
+    href="javascript:void(0)"
+    className="post-card-buttons"
+    id="show-comments"
+    >
+    <i className="bx bx-message-rounded mr-2" /> {post.commentCount || 0}
+    </a>
+    <div className="dropdown dropup share-dropup">
+      <a
+        href="#"
+        className="post-card-buttons"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i className="bx bx-share-alt mr-2" /> Share
+      </a>
+    </div>
+  </div>
+  <div className="media-body">
+    <div className="comment-see-more">
+      <div className="h6 text-secondary text-center" onClick={() => toggleComments(post.postId)} style={{ cursor: 'pointer' }}>
+        <hr></hr>
+        {openComments[post.postId] ? 'Hide Comments' : 'See Comments'}
+      </div>
+      {openComments[post.postId] && (
+        <div className="px-3">
+          <hr></hr>
+          <div className="row justify-content-start mb-3 media">
+            <a href="#" className="pull-left">
+              <Link to="/profile">
+                <img
+                src={avatar}
+                alt="User Avatar"
+                className="comment-user-img"
+                />
+              </Link>
+            </a>
+            <div className="media-body">
+              <form action="" method="" role="form" onSubmit={(e) => { e.preventDefault(); handleAddComment(post.postId); }}>
+                <div className="row">
+                  <div className="col-md-12">
+                    <div className="input-group">
+                      <input
+                      type="text"
+                      className="form-control comment-input"
+                      placeholder="Write a comment..."
+                      value={commentContent}
+                      onChange={(e) => setCommentContent(e.target.value)}
+                      onKeyPress={(e) => handleKeyPress(e, post.postId)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <ResponseList
+            postId={post.postId}
+            ref={el => responseListRefs.current[post.postId] = el}
+          />
+        </div>
+      )}
+    </div>
+  </div>
 </div>
         </div>
       ))}

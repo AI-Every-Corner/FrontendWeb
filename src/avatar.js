@@ -10,7 +10,7 @@ function Avatar() {
 
     const location = useLocation();
     const params = new URLSearchParams(location.search);
-    const { setAvatarUrl } = useContext(UserContext);
+    const { avatar, setAvatar } = useContext(UserContext);
     const [formData, setFormData] = useState({
         nickName: '',
         username: '',
@@ -47,7 +47,7 @@ function Avatar() {
                     imagePath: userData.imagePath
                 });
                 if (userData.imagePath) {
-                    setAvatarUrl(`http://localhost:8080${userData.imagePath}`);
+                    setAvatar(`http://localhost:8080${userData.imagePath}`);
                 }
             })
             .catch(error => {

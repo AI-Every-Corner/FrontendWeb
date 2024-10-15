@@ -1,15 +1,24 @@
-import { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, forwardRef, useImperativeHandle } from 'react';
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from 'axios';
 import TimePassedComponent from './timepassedcomponent';
 
-function ResponseList(postId) {
+const ResponseList = forwardRef(({ postId }, ref) => {
   const [responses, setResponses] = useState([]);
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [likedResponses, setLikedResponses] = useState([]);
+  const [likedResponses, setLikedResponses] = useState({});
   var fetchedResponses = fetchedResponses || [];
+  
+  // initialize page
+  useEffect(() => {
+    // setPage(0);
+    // setResponses([]);
+    // setHasMore(true);
+    // fetchComments();
+    // fetchLikedResponses();
+  }, []);
 
   const storeResponseIds = (postId, responseId) => {
     fetchedResponses.push({postId, responseId});
@@ -17,8 +26,10 @@ function ResponseList(postId) {
 
   const fetchComments = async () => {
     try {
+      // console.log("postId: ");
+      // console.log(postId);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-      const response = await axios.get(`http://localhost:8080/responses/${postId.postId}`,{
+      const response = await axios.get(`http://localhost:8080/responses/${postId}`,{
         headers: {
           'Authorization': `Bearer ${token}` // 添加 Authorization header
         },
@@ -27,35 +38,51 @@ function ResponseList(postId) {
           size: 5
         }
       });
+      // console.log("response");
+      // console.log(response);
 
-      console.log("postId.postId");
-      console.log(postId.postId);
-      console.log("page");
-      console.log(page);
-      console.log("response.data.respList[0].responseId");
-      console.log(response.data.respList[0].responseId);
-      if (page >= response.data.totalPages) {
-        setHasMore(false);
-        return;
-      } else if (!fetchedResponses.find(item => item.postId === postId.postId && item.responseId === response.data.respList[0].responseId)) {
-        console.log(response);
-        setResponses([...responses, ...response.data.respList]);  // Append new posts
+      // console.log("postId");
+      // console.log(postId);
+      // console.log("page");
+      // console.log(page);
+      // console.log("response.data.respList[0].responseId");
+      // console.log(response.data.respList[0].responseId);
 
-        // Update hasMore based on the API response
-        setHasMore(!response.data.last && response.data.totalPages > page + 1);
-
-        // Fetch user details for the new responses
-        const userIds = response.data.respList.map(resp => resp.userId);
-        fetchUsers(userIds);
-          
-        // Increment the page number
-        setPage(prevPage => prevPage + 1);
-
-        storeResponseIds(postId.postId, response.data.respList[0].responseId);
+      if (page === 0) {
+        setResponses(response.data.respList);
       } else {
-        console.log("already fetched");
-        setHasMore(false);
+        setResponses(prevResponses => [...prevResponses, ...response.data.respList]);
       }
+  
+      setHasMore(!response.data.last && response.data.totalPages > page + 1);
+      setPage(prevPage => prevPage + 1);
+  
+      // Fetch user details for the new responses
+      const userIds = response.data.respList.map(resp => resp.userId);
+      fetchUsers(userIds);
+
+      // if (page >= response.data.totalPages) {
+      //   setHasMore(false);
+      //   return;
+      // } else if (!fetchedResponses.find(item => item.postId === postId && item.responseId === response.data.respList[0].responseId)) {
+      //   // console.log(response);
+      //   setResponses([...responses, ...response.data.respList]);  // Append new posts
+
+      //   // Update hasMore based on the API response
+      //   setHasMore(!response.data.last && response.data.totalPages > page + 1);
+
+      //   // Fetch user details for the new responses
+      //   const userIds = response.data.respList.map(resp => resp.userId);
+      //   fetchUsers(userIds);
+          
+      //   // Increment the page number
+      //   setPage(prevPage => prevPage + 1);
+
+      //   storeResponseIds(postId, response.data.respList[0].responseId);
+      // } else {
+      //   console.log("already fetched");
+      //   setHasMore(false);
+      // }
     } catch (error) {
       console.error("fetchComments: " + error);
       setHasMore(false); // Set hasMore to false if there's an error
@@ -65,18 +92,24 @@ function ResponseList(postId) {
   // Fetch user data based on userIds and update the state
   const fetchUsers = async (userIds) => {
     try {
+      console.log("userIds");
+      console.log(userIds);
+      const userIdsArray = Array.isArray(userIds) ? userIds : [userIds];
+    
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const fetchedUsers = {};
-      await Promise.all(userIds.map(async (id) => {
-        // console.log("userIds: ");
-        // console.log(userIds);
-        if (!users[id]) {  // Avoid refetching already loaded users
-          const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
+      await Promise.all(userIdsArray.map(async (userId) => {
+        console.log("fetching userIds: ");
+        console.log(userIds);
+        if (!users[userId]) {  // Avoid refetching already loaded users
+          const response = await axios.get(`http://localhost:8080/api/auth/${userId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
-          fetchedUsers[id] = response.data;
+          fetchedUsers[userId] = response.data;
+          // console.log("fetchedUsers: ");
+          // console.log(fetchedUsers);
           // console.log("id: ");
           // console.log(id);
         }
@@ -94,7 +127,7 @@ function ResponseList(postId) {
     fetchComments();
   }, [postId, page]);
 
-  const addLike = async (postId, responseId) => {
+  const addLike = async (responseId) => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
@@ -102,52 +135,107 @@ function ResponseList(postId) {
         console.error("User ID not found in localStorage");
         return;
       }
-      console.log("type of userId: " + typeof userId);
-      const response = await axios.put(`http://localhost:8080/responses/${postId.postId}/${responseId}/like`, null, {
+      // console.log("type of userId: " + typeof userId);
+      const response = await axios.put(`http://localhost:8080/responses/${responseId}/like`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
         }
       });
 
-      console.log(response);
+      // console.log(response);
 
-      setLikedResponses([...likedResponses, responseId]);
+      setLikedResponses(prevLikedResponses => ({
+        ...prevLikedResponses,
+        [responseId]: true
+      }));
+
+      setResponses(prevResponses => prevResponses.map(response =>
+        response.responseId === responseId ? { ...response, likes: response.likes + 1} : response
+      ))
     } catch (error) {
       console.error("addLike: " + error);
     }
   }
 
-  const removeLike = async (postId, responseId) => {
+  const removeLike = async (responseId) => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
-      const response = await axios.delete(`http://localhost:8080/responses/${postId.postId}/${responseId}/unlike`, null, {
+      const response = await axios.delete(`http://localhost:8080/responses/${responseId}/unlike`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
         }
       });
       
-      console.log(response);
+      // console.log(response);
 
-      setLikedResponses(likedResponses.filter(id => id !== responseId));
+      setLikedResponses(prevResponses => prevResponses.map(response =>
+        response.responseId === responseId ? { ...response, likes: response.likes - 1} : response
+      ));
     } catch (error) {
       console.error("removeLike: " + error);
     }
   }
 
-  const handleLike = (postId, responseId) => {
-    if (likedResponses.includes(responseId)) {
-      removeLike(postId, responseId);
+  const handleLike = (responseId) => {
+    if (likedResponses[responseId]) {
+      removeLike(responseId);
     } else {
-      addLike(postId, responseId);
+      addLike(responseId);
     }
   }
 
   useEffect(() => {
-    console.log(likedResponses);
+    // console.log("likedResponses");
+    // console.log(likedResponses);
   }, [likedResponses]);
+
+  const fetchLikedResponses = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const result = await axios.get(`http://localhost:8080/responses/getLikedResponseIds/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const newLikedResponses = {};
+      result.data.forEach((item) => {
+        if (item.responseId) {
+          newLikedResponses[item.responseId] = true;
+        }
+      });
+      // console.log("newLikedResponses", newLikedResponses);
+      setLikedResponses(newLikedResponses);
+    } catch (error) {
+      console.error("fetchLikedResponses: " + error);
+    }
+  }
+
+  const refreshComments = async () => {
+    setPage(0);
+    setResponses([]);
+    setHasMore(true);
+    await fetchComments();
+  };
+
+  useImperativeHandle(ref, () => ({
+    // refreshComments: (newComment) => {
+    //   console.log("newComment");
+    //   console.log(newComment);
+      // if (newComment && newComment.userId) {
+      //   setResponses(prevResponses => [newComment, ...prevResponses]);
+      //   fetchUsers([newComment[0].userId]);
+      // } else {
+      //   console.error("Invalid new comment data:", newComment);
+      // }
+    // }
+    refreshComments: refreshComments
+  }));
+
   return (
     <InfiniteScroll
       dataLength={responses.length}
@@ -159,10 +247,14 @@ function ResponseList(postId) {
       <div>
         {responses.map((response) => (
 <div
-  className="border-top pt-3 hide-comments px-3"
   key={response.responseId}
+  className="border-top pt-3 hide-comments px-3"
 >
-  {/* {response.currentPage >= response.totalPages? hasMore = false : hasMore = true} */}
+  {console.log("response: ")}
+  {console.log(response)}
+  {/* {console.log("userId: " + response.userId)} */}
+  {console.log("users: ")}
+  {console.log(users)}
   <div className="row bootstrap snippets">
   <div className="col-md-12">
     <div className="comment-wrapper">
@@ -195,7 +287,9 @@ function ResponseList(postId) {
               </div>
               <div>
                 <a className="comment-created-time">
-                &nbsp; <TimePassedComponent updateAt={response.updateAt} />
+                {console.log("response.updateAt: ")}
+                {console.log(response.updateAt)}
+                &nbsp; <TimePassedComponent updateAt={response.updateAt} />&ensp;ago
                 </a>
               </div>
             </div>
@@ -209,10 +303,10 @@ function ResponseList(postId) {
           <div className="d-flex flex-row justify-content-between">
             <div className="d-flex align-items-center w-100 commentLR mb-3">
               <span className="like-btn">
-                <a className="post-card-buttons p-1" id="reactions" onClick={() => handleLike(postId, response.responseId)}>
+                <a className="post-card-buttons p-1" id="reactions" onClick={() => handleLike(response.responseId)}>
                   <i className="bx bxs-like mr-2 text-start" /> 
-                  {likedResponses.includes(response.responseId) ? 
-                  <span>{response.likes + 1}</span> : 
+                  {likedResponses[response.responseId] ? 
+                  <span>{response.likes}</span> : 
                   <span>{response.likes}</span>}
                 </a>
               </span>
@@ -221,18 +315,6 @@ function ResponseList(postId) {
         </div>
         </li>
         <li className="media">
-        {/* {response.length > 0?
-        <div className="media-body">
-          <div className="comment-see-more text-center" onClick={() => fetchComments()}>
-            <button
-              type="button"
-              className="btn btn-link fs-8"
-            >
-              See More
-            </button>
-          </div>
-        </div>
-        : null} */}
         </li>
       </ul>
       </div>
@@ -245,6 +327,6 @@ function ResponseList(postId) {
       </div>
     </InfiniteScroll>
   );
-}
+});
 
 export default ResponseList;
