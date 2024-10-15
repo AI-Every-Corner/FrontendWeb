@@ -26,6 +26,7 @@ const ResponseList = forwardRef(({ postId }, ref) => {
 
   const fetchComments = async () => {
     try {
+      fetchLikedResponses();
       // console.log("postId: ");
       // console.log(postId);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
@@ -83,6 +84,9 @@ const ResponseList = forwardRef(({ postId }, ref) => {
       //   console.log("already fetched");
       //   setHasMore(false);
       // }
+
+      console.log("likedResponses");
+      console.log(likedResponses);
     } catch (error) {
       console.error("fetchComments: " + error);
       setHasMore(false); // Set hasMore to false if there's an error
@@ -92,15 +96,15 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   // Fetch user data based on userIds and update the state
   const fetchUsers = async (userIds) => {
     try {
-      console.log("userIds");
-      console.log(userIds);
+      // console.log("userIds");
+      // console.log(userIds);
       const userIdsArray = Array.isArray(userIds) ? userIds : [userIds];
     
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const fetchedUsers = {};
       await Promise.all(userIdsArray.map(async (userId) => {
-        console.log("fetching userIds: ");
-        console.log(userIds);
+        // console.log("fetching userIds: ");
+        // console.log(userIds);
         if (!users[userId]) {  // Avoid refetching already loaded users
           const response = await axios.get(`http://localhost:8080/api/auth/${userId}`, {
             headers: {
@@ -162,17 +166,24 @@ const ResponseList = forwardRef(({ postId }, ref) => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
-      const response = await axios.delete(`http://localhost:8080/responses/${responseId}/unlike`, null, {
+      const response = await axios.put(`http://localhost:8080/responses/${responseId}/unlike`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'userId': userId
         }
       });
       
-      // console.log(response);
+      console.log(response);
 
-      setLikedResponses(prevResponses => prevResponses.map(response =>
-        response.responseId === responseId ? { ...response, likes: response.likes - 1} : response
+      setLikedResponses(prevLikedResponses => {
+        const newLikedResponses = { ...prevLikedResponses };
+        delete newLikedResponses[responseId];
+        return newLikedResponses;
+      });
+
+      // Update responses state
+      setResponses(prevResponses => prevResponses.map(response =>
+        response.responseId === responseId ? { ...response, likes: response.likes - 1 } : response
       ));
     } catch (error) {
       console.error("removeLike: " + error);
@@ -250,11 +261,11 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   key={response.responseId}
   className="border-top pt-3 hide-comments px-3"
 >
-  {console.log("response: ")}
-  {console.log(response)}
+  {/* {console.log("response: ")}
+  {console.log(response)} */}
   {/* {console.log("userId: " + response.userId)} */}
-  {console.log("users: ")}
-  {console.log(users)}
+  {/* {console.log("users: ")}
+  {console.log(users)} */}
   <div className="row bootstrap snippets">
   <div className="col-md-12">
     <div className="comment-wrapper">
@@ -287,8 +298,8 @@ const ResponseList = forwardRef(({ postId }, ref) => {
               </div>
               <div>
                 <a className="comment-created-time">
-                {console.log("response.updateAt: ")}
-                {console.log(response.updateAt)}
+                {/* {console.log("response.updateAt: ")}
+                {console.log(response.updateAt)} */}
                 &nbsp; <TimePassedComponent updateAt={response.updateAt} />&ensp;ago
                 </a>
               </div>
