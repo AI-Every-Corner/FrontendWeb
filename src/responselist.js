@@ -8,8 +8,17 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [likedResponses, setLikedResponses] = useState([]);
+  const [likedResponses, setLikedResponses] = useState({});
   var fetchedResponses = fetchedResponses || [];
+  
+  // initialize page
+  useEffect(() => {
+    setPage(0);
+    setResponses([]);
+    setHasMore(true);
+    fetchComments();
+    fetchLikedResponses();
+  }, []);
 
   const storeResponseIds = (postId, responseId) => {
     fetchedResponses.push({postId, responseId});
@@ -17,8 +26,10 @@ const ResponseList = forwardRef(({ postId }, ref) => {
 
   const fetchComments = async () => {
     try {
+      // console.log("postId: ");
+      // console.log(postId);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-      const response = await axios.get(`http://localhost:8080/responses/${postId.postId}`,{
+      const response = await axios.get(`http://localhost:8080/responses/${postId}`,{
         headers: {
           'Authorization': `Bearer ${token}` // 添加 Authorization header
         },
@@ -27,17 +38,19 @@ const ResponseList = forwardRef(({ postId }, ref) => {
           size: 5
         }
       });
+      // console.log("response");
+      // console.log(response);
 
-      console.log("postId.postId");
-      console.log(postId.postId);
-      console.log("page");
-      console.log(page);
-      console.log("response.data.respList[0].responseId");
-      console.log(response.data.respList[0].responseId);
+      // console.log("postId");
+      // console.log(postId);
+      // console.log("page");
+      // console.log(page);
+      // console.log("response.data.respList[0].responseId");
+      // console.log(response.data.respList[0].responseId);
       if (page >= response.data.totalPages) {
         setHasMore(false);
         return;
-      } else if (!fetchedResponses.find(item => item.postId === postId.postId && item.responseId === response.data.respList[0].responseId)) {
+      } else if (!fetchedResponses.find(item => item.postId === postId && item.responseId === response.data.respList[0].responseId)) {
         console.log(response);
         setResponses([...responses, ...response.data.respList]);  // Append new posts
 
@@ -51,7 +64,7 @@ const ResponseList = forwardRef(({ postId }, ref) => {
         // Increment the page number
         setPage(prevPage => prevPage + 1);
 
-        storeResponseIds(postId.postId, response.data.respList[0].responseId);
+        storeResponseIds(postId, response.data.respList[0].responseId);
       } else {
         console.log("already fetched");
         setHasMore(false);
@@ -110,9 +123,16 @@ const ResponseList = forwardRef(({ postId }, ref) => {
         }
       });
 
-      console.log(response);
+      // console.log(response);
 
-      setLikedResponses([...likedResponses, responseId]);
+      setLikedResponses(prevLikedResponses => ({
+        ...prevLikedResponses,
+        [responseId]: true
+      }));
+
+      setResponses(prevResponses => prevResponses.map(response =>
+        response.responseId === responseId ? { ...response, likes: response.likes + 1} : response
+      ))
     } catch (error) {
       console.error("addLike: " + error);
     }
@@ -129,25 +149,51 @@ const ResponseList = forwardRef(({ postId }, ref) => {
         }
       });
       
-      console.log(response);
+      // console.log(response);
 
-      setLikedResponses(likedResponses.filter(id => id !== responseId));
+      setLikedResponses(prevResponses => prevResponses.map(response =>
+        response.responseId === responseId ? { ...response, likes: response.likes - 1} : response
+      ));
     } catch (error) {
       console.error("removeLike: " + error);
     }
   }
 
-  const handleLike = (postId, responseId) => {
-    if (likedResponses.includes(responseId)) {
-      removeLike(postId, responseId);
+  const handleLike = (responseId) => {
+    if (likedResponses[responseId]) {
+      removeLike(responseId);
     } else {
-      addLike(postId, responseId);
+      addLike(responseId);
     }
   }
 
   useEffect(() => {
-    console.log(likedResponses);
+    // console.log("likedResponses");
+    // console.log(likedResponses);
   }, [likedResponses]);
+
+  const fetchLikedResponses = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      const result = await axios.get(`http://localhost:8080/responses/getLikedResponseIds/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const newLikedResponses = {};
+      result.data.forEach((item) => {
+        if (item.responseId) {
+          newLikedResponses[item.responseId] = true;
+        }
+      });
+      // console.log("newLikedResponses", newLikedResponses);
+      setLikedResponses(newLikedResponses);
+    } catch (error) {
+      console.error("fetchLikedResponses: " + error);
+    }
+  }
 
   useImperativeHandle(ref, () => ({
     refreshComments: (newComment) => {
@@ -218,10 +264,10 @@ const ResponseList = forwardRef(({ postId }, ref) => {
           <div className="d-flex flex-row justify-content-between">
             <div className="d-flex align-items-center w-100 commentLR mb-3">
               <span className="like-btn">
-                <a className="post-card-buttons p-1" id="reactions" onClick={() => handleLike(postId, response.responseId)}>
+                <a className="post-card-buttons p-1" id="reactions" onClick={() => handleLike(response.responseId)}>
                   <i className="bx bxs-like mr-2 text-start" /> 
-                  {likedResponses.includes(response.responseId) ? 
-                  <span>{response.likes + 1}</span> : 
+                  {likedResponses[response.responseId] ? 
+                  <span>{response.likes}</span> : 
                   <span>{response.likes}</span>}
                 </a>
               </span>
