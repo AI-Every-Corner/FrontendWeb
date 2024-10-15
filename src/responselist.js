@@ -13,11 +13,11 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   
   // initialize page
   useEffect(() => {
-    setPage(0);
-    setResponses([]);
-    setHasMore(true);
-    fetchComments();
-    fetchLikedResponses();
+    // setPage(0);
+    // setResponses([]);
+    // setHasMore(true);
+    // fetchComments();
+    // fetchLikedResponses();
   }, []);
 
   const storeResponseIds = (postId, responseId) => {
@@ -51,7 +51,7 @@ const ResponseList = forwardRef(({ postId }, ref) => {
         setHasMore(false);
         return;
       } else if (!fetchedResponses.find(item => item.postId === postId && item.responseId === response.data.respList[0].responseId)) {
-        console.log(response);
+        // console.log(response);
         setResponses([...responses, ...response.data.respList]);  // Append new posts
 
         // Update hasMore based on the API response
@@ -78,18 +78,22 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   // Fetch user data based on userIds and update the state
   const fetchUsers = async (userIds) => {
     try {
+      console.log("userIds");
+      console.log(userIds);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       const fetchedUsers = {};
-      await Promise.all(userIds.map(async (id) => {
-        // console.log("userIds: ");
-        // console.log(userIds);
-        if (!users[id]) {  // Avoid refetching already loaded users
-          const response = await axios.get(`http://localhost:8080/api/auth/${id}`, {
+      await Promise.all(userIds.map(async (userId) => {
+        console.log("fetching userIds: ");
+        console.log(userIds);
+        if (!users[userId]) {  // Avoid refetching already loaded users
+          const response = await axios.get(`http://localhost:8080/api/auth/${userId}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
-          fetchedUsers[id] = response.data;
+          fetchedUsers[userId] = response.data;
+          // console.log("fetchedUsers: ");
+          // console.log(fetchedUsers);
           // console.log("id: ");
           // console.log(id);
         }
@@ -115,7 +119,7 @@ const ResponseList = forwardRef(({ postId }, ref) => {
         console.error("User ID not found in localStorage");
         return;
       }
-      console.log("type of userId: " + typeof userId);
+      // console.log("type of userId: " + typeof userId);
       const response = await axios.put(`http://localhost:8080/responses/${responseId}/like`, null, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -197,9 +201,11 @@ const ResponseList = forwardRef(({ postId }, ref) => {
 
   useImperativeHandle(ref, () => ({
     refreshComments: (newComment) => {
+      console.log("newComment");
+      console.log(newComment);
       setResponses(prevResponses => [newComment, ...prevResponses]);
       // Optionally, you might want to fetch user data for the new comment
-      fetchUsers([newComment.userId]);
+      fetchUsers(newComment[0].userId);
     }
   }));
 
@@ -217,7 +223,11 @@ const ResponseList = forwardRef(({ postId }, ref) => {
   className="border-top pt-3 hide-comments px-3"
   key={response.responseId}
 >
-  {/* {response.currentPage >= response.totalPages? hasMore = false : hasMore = true} */}
+  {/* {console.log("response: ")}
+  {console.log(response)} */}
+  {/* {console.log("userId: " + response.userId)} */}
+  {console.log("users: ")}
+  {console.log(users)}
   <div className="row bootstrap snippets">
   <div className="col-md-12">
     <div className="comment-wrapper">

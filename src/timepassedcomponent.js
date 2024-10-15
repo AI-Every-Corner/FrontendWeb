@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const TimePassedComponent = ({ updateAt }) => {
   const [timePassed, setTimePassed] = useState('');
+  // console.log("updateAt: " + updateAt);
 
   useEffect(() => {
     const timeThatPast = (updateAt) => {

@@ -387,7 +387,7 @@ const PostList = () => {
           </div>
           <ResponseList
             postId={post.postId}
-            ref={el => responseListRefs.current[post.postId] = el} 
+            ref={el => responseListRefs.current[post.postId] = el}
           />
         </div>
       )}
