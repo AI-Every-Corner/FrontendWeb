@@ -276,6 +276,8 @@ const PostList = () => {
     >
       {posts.map((post) => (
         <div key={post.postId}>
+        {console.log("post")}
+        {console.log(post)}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">
