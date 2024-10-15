@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import TimePassedComponent from "./timepassedcomponent";
@@ -22,6 +22,7 @@ const ProfileList = () => {
     const [likedPosts, setLikedPosts] = useState([]);
     const [commentContent, setCommentContent] = useState("");
     const { avatar } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
+    const responseListRefs = useRef({});
 
     const fetchPosts = async () => {
         try {
@@ -84,23 +85,51 @@ const ProfileList = () => {
         })); // hide : show
     }
 
+    const refreshAllComments = () => {
+        Object.values(responseListRefs.current).forEach(ref => {
+            if (ref && ref.refreshComments) {
+                ref.refreshComments();
+            }
+        });
+    };
+
     const handleAddComment = async (postId) => {
         if (!commentContent.trim()) {
             alert("回覆內容不能為空");
             return;
         }
         try {
+
+            console.log("commentContent:", commentContent);
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
-            const response = await axios.post(`http://localhost:8080/responses/${postId}`, {
+
+            const requestBody = {
+                postId: postId,
+                userId: userId, // 添加 userId
                 content: commentContent,
-                userId: userId // 添加 userId
-            }, {
+                updateAt: new Date().toISOString()
+            }
+            console.log("requestBody: ");
+            console.log(requestBody);
+
+            const response = await axios.post(`http://localhost:8080/createResponse`, requestBody, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
             setCommentContent(""); // 清空輸入框
             // TODO: 更新回覆列表或重新加載回覆
+
+            setPosts(prevPosts => prevPosts.map(post =>
+                post.postId === postId ? { ...post, commentCount: post.commentCount + 1 } : post
+            ));
+
+            // Trigger a refresh of the ResponseList
+            if (responseListRefs.current[postId]) {
+                responseListRefs.current[postId].refreshComments(response.data);
+            }
+            refreshAllComments();
         } catch (error) {
             console.error("Failed to add comment:", error);
         }
@@ -141,9 +170,17 @@ const ProfileList = () => {
                 }
             });
 
-            console.log(response);
+            //console.log(response);
 
-            setLikedPosts([...likedPosts, postId]);
+            setLikedPosts(prevLikedPosts => ({
+                ...prevLikedPosts,
+                [postId]: true
+            }));
+
+            // Update the posts state
+            setPosts(prevPosts => prevPosts.map(post =>
+                post.postId === postId ? { ...post, likes: post.likes + 1 } : post
+            ));
         } catch (error) {
             console.error("addLike: " + error);
         }
@@ -162,14 +199,25 @@ const ProfileList = () => {
 
             console.log(response);
 
-            setLikedPosts(likedPosts.filter(id => id !== postId));
+            setLikedPosts(prevLikedPosts => {
+                const newLikedPosts = { ...prevLikedPosts };
+                delete newLikedPosts[postId];
+                return newLikedPosts;
+            });
+
+            // Update the posts state
+            setPosts(prevPosts => prevPosts.map(post =>
+                post.postId === postId ? { ...post, likes: post.likes - 1 } : post
+            ));
         } catch (error) {
             console.error("removeLike: " + error);
         }
     }
 
     const handleLike = (postId) => {
-        if (likedPosts.includes(postId)) {
+        console.log("postId:", postId);
+        console.log("likedPosts:", likedPosts);
+        if (likedPosts[postId]) {
             removeLike(postId);
         } else {
             addLike(postId);
@@ -177,8 +225,40 @@ const ProfileList = () => {
     }
 
     useEffect(() => {
+        console.log("likedPosts");
         console.log(likedPosts);
     }, [likedPosts]);
+
+    const fetchLikedPosts = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const response = await axios.get(`http://localhost:8080/posts/getLikedPostIds/${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            // console.log(response.data);
+
+            const newLikedPosts = {};
+            response.data.forEach((item) => {
+                if (item.postId) {
+                    newLikedPosts[item.postId] = true;
+                }
+            });
+            console.log("newLikedPosts", newLikedPosts);
+            setLikedPosts(newLikedPosts);
+        } catch (error) {
+            console.error("fetchLikedPosts: " + error);
+        }
+    }
+
+    const handleKeyPress = (e, postId) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent the default form submission
+            handleAddComment(postId);
+        }
+    };
 
     return (
         <InfiniteScroll
@@ -236,15 +316,18 @@ const ProfileList = () => {
                             <div className="argon-reaction">
                                 <span className="like-btn" onClick={() => handleLike(post.postId)}>
                                     {
-                                        likedPosts.includes(post.postId) ? (
-                                            <a className="post-card-buttons" id="reactions">
-                                                <i className="bx bxs-like mr-2" /> {post.likes + 1}
-                                            </a>
-                                        ) : (
-                                            <a className="post-card-buttons" id="reactions">
-                                                <i className="bx bxs-like mr-2" /> {post.likes}
-                                            </a>
-                                        )
+                                        likedPosts[post.postId] ?
+                                            (
+                                                <a className="post-card-buttons" id="reactions">
+                                                    <i className="bx bxs-like mr-2" /> {post.likes}
+                                                </a>
+                                            )
+                                            :
+                                            (
+                                                <a className="post-card-buttons" id="reactions">
+                                                    <i className="bx bxs-like mr-2" /> {post.likes}
+                                                </a>
+                                            )
                                     }
                                     <ul className="dropdown-shadow">
                                         <li
@@ -304,6 +387,7 @@ const ProfileList = () => {
                                                                     placeholder="Write a comment..."
                                                                     value={commentContent}
                                                                     onChange={(e) => setCommentContent(e.target.value)}
+                                                                    onKeyPress={(e) => handleKeyPress(e, post.postId)}
                                                                 />
                                                             </div>
                                                         </div>
@@ -311,7 +395,10 @@ const ProfileList = () => {
                                                 </form>
                                             </div>
                                         </div>
-                                        <ResponseList postId={post.postId} />
+                                        <ResponseList
+                                            postId={post.postId}
+                                            ref={el => responseListRefs.current[post.postId] = el}
+                                        />
                                     </div>
                                 )}
                             </div>
