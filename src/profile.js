@@ -149,13 +149,13 @@ function Profile() {
                                                     </p>
                                                 </div>
                                                 <Follow />
-                                                <div className="intro mt-5 mv-hidden">
+                                                {/* <div className="intro mt-5 mv-hidden">
                                                     <div className="intro-item d-flex justify-content-between align-items-center">
                                                         <h3 className="intro-about">Intro</h3>
                                                     </div>
                                                     <Intro />
 
-                                                </div>
+                                                </div> */}
                                                 <MiniPhoto />
                                             </div>
                                         </div>
@@ -168,9 +168,9 @@ function Profile() {
                                                             <li className="list-inline-item profile-active">
                                                                 <a href={`/profile?userId=${userId}`}>Timeline</a>
                                                             </li>
-                                                            <li className="list-inline-item">
+                                                            {/* <li className="list-inline-item">
                                                                 <a href={`/about?userId=${userId}`}>About</a>
-                                                            </li>
+                                                            </li> */}
                                                             <li className="list-inline-item">
                                                                 <a href={`/friends?userId=${userId}`}>Friends</a>
                                                             </li>

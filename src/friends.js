@@ -135,12 +135,12 @@ function Friends() {
                       <div className="intro mt-4">
                       <Follow />
                       </div>
-                      <div className="intro mt-5 mv-hidden">
+                      {/*<div className="intro mt-5 mv-hidden">
                         <div className="intro-item d-flex justify-content-between align-items-center">
                           <h3 className="intro-about">Intro</h3>
                         </div>
                         <Intro />
-                      </div>
+                      </div>*/}
                       <MiniPhoto />
                     </div>
                   </div>
@@ -153,15 +153,15 @@ function Friends() {
                             <li className="list-inline-item">
                               <a href={`/profile?userId=${userId}`}>Timeline</a>
                             </li>
-                            <li className="list-inline-item">
-                              <a href={`/about?userId=${userId}`}>About</a></li>
+                            {/* <li className="list-inline-item">
+                              <a href={`/about?userId=${userId}`}>About</a></li> */}
                             <li className="list-inline-item profile-active">
                               <a href={`/friends?userId=${userId}`}>Friends</a>
                             </li>
                             <li className="list-inline-item">
                               <a href={`/photo?userId=${userId}`}>Photos</a>
                             </li>
-                            <li className="list-inline-item dropdown">
+                            {/* <li className="list-inline-item dropdown">
                               <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i className='bx bx-dots-vertical-rounded'></i>
                               </a>
@@ -172,7 +172,7 @@ function Friends() {
                                 <a href="#" className="dropdown-item">Events</a>
                                 <a href="#" className="dropdown-item">Likes</a>
                               </div>
-                            </li>
+                            </li> */}
                           </ul>
                           <div className="bg-white py-3 px-4 shadow-sm">
                             <div className="card-head d-flex justify-content-between">
