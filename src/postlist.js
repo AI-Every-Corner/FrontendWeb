@@ -40,7 +40,7 @@ const PostList = () => {
           size: 10
         }
       });
-      console.log(response);
+      // console.log(response);
       setPosts([...posts, ...response.data.postsList]);  // Append new posts
 
       if (response.data.last || response.data.totalPages - 1 === page) {
@@ -106,7 +106,7 @@ const PostList = () => {
       return;
     }
     try {
-      console.log("commentContent:", commentContent);
+      // console.log("commentContent:", commentContent);
       const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token
       
       const requestBody = {
@@ -115,7 +115,7 @@ const PostList = () => {
         content: commentContent,
         updateAt: new Date().toISOString()
       }
-      console.log("requestBody: ");
+      // console.log("requestBody: ");
       console.log(requestBody);
 
       const response = await axios.post(`http://localhost:8080/createResponse`, requestBody, {
@@ -220,8 +220,8 @@ const PostList = () => {
   }
 
   const handleLike = (postId) => {
-    console.log("postId:", postId);
-    console.log("likedPosts:", likedPosts);
+    // console.log("postId:", postId);
+    // console.log("likedPosts:", likedPosts);
     if (likedPosts[postId]) {
       removeLike(postId);
     } else {
@@ -230,8 +230,8 @@ const PostList = () => {
   }
 
   useEffect(() => {
-    console.log("likedPosts");
-    console.log(likedPosts);
+    // console.log("likedPosts");
+    // console.log(likedPosts);
   }, [likedPosts]);
 
   const fetchLikedPosts = async () => {
@@ -276,8 +276,8 @@ const PostList = () => {
     >
       {posts.map((post) => (
         <div key={post.postId}>
-        {console.log("post")}
-        {console.log(post)}
+        {/* {console.log("post")}
+        {console.log(post)} */}
 <div className="post border-bottom p-3 bg-white w-shadow" key={post.postId}>
   <div className="media text-muted pt-3">
     <Link to={`/profile?userId=${post.userId}`} className="d-flex flex-row">

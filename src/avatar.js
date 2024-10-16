@@ -47,7 +47,11 @@ function Avatar() {
                     imagePath: userData.imagePath
                 });
                 if (userData.imagePath) {
-                    setAvatar(`http://localhost:8080${userData.imagePath}`);
+                    if (userData.imagePath.startsWith('http') || userData.imagePath.startsWith('https')) {
+                        setAvatar(userData.imagePath);  // No need to prepend anything
+                    } else {
+                        setAvatar(`http://localhost:8080${userData.imagePath}`);  // Prepend base URL for relative paths
+                    }
                 }
             })
             .catch(error => {

@@ -28,12 +28,12 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <UserProvider>
     <Router>
+      <Header />
       <Routes>
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/*' element={
           <>
-            <Header />
             <div className="main-content">
               <Routes>
                 <Route path='/' element={<PrivateRoute element={MainPage} />} />

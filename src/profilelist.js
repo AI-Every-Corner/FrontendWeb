@@ -24,6 +24,10 @@ const ProfileList = () => {
     const { avatar } = useContext(UserContext); // 使用 useContext 來獲取 此用者相片
     const responseListRefs = useRef({});
 
+    useEffect(() => {
+        console.log("Profile Avatar:", avatar);
+      }, [avatar]);
+      
     const fetchPosts = async () => {
         try {
             const token = localStorage.getItem('token'); // 從 localStorage 中讀取 token

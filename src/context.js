@@ -21,9 +21,17 @@ export const UserProvider = ({ children }) => {
     const storedUserId = localStorage.getItem('userId');  // 從 localStorage 獲取 userId
     const storedCover = localStorage.getItem('coverImage');
 
+    console.log("Avatar from localStorage:", storedAvatar);
+
     if (storedAvatar) {
-      setAvatar(`${storedAvatar}`);
-      //setAvatarUrl(`http://localhost:8080${storedAvatarUrl}`);
+      // Check if it's already an absolute URL
+      console.log("storedAvatar");
+      console.log(storedAvatar);
+      if (storedAvatar.startsWith('http') || storedAvatar.startsWith('https')) {
+          setAvatar(storedAvatar);  // No need to prepend anything
+      } else {
+          setAvatar(`http://localhost:8080${storedAvatar}`);  // Prepend base URL for relative paths
+      }
     }
 
     if (storedCover) {
